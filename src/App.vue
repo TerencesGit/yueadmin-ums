@@ -1,13 +1,22 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <router-view></router-view>
+    <AsideComp></AsideComp>
+    <HeaderComp></HeaderComp>
+    <MainComp></MainComp>
   </div>
 </template>
 
 <script>
+import AsideComp from '@/components/Aside'
+import HeaderComp from '@/components/Header'
+import MainComp from '@/components/Main'
 export default {
-  name: 'app'
+  name: 'app',
+  components: {
+    AsideComp,
+    HeaderComp,
+    MainComp
+  }
 }
 </script>
 
@@ -16,8 +25,35 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+body {
+  margin: 0;
+  color: #333;
+}
+a {
+  text-decoration: none
+}
+.clearfix:after,
+.clearfix:before,
+.container-fluid:after,
+.container-fluid:before {
+  display: table;
+  content: '';
+}
+.clearfix:after,
+.container-fluid:after {
+  clear: both
+}
+.pull-right {
+  float: right
+}
+.pull-left {
+  float: left
+}
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
