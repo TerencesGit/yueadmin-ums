@@ -1,5 +1,5 @@
 <template>
-	<div class="main">
+	<div class="main transition" :class="{'spread': isHideSidebar}">
 		<div class="wrapper">
 			<div class="container-fluid">
 				<transition name="router-fade" mode="out-in">
@@ -17,14 +17,15 @@
 	</div>
 </template>
 <script>
-	export default {
-	  methods: {
+export default {
+  methods: {
 	    backTop () {
       document.body.scrollTop = 0
       document.documentElement.scrollTop = 0
     }
-  }
-	}
+  },
+  props: ['isHideSidebar']
+}
 </script>
 <style scoped lang="scss">
 	.main {
@@ -33,7 +34,6 @@
     left: 240px;
     right: 0;
     height: calc(100% - 60px);
-    transition: left .3s;
     .wrapper {
 	    min-height: 100%;
 	    height: auto !important;

@@ -1,40 +1,38 @@
 <template>
-	<header class="header clearfix">
+	<header class="header clearfix transition" :class="{'spread': isHideSidebar}">
 		<div class="pull-left">
-			<el-button type="primary" class="btn-toggle" @click="doSomething"><i class="fa fa-bars"></i></el-button>
+			<el-button type="primary" class="btn-toggle" @click="toggleSidebar"><i class="fa fa-bars"></i></el-button>
 		</div>
 		<el-dropdown :hide-on-click="false" trigger="click" class="pull-right">
 		  <span class="el-dropdown-link">
-		  	<img src="../assets/logo.png" class="avatar"/>
+		  	<img src="../assets/img/logo.png" class="avatar"/>
 		    Transform<i class="el-icon-caret-bottom el-icon--right"></i>
 		  </span>
 		  <el-dropdown-menu slot="dropdown">
-		    <el-dropdown-item @click.native="">修改密码</el-dropdown-item>
-		    <el-dropdown-item @click.native="" disabled>主页</el-dropdown-item>
-				<el-dropdown-item divided @click.native="">退出</el-dropdown-item>
+		    <el-dropdown-item @click.native="" disabled>修改密码</el-dropdown-item>
+		    <el-dropdown-item @click.native=""><router-link :to="account">主页</router-link></el-dropdown-item>
+				<el-dropdown-item divided><router-link :to="loginout">退出</router-link></el-dropdown-item>
 		  </el-dropdown-menu>
 		</el-dropdown>
 	</header>
 </template>
 <script>
   export default {
-    data () {
-      return {
-        activeIndex: '1',
-        activeIndex2: '1'
-      }
-    },
+  	props: ['isHideSidebar'],
+  	data () {
+  		return {
+  			loginout: '/',
+  			account: '/account/home'
+  		}
+  	},
     methods: {
-      handleSelect (key, keyPath) {
-        console.log(key, keyPath)
-      },
-      doSomething () {
-        this.$store.dispatch('update')
+      toggleSidebar () {
+        this.$emit('toggleSide')
       }
     }
   }
 </script>
-<style scoped>
+<style scoped lang="scss">
 	.header {
 		position: fixed;
 		top: 0;
@@ -43,7 +41,6 @@
 		z-index: 999;
 		background: #fff;
 		box-shadow: 0 0 1px rgba(0,0,0,0.25);
-		transition: left .3s;
 	}
 	.header.spread {
 		left: 0;
@@ -61,7 +58,6 @@
 		min-width: 150px;
 		height: 60px;
 		line-height: 60px;
-		margin-right: 15px;
 	}
 	.el-dropdown-link {
 		padding: 10px;
@@ -70,6 +66,9 @@
 	}
 	.el-dropdown-menu {
 		width: 140px;
+		a {
+			display: block
+		}
 	}
 	.btn-toggle {
 		margin: 12px 20px;

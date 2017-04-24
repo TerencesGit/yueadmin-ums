@@ -4,17 +4,19 @@ import babelpolyfill from 'babel-polyfill'
 import Vue from 'vue'
 import Router from 'vue-router'
 import App from './App'
-import router from './router'
+import routes from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 import 'font-awesome/css/font-awesome.min.css'
+import '@/assets/css/base.css'
 Vue.use(ElementUI)
+Vue.use(Router)
 Vue.config.productionTip = false
-
+const router = new Router({
+  routes
+})
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
   router,
-  template: '<App/>',
-  components: { App }
+  render: h => h(App)
 }).$mount('#app')
