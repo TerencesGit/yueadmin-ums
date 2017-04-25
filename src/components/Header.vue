@@ -11,7 +11,7 @@
 		  <el-dropdown-menu slot="dropdown">
 		    <el-dropdown-item @click.native="" disabled>修改密码</el-dropdown-item>
 		    <el-dropdown-item @click.native=""><router-link :to="account">主页</router-link></el-dropdown-item>
-				<el-dropdown-item divided><router-link :to="loginout">退出</router-link></el-dropdown-item>
+				<el-dropdown-item divided><router-link :to="logout">退出</router-link></el-dropdown-item>
 		  </el-dropdown-menu>
 		</el-dropdown>
 	</header>
@@ -21,7 +21,7 @@
   	props: ['isHideSidebar'],
   	data () {
   		return {
-  			loginout: '/',
+  			logout: '/',
   			account: '/account/home'
   		}
   	},
@@ -41,9 +41,9 @@
 		z-index: 999;
 		background: #fff;
 		box-shadow: 0 0 1px rgba(0,0,0,0.25);
-	}
-	.header.spread {
-		left: 0;
+		&.spread {
+			left: 0;
+		}
 	}
 	.el-menu {
 		border-radius: 0;

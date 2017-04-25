@@ -1,8 +1,8 @@
 <template>
-	<el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-width="80px" class="demo-ruleForm">
+	<el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-width="90px" class="demo-ruleForm">
 		<h2 class="page-header">欢迎登录</h2>
-		<el-form-item label="用户名" prop="age">
-	    <el-input v-model.number="ruleForm2.age" placeholder="请输入用户名"></el-input>
+		<el-form-item label="用户名" prop="name">
+	    <el-input v-model.string="ruleForm2.name" placeholder="请输入用户名"></el-input>
 	  </el-form-item>
 	  <el-form-item label="密码" prop="pass">
 	    <el-input type="password" v-model="ruleForm2.pass" auto-complete="off" placeholder="请输入密码"></el-input>
@@ -18,76 +18,104 @@
 	</el-form>
 </template>
 <script>
-  export default {
-    data() {
-      var checkAge = (rule, value, callback) => {
-        if (!value) {
-          return callback(new Error('用户名不能为空'));
+import { requestLogin } from '../api'
+export default {
+  data() {
+    // var checkAge = (rule, value, callback) => {
+    //   if (!value) {
+    //     return callback(new Error('用户名不能为空'));
+    //   }
+    //   setTimeout(() => {
+    //     if (!Number.isInteger(value)) {
+    //       callback(new Error('请输入数字值'));
+    //     } else {
+    //       if (value < 18) {
+    //         callback(new Error('必须年满18岁'));
+    //       } else {
+    //         callback();
+    //       }
+    //     }
+    //   }, 1000);
+    // };
+    var validatePass = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入密码'));
+      } else {
+        if (this.ruleForm2.checkPass !== '') {
+          this.$refs.ruleForm2.validateField('checkPass');
         }
-        setTimeout(() => {
-          if (!Number.isInteger(value)) {
-            callback(new Error('请输入数字值'));
-          } else {
-            if (value < 18) {
-              callback(new Error('必须年满18岁'));
-            } else {
-              callback();
-            }
-          }
-        }, 1000);
-      };
-      var validatePass = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请输入密码'));
-        } else {
-          if (this.ruleForm2.checkPass !== '') {
-            this.$refs.ruleForm2.validateField('checkPass');
-          }
-          callback();
-        }
-      };
-      var validatePass2 = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请再次输入密码'));
-        } else if (value !== this.ruleForm2.pass) {
-          callback(new Error('两次输入密码不一致!'));
-        } else {
-          callback();
-        }
-      };
-      return {
-        ruleForm2: {
-          pass: '',
-          checkPass: '',
-          age: ''
-        },
-        rules2: {
-          pass: [
-            { validator: validatePass, trigger: 'blur' }
-          ],
-          checkPass: [
-            { validator: validatePass2, trigger: 'blur' }
-          ],
-          age: [
-            { validator: checkAge, trigger: 'blur' }
-          ]
-        }
-      };
-    },
-    methods: {
-      submitForm(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            alert('submit!');
-          	location.href = '#/account/home'
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
+        callback();
       }
+    };
+    var validatePass2 = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请再次输入密码'));
+      } else if (value !== this.ruleForm2.pass) {
+        callback(new Error('两次输入密码不一致!'));
+      } else {
+        callback();
+      }
+    };
+    return {
+      ruleForm2: {
+        name: '',
+        pass: '',
+        checkPass: ''
+      },
+      rules2: {
+        name: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 5, message: '长度不少于5个字符', trigger: 'blur' }
+        ],
+        pass: [
+          { required: true, validator: validatePass, trigger: 'blur' }
+        ],
+        checkPass: [
+          { required: true, validator: validatePass2, trigger: 'blur' }
+        ]
+      }
+    };
+  },
+  methods: {
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          let param = this.ruleForm2
+          requestLogin(param).then(res => {
+            if (res.data.status === 0) {
+              this.$message({
+                type: 'error',
+                message: '用户名不存在'
+              })
+            } else if (res.data.status === 1) {
+              this.$message({
+                type: 'error',
+                message: '密码错误'
+              })
+            } else if (res.data.status === 2) {
+              this.$message({
+                type: 'success',
+                message: '登录成功'
+              })
+
+            } else {
+              this.$message({
+                type: 'error',
+                message: '登录失败，请重试'
+              })
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          })
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      })
     }
   }
+}
 </script>
 <style scoped lang="scss">
 	.demo-ruleForm {
