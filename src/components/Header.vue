@@ -10,27 +10,56 @@
 		  </span>
 		  <el-dropdown-menu slot="dropdown">
 		    <el-dropdown-item @click.native="" disabled>修改密码</el-dropdown-item>
-		    <el-dropdown-item @click.native=""><router-link :to="account">主页</router-link></el-dropdown-item>
-				<el-dropdown-item divided><router-link :to="logout">退出</router-link></el-dropdown-item>
+		    <el-dropdown-item @click.native=""><router-link :to="home">主页</router-link></el-dropdown-item>
+				<el-dropdown-item divided><a @click="logout">退出</a></el-dropdown-item>
 		  </el-dropdown-menu>
 		</el-dropdown>
 	</header>
 </template>
 <script>
-  export default {
-  	props: ['isHideSidebar'],
-  	data () {
-  		return {
-  			logout: '/',
-  			account: '/account/home'
-  		}
-  	},
-    methods: {
-      toggleSidebar () {
-        this.$emit('toggleSide')
-      }
+import { requestExit } from '../api'
+export default {
+	props: ['isHideSidebar'],
+	data () {
+		return {
+			home: '/account/home'
+		}
+	},
+  methods: {
+    toggleSidebar () {
+      this.$emit('toggleSide')
+    },
+    logout () {
+    	this.$confirm('确定退出系统?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+      	let params = 123
+      	console.log(params)
+      	requestExit(params).then(res => {
+      		if(res.data.status === 2) {
+      			this.$router.push('/login');
+      			this.$message({
+		          type: 'success',
+		          message: '退出成功!'
+		        })
+      		} else {
+      			this.$message({
+		          type: 'success',
+		          message: '删除成功!'
+		        })
+      		}
+      	})
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });          
+      })
     }
   }
+}
 </script>
 <style scoped lang="scss">
 	.header {

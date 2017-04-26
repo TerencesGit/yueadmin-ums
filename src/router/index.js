@@ -1,11 +1,24 @@
 import Hello from '@/components/Hello'
-import Layout from '@/components/Layout'
 import Login from '@/view/login'
+import NotFound from '@/view/NotFound'
+
+import Layout from '@/components/Layout'
 import Home from '@/view/account/home'
+
 const routes = [
   {
     path: '/',
     name: 'Hello',
+    component: Hello
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: Login
+  },
+  {
+    path: '/logout',
+    name: 'logout',
     component: Login
   },
   {
@@ -19,9 +32,14 @@ const routes = [
     	}
     ]
   },
+   {
+    path: '/NotFound',
+    name: 'notfound',
+    component: NotFound
+  },
   {
   	path: '*',
-  	redirect: '/account'
+  	redirect: '/NotFound'
   }
 ]
 export default routes

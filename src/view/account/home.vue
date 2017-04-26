@@ -1,5 +1,5 @@
 <template>
-	<el-row gutter="20">
+	<el-row :gutter="20">
     <div class="grid-content bg-purple">
       <h1>悦视觉后台管理</h1>
     </div>

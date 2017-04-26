@@ -8,11 +8,11 @@
         </a>
       </div>
       <div class="divide-line"></div>
-  		<el-menu default-active="1-1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" theme="dark" unique-opened=true>
-        <el-submenu :index="menu.index" v-for="menu in menus">
-          <template slot="title"><i class="fa fa-lg" :class="menu.logo"></i>{{ menu.name }}</template>
-            <el-menu-item :index="item.index" v-for="item in menu.submenu">
-            	<router-link :to="item.link">{{ item.name }}</router-link>
+  		<el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" theme="dark" :unique-opened=true router>
+        <el-submenu :index="index+''" v-for="(menu, index) in routers">
+          <template slot="title"><i class="fa fa-lg" :class="menu.icon"></i>{{ menu.name }}</template>
+            <el-menu-item :index="submenu.index" v-for="submenu in menu.children">
+            	<router-link :to="submenu.link">{{ submenu.name }}</router-link>
             </el-menu-item>
         </el-submenu>
       </el-menu>
@@ -25,38 +25,34 @@
     data () {
       return {
         name: '我的企业',
-        menus: [
+        routers: [
           {
             name: '账户管理',
-            index: '1',
-            logo: 'fa-user',
-            submenu: [
-              {name: '账户首页', link: '/account/home', index: '1-1'}
+            icon: 'fa-user',
+            children: [
+              {name: '账户首页', link: '/account/home', index: '/account/home'}
               // {name: '账户编辑', link: '/account/edit', index: '1-2'},
               // {name: '账户安全', link: '/account/security', index: '1-3'}
             ]
           },
           {
             name: '供应商',
-            index: '2',
-            logo: 'fa-paw',
-            submenu: [
+            icon: 'fa-paw',
+            children: [
               {name: '商品管理', link: '/supplier/wareManage', index: '2-1'}
             ]
           },
           {
             name: '分销商',
-            index: '3',
-            logo: 'fa-sitemap',
-            submenu: [
+            icon: 'fa-sitemap',
+            children: [
               {name: '订单管理', link: '/distributor/orderManage', index: '3-1'}
             ]
           },
           {
             name: '平台管理员',
-            index: '4',
-            logo: 'fa-desktop',
-            submenu: [
+            icon: 'fa-desktop',
+            children: [
               {name: '商品上架审核', link: '/admin/wareAudit', index: '4-1'}
             ]
           }
