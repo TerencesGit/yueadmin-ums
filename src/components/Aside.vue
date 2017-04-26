@@ -1,14 +1,14 @@
 <template>
-	<aside class="sidebar transition" :class="{'hide': isHideSidebar}">
+	<aside class="sidebar transition" :class="{'hide': sidebarStatus}">
     <div class="sidebar-wrap">
       <div class="sidebar-header">
         <a href="/" class="brand ellipsis" :title="name">
           <i class="fa fa-flag fa-lg"></i>
-          <strong>{{ name }}</strong>
+          <strong>{{ partner.name }}</strong>
         </a>
       </div>
       <div class="divide-line"></div>
-  		<el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" theme="dark" :unique-opened=true router>
+  		<el-menu :default-active="$route.path" class="el-menu-vertical-demo" theme="dark" :unique-opened=true router>
         <el-submenu :index="index+''" v-for="(menu, index) in routers">
           <template slot="title"><i class="fa fa-lg" :class="menu.icon"></i>{{ menu.name }}</template>
             <el-menu-item :index="submenu.index" v-for="submenu in menu.children">
@@ -20,52 +20,56 @@
 	</aside>
 </template>
 <script>
-  export default {
-    props: ['isHideSidebar'],
-    data () {
-      return {
-        name: '我的企业',
-        routers: [
-          {
-            name: '账户管理',
-            icon: 'fa-user',
-            children: [
-              {name: '账户首页', link: '/account/home', index: '/account/home'}
-              // {name: '账户编辑', link: '/account/edit', index: '1-2'},
-              // {name: '账户安全', link: '/account/security', index: '1-3'}
-            ]
-          },
-          {
-            name: '供应商',
-            icon: 'fa-paw',
-            children: [
-              {name: '商品管理', link: '/supplier/wareManage', index: '2-1'}
-            ]
-          },
-          {
-            name: '分销商',
-            icon: 'fa-sitemap',
-            children: [
-              {name: '订单管理', link: '/distributor/orderManage', index: '3-1'}
-            ]
-          },
-          {
-            name: '平台管理员',
-            icon: 'fa-desktop',
-            children: [
-              {name: '商品上架审核', link: '/admin/wareAudit', index: '4-1'}
-            ]
-          }
-        ]
-      }
-    },
-    methods: {
-      handleOpen (key, keyPath) {
-      },
-      handleClose (key, keyPath) {
-      }
+import { mapGetters } from 'vuex'
+export default {
+  data () {
+    return {
+      // routers: [
+      //   {
+      //     name: '账户管理',
+      //     icon: 'fa-user',
+      //     children: [
+      //       {name: '账户首页', link: '/account/home', index: '/account/home'}
+      //       // {name: '账户编辑', link: '/account/edit', index: '1-2'},
+      //       // {name: '账户安全', link: '/account/security', index: '1-3'}
+      //     ]
+      //   },
+      //   {
+      //     name: '供应商',
+      //     icon: 'fa-paw',
+      //     children: [
+      //       {name: '商品管理', link: '/supplier/wareManage', index: '2-1'}
+      //     ]
+      //   },
+      //   {
+      //     name: '分销商',
+      //     icon: 'fa-sitemap',
+      //     children: [
+      //       {name: '订单管理', link: '/distributor/orderManage', index: '3-1'}
+      //     ]
+      //   },
+      //   {
+      //     name: '平台管理员',
+      //     icon: 'fa-desktop',
+      //     children: [
+      //       {name: '商品上架审核', link: '/admin/wareAudit', index: '4-1'}
+      //     ]
+      //   }
+      // ]
     }
-  }
+  },
+  computed: {
+    ...mapGetters([
+      'sidebarStatus'
+    ]),
+    ...mapGetters({
+      routers: 'userPermission'
+    }),
+    ...mapGetters({
+      partner: 'partnerInfo'
+    }),
+  },
+}
 </script>
 <style scoped lang="scss">
 	.sidebar {

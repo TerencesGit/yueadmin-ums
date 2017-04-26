@@ -1,5 +1,5 @@
 <template>
-	<div class="main transition" :class="{'spread': isHideSidebar}">
+	<div class="main transition" :class="{'spread': sidebarStatus}">
 		<div class="wrapper">
 			<div class="container-fluid">
 				<transition name="router-fade" mode="out-in">
@@ -17,6 +17,7 @@
 	</div>
 </template>
 <script>
+import { mapGetters } from 'vuex'
 export default {
   methods: {
 	    backTop () {
@@ -24,7 +25,11 @@ export default {
       document.documentElement.scrollTop = 0
     }
   },
-  props: ['isHideSidebar']
+  computed: {
+    ...mapGetters([
+      'sidebarStatus'
+    ])
+  }
 }
 </script>
 <style scoped lang="scss">

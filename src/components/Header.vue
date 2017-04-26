@@ -1,12 +1,12 @@
 <template>
-	<header class="header clearfix transition" :class="{'spread': isHideSidebar}">
+	<header class="header clearfix transition" :class="{'spread': sidebarStatus}">
 		<div class="pull-left">
 			<el-button type="primary" class="btn-toggle" @click="toggleSidebar"><i class="fa fa-bars"></i></el-button>
 		</div>
 		<el-dropdown :hide-on-click="false" trigger="click" class="pull-right">
 		  <span class="el-dropdown-link">
 		  	<img src="../assets/img/logo.png" class="avatar"/>
-		    Transform<i class="el-icon-caret-bottom el-icon--right"></i>
+		    {{ username }}<i class="el-icon-caret-bottom el-icon--right"></i>
 		  </span>
 		  <el-dropdown-menu slot="dropdown">
 		    <el-dropdown-item @click.native="" disabled>修改密码</el-dropdown-item>
@@ -17,48 +17,54 @@
 	</header>
 </template>
 <script>
+import { mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 import { requestExit } from '../api'
 export default {
-	props: ['isHideSidebar'],
 	data () {
 		return {
 			home: '/account/home'
 		}
 	},
   methods: {
-    toggleSidebar () {
-      this.$emit('toggleSide')
-    },
+  	...mapActions([
+  		'toggleSidebar'
+  	]),
     logout () {
     	this.$confirm('确定退出系统?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-      	let params = 123
-      	console.log(params)
-      	requestExit(params).then(res => {
+      	requestExit().then(res => {
       		if(res.data.status === 2) {
-      			this.$router.push('/login');
+      			localStorage.removeItem('userId')
+      			this.$router.push('/login')
       			this.$message({
 		          type: 'success',
 		          message: '退出成功!'
 		        })
       		} else {
       			this.$message({
-		          type: 'success',
-		          message: '删除成功!'
+		          type: 'error',
+		          message: '退出失败!'
 		        })
       		}
       	})
       }).catch(() => {
         this.$message({
           type: 'info',
-          message: '已取消删除'
+          message: '已取消操作'
         });          
       })
     }
-  }
+  },
+  computed: {
+	  ...mapGetters([
+  		'sidebarStatus',
+  		'username'
+  	])
+  },
 }
 </script>
 <style scoped lang="scss">

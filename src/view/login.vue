@@ -99,13 +99,13 @@ export default {
                 message: '密码错误'
               })
             } else if (res.data.status === 2) {
-              console.log(res.data.userId)
-              localStorage.setItem('userId', res.data.userId);
+              console.log(res.data.sessionID)
+              localStorage.setItem('sessionId', res.data.sessionID)
+              _this.$router.push({ path: '/account/home' })
               this.$message({
                 type: 'success',
                 message: '登录成功'
               })
-              _this.$router.push({ path: '/account/home' })
             } else {
               this.$message({
                 type: 'error',
