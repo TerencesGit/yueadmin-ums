@@ -10,6 +10,7 @@ import routes from './router'
 import store from './vuex/store'
 import NProgress from 'nprogress'
 import ElementUI from 'element-ui'
+import { Message } from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 import 'font-awesome/css/font-awesome.min.css'
 import 'animate.css/animate.min.css'
@@ -21,10 +22,6 @@ Vue.use(ElementUI)
 NProgress.configure({ ease: 'ease', speed: 2000 })
 // NProgress.configure({ showSpinner: false })
 Vue.config.productionTip = false
-const axio = axios.create({
-  baseURL: 'http:localhost:3000',
-  timeout: 5000
-});
 const router = new Router({
   routes  
 })
@@ -42,7 +39,23 @@ router.beforeEach((to, from, next) => {
 })
 router.afterEach((to, from, next) => {
   console.log(to.path);
-});
+})
+/* response interceptors */
+axios.interceptors.response.use(function (res) {
+  if (res.data.status ===  '401') {
+  	localStorage.removeItem('sessionId')
+    router.push('/login')
+    Message.info({
+   	  message: '长时间未操作,请重新登录'
+    })
+  } else if (res.data.status === '403') {
+  	router.push('/NoPermission')
+  }
+  return res;
+}, function (error) {
+  // response error
+  return Promise.reject(error)
+})
 /* eslint-disable no-new */
 new Vue({
 	store,

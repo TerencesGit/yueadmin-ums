@@ -1,11 +1,11 @@
 <template>
 	<div class="wrap">
     <div class="top">
-      <h1>404</h1>
+      <h1>403</h1>
     </div>
     <div class="bottom">
-      <h3>Sorry, the page you visit does not exist</h3>
-      <h3>抱歉，您访问的页面不存在</h3>
+      <h3>Sorry, you are not authorized to access this page</h3>
+      <h3>抱歉，您无权访问此页面</h3>
       <el-button type="default" @click="back">返回</el-button>
     </div>
   </div>
@@ -14,7 +14,7 @@
 export default {
   methods: {
     back () {
-      this.$router.go(-1)
+      this.$router.push('/login')
     }
   }
 }
@@ -40,6 +40,6 @@ export default {
     color: #fff;
   }
   .bottom {
-    padding-top: 30px;
+    padding-top: 40px;
   }
 </style>

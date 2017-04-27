@@ -1,6 +1,7 @@
 import Hello from '@/components/Hello'
 import Login from '@/view/login'
 import NotFound from '@/view/NotFound'
+import NoPermission from '@/view/NoPermission'
 
 import Layout from '@/components/Layout'
 import Home from '@/view/account/home'
@@ -32,7 +33,12 @@ const routes = [
     	}
     ]
   },
-   {
+  {
+    path: '/NoPermission',
+    name: 'nopermission',
+    component: NoPermission
+  },
+  {
     path: '/NotFound',
     name: 'notfound',
     component: NotFound

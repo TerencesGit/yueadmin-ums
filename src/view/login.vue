@@ -1,23 +1,27 @@
 <template>
-  <div class="container animated fadeInDown">
-    <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-width="90px" class="demo-ruleForm">
-      <h2 class="page-header">欢迎登录</h2>
-      <el-form-item label="用户名" prop="name">
-        <el-input v-model.string="ruleForm2.name" placeholder="请输入用户名"></el-input>
-      </el-form-item>
-      <el-form-item label="密码" prop="pass">
-        <el-input type="password" v-model="ruleForm2.pass" auto-complete="off" placeholder="请输入密码"></el-input>
-      </el-form-item>
-      <el-form-item label="确认密码" prop="checkPass">
-        <el-input type="password" v-model="ruleForm2.checkPass" auto-complete="off" placeholder="确认密码"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" class="el-button--block"  @keyup.enter="submitForm('ruleForm2')" @click="submitForm('ruleForm2')">
-          提交
-        </el-button>
-      </el-form-item>
-    </el-form>    
-  </div>
+  <transition name="custom-classes-transition"
+    enter-active-class="animated fadeInDown"
+  >
+    <div class="container">
+      <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-width="90px" class="demo-ruleForm" :class="{'animated shake': invalid}">
+        <h2 class="page-header">欢迎登录</h2>
+        <el-form-item label="用户名" prop="name">
+          <el-input v-model.string="ruleForm2.name" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="pass">
+          <el-input type="password" v-model="ruleForm2.pass" auto-complete="off" placeholder="请输入密码"></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="checkPass">
+          <el-input type="password" v-model="ruleForm2.checkPass" auto-complete="off" placeholder="确认密码"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" class="el-button--block"  @keyup.enter="submitForm('ruleForm2')" @click="submitForm('ruleForm2')" :loading="logging">
+            提交
+          </el-button>
+        </el-form-item>
+      </el-form>    
+    </div>
+  </transition>
 </template>
 <script>
 import { requestLogin } from '../api'
@@ -60,6 +64,8 @@ export default {
       }
     };
     return {
+      invalid: false,
+      logging: false,
       ruleForm2: {
         name: '',
         pass: '',
@@ -81,13 +87,12 @@ export default {
   },
   methods: {
     submitForm(formName) {
-      let _this = this
       this.$refs[formName].validate((valid) => {
-        if (valid) {
+        if (valid && !this.logging) {
+          this.logging = true
           NProgress.start()
           NProgress.inc()
-          let param = this.ruleForm2
-          requestLogin(param).then(res => {
+          requestLogin(this.ruleForm2).then(res => {
             if (res.data.status === 0) {
               this.$message({
                 type: 'error',
@@ -99,25 +104,26 @@ export default {
                 message: '密码错误'
               })
             } else if (res.data.status === 2) {
-              console.log(res.data.sessionID)
               localStorage.setItem('sessionId', res.data.sessionID)
-              _this.$router.push({ path: '/account/home' })
               this.$message({
                 type: 'success',
                 message: '登录成功'
               })
+              this.$router.push({ path: '/account/home' })
             } else {
               this.$message({
                 type: 'error',
                 message: '登录失败，请重试'
               })
             }
+            this.logging = false
           })
           .catch(function (error) {
             console.log(error);
           })
           NProgress.done()
         } else {
+          this.invalid = true
           console.log('error submit!!');
           return false;
         }
@@ -142,4 +148,14 @@ export default {
     margin: 0 0 20px;
     border-bottom: 1px solid #eee;
 	}
+  .slide-fade-enter-active {
+    transition: all .3s ease;
+  }
+  .slide-fade-leave-active {
+    transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+  }
+  .slide-fade-enter, .slide-fade-leave-active {
+    transform: translateY(10px);
+    opacity: 0;
+  }
 </style>

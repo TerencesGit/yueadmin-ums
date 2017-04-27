@@ -2,7 +2,9 @@
 	<div class="main transition" :class="{'spread': sidebarStatus}">
 		<div class="wrapper">
 			<div class="container-fluid">
-				<transition name="router-fade" mode="out-in">
+				<transition name="custom-classes-transition"
+		    enter-active-class="animated fadeInRight"
+		    leave-active-class="animated fadeOutRight">
 					<router-view></router-view>
 				</transition>
 				<div class="wrap-footer"></div>

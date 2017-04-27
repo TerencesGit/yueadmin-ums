@@ -2,7 +2,7 @@
 	<aside class="sidebar transition" :class="{'hide': sidebarStatus}">
     <div class="sidebar-wrap">
       <div class="sidebar-header">
-        <a href="/" class="brand ellipsis" :title="name">
+        <a href="/" class="brand ellipsis" :title="partner.name">
           <i class="fa fa-flag fa-lg"></i>
           <strong>{{ partner.name }}</strong>
         </a>

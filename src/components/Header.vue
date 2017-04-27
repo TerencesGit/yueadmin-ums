@@ -38,7 +38,7 @@ export default {
       }).then(() => {
       	requestExit().then(res => {
       		if(res.data.status === 2) {
-      			localStorage.removeItem('userId')
+      			localStorage.removeItem('sessionId')
       			this.$router.push('/login')
       			this.$message({
 		          type: 'success',
