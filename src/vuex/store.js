@@ -8,7 +8,8 @@ const state = {
 	sidebarStatus: false,
 	username: '',
 	userPermission: [],
-	partnerInfo: {}
+	partnerInfo: {},
+	wareList: []
 }
 
 const mutations = {
@@ -23,6 +24,9 @@ const mutations = {
 	},
 	SET_PARTNER_INFO (state, partner) {
 		state.partnerInfo = partner
+	},
+	SET_WARELIST (state, warelist) {
+		state.wareList = warelist
 	}
 }
 

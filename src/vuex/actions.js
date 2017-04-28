@@ -10,3 +10,6 @@ export const setUserPermission = ({ commit }, permission) => {
 export const setPartner = ({ commit }, partner) => {
 	commit('SET_PARTNER_INFO', partner)
 }
+export const setWareList = ({ commit }, warelist) => {
+	commit('SET_WARELIST', warelist)
+}

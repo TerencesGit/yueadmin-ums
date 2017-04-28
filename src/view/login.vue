@@ -1,6 +1,5 @@
 <template>
-  <transition name="custom-classes-transition"
-    enter-active-class="animated fadeInDown"
+  <transition name="slide-fade"
   >
     <div class="container">
       <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-width="90px" class="demo-ruleForm" :class="{'animated shake': invalid}">
@@ -149,13 +148,80 @@ export default {
     border-bottom: 1px solid #eee;
 	}
   .slide-fade-enter-active {
-    transition: all .3s ease;
+    transition: all .5s ease;
   }
-  .slide-fade-leave-active {
-    transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-  }
-  .slide-fade-enter, .slide-fade-leave-active {
-    transform: translateY(10px);
+  .slide-fade-enter {
+    transform: translateY(-30px);
     opacity: 0;
+  }
+  .animated {
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    z-index: 100
+  }
+
+  .animated.infinite {
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite
+  }
+
+  .animated.hinge {
+    -webkit-animation-duration: 2s;
+    animation-duration: 2s
+  }
+  @-webkit-keyframes shake {
+    0%,
+    100% {
+      -webkit-transform: translateX(0);
+      transform: translateX(0)
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      -webkit-transform: translateX(-10px);
+      transform: translateX(-10px)
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+      -webkit-transform: translateX(10px);
+      transform: translateX(10px)
+    }
+  }
+
+  @keyframes shake {
+    0%,
+    100% {
+      -webkit-transform: translateX(0);
+      -ms-transform: translateX(0);
+      transform: translateX(0)
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      -webkit-transform: translateX(-10px);
+      -ms-transform: translateX(-10px);
+      transform: translateX(-10px)
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+      -webkit-transform: translateX(10px);
+      -ms-transform: translateX(10px);
+      transform: translateX(10px)
+    }
+  }
+
+  .shake {
+    -webkit-animation-name: shake;
+    animation-name: shake
   }
 </style>

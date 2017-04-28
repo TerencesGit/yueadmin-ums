@@ -10,3 +10,6 @@ export const userPermission = state => {
 export const partnerInfo = state => {
 	return state.partnerInfo
 }
+export const wareList = state => {
+	return state.wareList
+}

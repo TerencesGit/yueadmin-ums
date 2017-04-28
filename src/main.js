@@ -8,19 +8,19 @@ import axios from 'axios'
 import App from './App'
 import routes from './router'
 import store from './vuex/store'
-import NProgress from 'nprogress'
 import ElementUI from 'element-ui'
 import { Message } from 'element-ui'
+import NProgress from 'nprogress'
 import 'element-ui/lib/theme-default/index.css'
 import 'font-awesome/css/font-awesome.min.css'
-import 'animate.css/animate.min.css'
 import 'nprogress/nprogress.css'
 import '@/assets/css/base.css'
+NProgress.configure({ ease: 'ease', speed: 500, minimum: 0.5})
+NProgress.configure({ showSpinner: false })
 Vue.use(Router)
 Vue.use(Vuex)
 Vue.use(ElementUI)
-NProgress.configure({ ease: 'ease', speed: 2000 })
-// NProgress.configure({ showSpinner: false })
+Vue.prototype.$nprogress = NProgress
 Vue.config.productionTip = false
 const router = new Router({
   routes  
@@ -34,11 +34,13 @@ router.beforeEach((to, from, next) => {
 	if (!sessionId && to.path != '/login') {
 		next('/login')
 	} else {
+		NProgress.start()
 		next()
 	}
 })
 router.afterEach((to, from, next) => {
-  console.log(to.path);
+  console.log(to.path)
+  NProgress.done()
 })
 /* response interceptors */
 axios.interceptors.response.use(function (res) {
@@ -54,6 +56,9 @@ axios.interceptors.response.use(function (res) {
   return res;
 }, function (error) {
   // response error
+  Message.info({
+ 	  message: '服务器响应错误，请重试'
+  })
   return Promise.reject(error)
 })
 /* eslint-disable no-new */

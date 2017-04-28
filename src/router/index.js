@@ -5,6 +5,9 @@ import NoPermission from '@/view/NoPermission'
 
 import Layout from '@/components/Layout'
 import Home from '@/view/account/home'
+import wareManage from '@/view/supplier/wareManage'
+import addWare from '@/view/supplier/wareAdd'
+import editWare from '@/view/supplier/wareEdit'
 
 const routes = [
   {
@@ -18,19 +21,33 @@ const routes = [
     component: Login
   },
   {
-    path: '/logout',
-    name: 'logout',
-    component: Login
-  },
-  {
     path: '/account',
-    name: 'layout',
+    name: 'account',
     component: Layout,
     children: [
     	{
     		path: 'home',
     		component: Home
     	}
+    ]
+  },
+  {
+    path: '/supplier',
+    name: 'supplier',
+    component: Layout,
+    children: [
+      {
+        path: 'wareManage',
+        component: wareManage
+      },
+      {
+        path: 'addWare',
+        component: addWare
+      },
+      {
+        path: 'editWare',
+        component: editWare
+      }
     ]
   },
   {
@@ -43,9 +60,9 @@ const routes = [
     name: 'notfound',
     component: NotFound
   },
-  {
-  	path: '*',
-  	redirect: '/NotFound'
-  }
+  // {
+  // 	path: '*',
+  // 	redirect: '/NotFound'
+  // }
 ]
 export default routes
