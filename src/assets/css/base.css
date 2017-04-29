@@ -37,6 +37,12 @@ a {
 .m-b {
   margin-bottom: 15px
 }
+.m-r {
+  margin-right: 15px;
+}
+.m-l {
+  margin-left: 15px;
+}
 .text-center {
   text-align: center
 }
@@ -66,4 +72,11 @@ a {
 }
 .form-control {
   width: 100% !important;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .3s;
+}
+.fade-enter, .fade-leave-active {
+  /*transform: translateX(30px);*/
+  opacity: 0;
 }

@@ -73,6 +73,9 @@ export default {
       }).then(() => {
         this.$nprogress.done()
         this.loading = false
+      }).catch((error) => {
+        this.$nprogress.done()
+        this.loading = false
       })
     },
     handleIconClick () {

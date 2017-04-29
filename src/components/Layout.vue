@@ -27,7 +27,7 @@ export default {
       this.$store.dispatch('setPartner', data.partner)
     })
     .catch(function (error) {
-      console.log(error);
+      console.log(error)
     })
   }
 }

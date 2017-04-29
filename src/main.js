@@ -11,6 +11,7 @@ import store from './vuex/store'
 import ElementUI from 'element-ui'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress'
+import moment from 'moment'
 import 'element-ui/lib/theme-default/index.css'
 import 'font-awesome/css/font-awesome.min.css'
 import 'nprogress/nprogress.css'
@@ -20,8 +21,12 @@ NProgress.configure({ showSpinner: false })
 Vue.use(Router)
 Vue.use(Vuex)
 Vue.use(ElementUI)
+Vue.prototype.$moment = moment
 Vue.prototype.$nprogress = NProgress
 Vue.config.productionTip = false
+Vue.filter('format', function(value){
+	return moment(value).format('YYYY-MM-DD')
+})
 const router = new Router({
   routes  
 })

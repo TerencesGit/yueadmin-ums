@@ -5,6 +5,7 @@ import NoPermission from '@/view/NoPermission'
 
 import Layout from '@/components/Layout'
 import Home from '@/view/account/home'
+import brandManage from '@/view/supplier/brandManage'
 import wareManage from '@/view/supplier/wareManage'
 import addWare from '@/view/supplier/wareAdd'
 import editWare from '@/view/supplier/wareEdit'
@@ -36,18 +37,10 @@ const routes = [
     name: 'supplier',
     component: Layout,
     children: [
-      {
-        path: 'wareManage',
-        component: wareManage
-      },
-      {
-        path: 'addWare',
-        component: addWare
-      },
-      {
-        path: 'editWare',
-        component: editWare
-      }
+      { path: 'brandManage', component: brandManage, name: '品牌管理' },
+      { path: 'wareManage', component: wareManage, name: '商品管理' },
+      { path: 'addWare',component: addWare, name: '商品添加' },
+      { path: 'editWare',component: editWare, name: '商品编辑' },
     ]
   },
   {

@@ -14,12 +14,19 @@ axios.interceptors.request.use(function (config) {
   return config
 }, function (error) {
   // 请求错误
-  console.log('error12345')
   return Promise.reject(error)
 })
-export const requestLogin = params => { return axios.post('/signinPost', params)}
+// 登录
+export const requestLogin = data => { return axios.post('/signinPost', data)}
+// 登出
 export const requestExit = () => { return axios.get('/logoutAsync')}
+// 获取侧边栏
 export const getUserPermission = () => { return axios.get('/user/permission')}
+// 品牌管理
+export const brandList = () => { return axios.get('/brand/provider/brandList')}
+export const brandAdd = data => { return axios.post('/brand/provider/brandAdd', data)}
+export const brandDel = params => { return axios.get('/brand/provider/brandDel', {params: params})}
+
 export const getWareList = () => { return axios.get('/user/getWareList')}
-export const addWare = params => { return axios.post('/user/addWare', params)}
+export const addWare = data => { return axios.post('/user/addWare', data)}
 export const getWareDetail = params => { return axios.get('/user/wareDetail', {params: params})}
