@@ -24,8 +24,11 @@ Vue.use(ElementUI)
 Vue.prototype.$moment = moment
 Vue.prototype.$nprogress = NProgress
 Vue.config.productionTip = false
-Vue.filter('format', function(value){
+Vue.filter('DateFormat', function(value){
 	return moment(value).format('YYYY-MM-DD')
+})
+Vue.filter('TimeFormat', function(value){
+	return moment(value).format('YYYY-MM-DD HH:mm:ss')
 })
 const router = new Router({
   routes  
@@ -53,7 +56,7 @@ axios.interceptors.response.use(function (res) {
   	localStorage.removeItem('sessionId')
     router.push('/login')
     Message.info({
-   	  message: '长时间未操作,请重新登录'
+   	  message: '长时间未操 作,请重新登录'
     })
   } else if (res.data.status === '403') {
   	router.push('/NoPermission')

@@ -9,7 +9,9 @@ const state = {
 	username: '',
 	userPermission: [],
 	partnerInfo: {},
-	wareList: []
+	wareList: [],
+	brandList: [],
+	selectedBrand: {}
 }
 
 const mutations = {
@@ -27,9 +29,14 @@ const mutations = {
 	},
 	SET_WARELIST (state, warelist) {
 		state.wareList = warelist
+	},
+	SET_BRAND_LIST (state, brandlist) {
+		state.brandList = brandlist
+	},
+	SELECTED_BRAND (state, brand) {
+		state.selectedBrand = brand
 	}
 }
-
 export default new Vuex.Store({
 	state,
 	actions,

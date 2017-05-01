@@ -26,6 +26,7 @@ export const getUserPermission = () => { return axios.get('/user/permission')}
 export const brandList = () => { return axios.get('/brand/provider/brandList')}
 export const brandAdd = data => { return axios.post('/brand/provider/brandAdd', data)}
 export const brandDel = params => { return axios.get('/brand/provider/brandDel', {params: params})}
+export const brandDetail = params => { return axios.get('/brand/provider/brandDetail', {params: params})}
 
 export const getWareList = () => { return axios.get('/user/getWareList')}
 export const addWare = data => { return axios.post('/user/addWare', data)}

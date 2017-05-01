@@ -1,63 +1,33 @@
 <template>
   <section>
-    <el-row>
-      <el-col :span="20" :offset="2">
-        <el-button type="primary" class="pull-right" @click="dialogFormVisible = true">添加品牌</el-button>
-        <el-button class="pull-right m-r">批量操作</el-button>
-      </el-col>
-    </el-row>
-    <el-row>
-      <el-col :span="6" v-for="(item, index) in brandList" :offset="index % 3 === 0 ? 2 : 1" v-loading="loading">
-        <transition name="fade" mode="out-in">
-          <el-card :body-style="{ padding: '5px' }">
-            <img :src="item.logo_url" class="image">
-            <div style="padding: 14px;">
-              <span>{{ item.brand_name }}</span>
-              <div class="bottom clearfix">
-                <time class="time">{{item.meta.createAt | format}}</time>
-
-                <el-button type="default" size="small" class="button" @click="handleBrandDel(item._id)">删除</el-button>
-              </div>
-            </div>
-          </el-card>
-        </transition>
-      </el-col>
-    </el-row>
-    <el-dialog title="添加品牌" v-model="dialogFormVisible">
-      <el-form :model="brandForm" :rules="brandRules" ref="brandForm" label-width="120px" style="padding: 30px" v-loading="loading">
-        <el-form-item label="品牌名称" prop="brand_name">
-          <el-input v-model="brandForm.brand_name" placeholder="品牌名称"></el-input>
-        </el-form-item>
-        <el-form-item label="LOGO" prop="logo_url">
-          <el-upload
-            class="avatar-uploader"
-            name="logo"
-            accept="image/jpeg, image/png"
-            action="http://localhost:3000/user/upload"
-            :show-file-list="false"
-            :on-success="handleLogoSuccess"
-            :on-progress="uploadProgress"
-            :before-upload="beforeLogoUpload">
-            <img v-if="imageUrl" :src="imageUrl" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon" v-loading="uploading"></i>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="品牌描述" prop="content">
-          <el-input type="textarea" v-model="brandForm.content" placeholder="品牌描述"></el-input>
-        </el-form-item>
-        <el-form-item label="专题页" prop="brand_page">
-          <el-input v-model="brandForm.brand_page" placeholder="可选"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="resetForm('brandForm')">取 消</el-button>
-        <el-button type="primary" @click="submitForm('brandForm')">确 定</el-button>
+    <el-row class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          <span>品牌详情</span>
+          <a href="javascript:;" class="pull-right" @click="back">返回列表</a>
+          <a href="javascript:;" class="pull-right m-r" @click="handleBrandEdit(brandForm._id)">编辑</a>
+        </h3>
       </div>
-    </el-dialog>
+      <div class="panel-body clearfix">
+        <el-col :span="16" :offset="4">
+          <el-form :model="brandForm" ref="brandForm" label-width="160px" v-loading="loading">
+            <el-form-item label="品牌名称" prop="name">
+              <el-input v-model="brandForm.brand_name"></el-input>
+            </el-form-item>
+            <el-form-item label="品牌LOGO" prop="name">
+              <img :src="brandForm.logo_url" style="width: 100%" alt="品牌LOGO">
+            </el-form-item>
+            <el-form-item label="品牌描述" prop="name">
+              <el-input type="textarea" v-model="brandForm.content"></el-input>
+            </el-form-item>
+          </el-form>
+        </el-col>
+      </div>
+    </el-row>
   </section>
 </template>
 <script>
-import { brandList, brandAdd, brandDel } from '../../api'
+import { brandDetail } from '../../api'
 export default {
   data() {
     return {
@@ -65,8 +35,9 @@ export default {
       imageUrl: false,
       loading: false,
       uploading: false,
-      brandList: [],
+      // brandList: [],
       brandForm: {
+        _id: '',
         brand_name: '',
         content: '',
         logo_url: '',
@@ -84,20 +55,19 @@ export default {
         logo_url: [
           {required: true, message: '请选择品牌LOGO', trigger: 'blur'}
         ]
-      },
-      currentDate: this.$moment(new Date()).format('YYYY-MM-DD')
+      }
     }
   },
   methods: {
     uploadProgress () {
       this.uploading = true
     },
-    handleLogoSuccess (res, file) {
+    handleAvatarSuccess (res, file) {
       this.uploading = false
       this.brandForm.logo_url = res.logo_url
       this.imageUrl = URL.createObjectURL(file.raw)
     },
-    beforeLogoUpload (file) {
+    beforeAvatarUpload (file) {
       const isJPG = file.type === 'image/jpeg' || 'image/png';
       const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -142,8 +112,10 @@ export default {
     },
     loadBrands () {
       this.$nprogress.start()
+      // this.loading = true
       brandList().then(res => {
-        this.brandList = res.data.brands
+        this.$store.dispatch('setBrandList', res.data.brands)
+        // this.brandList = res.data.brands
       }).then(() => {
         this.loading = false
         this.$nprogress.done()
@@ -170,11 +142,28 @@ export default {
           message: '已取消删除'
         })
       })
+    },
+    getBrand () {
+      let id = this.$route.query.id
+      // this.loading = true
+      brandDetail({id: id}).then(res => {
+        if(res.data.status === 2) {
+          this.brandForm = res.data.brand
+        }
+      })
+    },
+    handleBrandEdit (id) {
+      this.$router.push({
+        path: '/provider/brandEdit?id=' + id
+      })
+    },
+    back () {
+      this.$router.back()
     }
   },
-  created () {
-    this.loadBrands()
-  }
+  mounted () {
+    this.getBrand()
+  },
 }
 </script>
 <style scoped>
@@ -220,14 +209,22 @@ export default {
     display: block;
     width: 100%;
     height: 225px;
+    cursor: pointer;
   }
 
   .el-card {
     margin-bottom: 30px;
-    cursor: pointer;
     transition: all .3s
   }
   .el-card:hover {
     transform: scaleX(1.03) scaleY(1.03);
   }
+  .router-fade-enter-active, .router-fade-leave-active {
+    transition: opacity .3s;
+  }
+  .router-fade-enter, .router-fade-leave-active {
+    /*transform: translateX(30px);*/
+    opacity: 0;
+  }
+
 </style>

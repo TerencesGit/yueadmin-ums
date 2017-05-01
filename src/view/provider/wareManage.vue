@@ -82,7 +82,7 @@ export default {
       console.log(this.criteria)
     },
     addWare () {
-      this.$router.push('/supplier/addWare')
+      this.$router.push('/provider/addWare')
     },
     handleSizeChange (val) {
     },
@@ -91,17 +91,17 @@ export default {
     },
     showWare ($index, row) {
       this.$router.push({
-        path: '/supplier/editWare?id=' + row.ware_code
+        path: '/provider/editWare?id=' + row.ware_code
       })
     },
     setSKU ($index, row) {
       this.$router.push({
-        path: '/supplier/setSKU?id=' + row.ware_code
+        path: '/provider/setSKU?id=' + row.ware_code
       })
     },
     setStock ($index, row) {
       this.$router.push({
-        path: '/supplier/setStock?id=' + row.ware_code
+        path: '/provider/setStock?id=' + row.ware_code
       })
     }   
   },
