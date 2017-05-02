@@ -25,6 +25,7 @@ export const getUserPermission = () => { return axios.get('/user/permission')}
 // 品牌管理
 export const brandList = () => { return axios.get('/brand/provider/brandList')}
 export const brandAdd = data => { return axios.post('/brand/provider/brandAdd', data)}
+export const brandSave = data => { return axios.post('/brand/provider/brandSave', data)}
 export const brandDel = params => { return axios.get('/brand/provider/brandDel', {params: params})}
 export const brandDetail = params => { return axios.get('/brand/provider/brandDetail', {params: params})}
 

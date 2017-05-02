@@ -56,7 +56,7 @@ axios.interceptors.response.use(function (res) {
   	localStorage.removeItem('sessionId')
     router.push('/login')
     Message.info({
-   	  message: '长时间未操 作,请重新登录'
+   	  message: '长时间未操作,请重新登录'
     })
   } else if (res.data.status === '403') {
   	router.push('/NoPermission')

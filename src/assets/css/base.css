@@ -11,8 +11,6 @@ a {
   text-decoration: none;
   color: inherit;
 }
-.toolbar:after,
-.toolbar:before,
 .clearfix:after,
 .clearfix:before,
 .container-fluid:after,
@@ -20,7 +18,6 @@ a {
   display: table;
   content: '';
 }
-.toolbar:after,
 .clearfix:after,
 .container-fluid:after {
   clear: both
@@ -85,13 +82,6 @@ a {
 .form-control {
   width: 100% !important;
 }
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .3s;
-}
-.fade-enter, .fade-leave-active {
-  /*transform: translateX(30px);*/
-  opacity: 0;
-}
 .uploader .el-upload {
   border: 1px dashed #d9d9d9;
   border-radius: 6px;
@@ -109,4 +99,26 @@ a {
   height: 178px;
   line-height: 178px;
   text-align: center;
+}
+.card-title {
+  line-height: 36px; 
+  font-size: 20px; 
+  font-weight: bold
+}
+dl {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+.dl-horizontal dt {
+  float: left;
+  width: 160px;
+  overflow: hidden;
+  clear: left;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dl-horizontal dd {
+  margin-left: 180px;
 }

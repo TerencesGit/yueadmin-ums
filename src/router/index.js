@@ -7,7 +7,6 @@ import Layout from '@/components/Layout'
 import Home from '@/view/account/home'
 import brandManage from '@/view/provider/brandManage'
 import brandDetail from '@/view/provider/brandDetail'
-import brandEdit from '@/view/provider/brandEdit'
 
 import wareManage from '@/view/provider/wareManage'
 import addWare from '@/view/provider/wareAdd'
@@ -42,7 +41,6 @@ const routes = [
     children: [
       { path: 'brandManage', component: brandManage, name: '品牌管理' },
       { path: 'brandDetail', component: brandDetail, name: '品牌详情' },
-      { path: 'brandEdit', component: brandEdit, name: '品牌编辑' },
       { path: 'wareManage', component: wareManage, name: '商品管理' },
       { path: 'addWare',component: addWare, name: '商品添加' },
       { path: 'editWare',component: editWare, name: '商品编辑' },

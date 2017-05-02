@@ -2,10 +2,10 @@
   <section>
     <el-row>
       <el-col>
-        <el-button type="primary" class="pull-right" @click="handleBrandAdd">添加品牌</el-button>
+        <el-button type="primary" class="pull-right" @click="beforeBrandAdd">添加品牌</el-button>
       </el-col>
     </el-row>
-    <el-row :gutter="20">
+    <el-row :gutter="20" v-loading="loading">
       <el-col :xs="12" :sm="8" :md="8" :lg="6" v-for="(item, index) in brandList">
         <transition name="router-fade" mode="out-in">
           <el-card :body-style="{ padding: '5px' }">
@@ -13,8 +13,8 @@
             <div style="padding: 14px;">
               <span>{{ item.brandName }}</span>
               <div class="bottom clearfix">
-                <time class="time">更新时间：{{item.updateTime}}</time>
-                <div class="button-group">
+                <time class="time">{{ item.updateTime | DateFormat }}</time>
+                <div style="float: right;">
                   <el-button :plain="true" type="warning" size="small" @click="handleBrandEdit(item)">编辑</el-button>
                   <el-button :plain="true" type="danger" size="small" @click="handleBrandDel(item.brandId)">删除</el-button>
                 </div>
@@ -24,7 +24,7 @@
         </transition>
       </el-col>
     </el-row>
-    <el-dialog title="添加品牌" v-model="dialogFormVisible">
+    <el-dialog :title="formTitle" v-model="dialogFormVisible">
       <el-form :model="brandForm" :rules="brandRules" ref="brandForm" label-width="120px" style="padding: 30px" v-loading="loading">
         <el-form-item label="品牌名称" prop="brandName">
           <el-input v-model="brandForm.brandName" placeholder="品牌名称"></el-input>
@@ -40,7 +40,7 @@
             :on-progress="uploadProgress"
             :before-upload="beforeUpload"
             :auto-upload="true">
-            <img v-if="brandForm.logoUrl" :src="brandForm.logoUrl" class="avatar">
+            <img v-if="brandForm.logoUrl" :src="brandForm.logoUrl" class="logo">
             <i v-else class="el-icon-plus uploader-icon" v-loading="uploading"></i>
           </el-upload>
         </el-form-item>
@@ -62,15 +62,15 @@
   </section>
 </template>
 <script>
-import { mapGetters } from 'vuex'
-import { brandList, brandAdd, brandDel } from '../../api'
+import { brandList, brandSave, brandDel } from '../../api'
 export default {
   data() {
     return {
       dialogFormVisible: false,
-      imageUrl: false,
       loading: false,
       uploading: false,
+      brandList: [],
+      formTitle: '',
       brandForm: {
         brandId: '',
         brandName: '',
@@ -79,7 +79,6 @@ export default {
         brandPage: '',
         status: '1'
       },
-      editBrandForm: {},
       brandRules: {
         brandName: [
           {required: true, message: '请输入品牌名称', trigger: 'blur'},
@@ -96,7 +95,16 @@ export default {
     }
   },
   methods: {
-    handleBrandAdd () {
+    loadBrandList () {
+      this.loading = true
+      brandList().then(res => {
+        this.brandList = res.data.brands
+      }).then(() => {
+        this.loading = false
+      })
+    },
+    beforeBrandAdd () {
+      this.formTitle = '添加品牌'
       this.brandForm = {
         brandId: '',
         brandName: '',
@@ -106,14 +114,6 @@ export default {
         status: '1'
       }
       this.dialogFormVisible = true
-    },
-    uploadProgress () {
-      this.uploading = true
-    },
-    handleSuccess (res, file) {
-      this.uploading = false
-      this.brandForm.logoUrl = res.logoUrl
-      this.imageUrl = URL.createObjectURL(file.raw)
     },
     beforeUpload (file) {
       const isJPG = file.type === 'image/jpeg' || 'image/png';
@@ -126,131 +126,108 @@ export default {
       }
       return isJPG && isLt2M;
     },
+    uploadProgress () {
+      this.uploading = true
+    },
+    handleSuccess (res, file) {
+      this.uploading = false
+      this.brandForm.logoUrl = res.logoUrl
+      // this.imageUrl = URL.createObjectURL(file.raw)
+    },
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if(valid) {
-          // this.loading = true
-          // brandAdd(this.brandForm).then(res => {
-          //   if(res.data.status === 2) {
-          //     this.$message({
-          //       type: 'success',
-          //       message: '添加成功！'
-          //     })
-          //   }
-          // }).then(() => {
-          //   this.loading = false
-          //   this.resetForm('brandForm')
-          //   this.loadBrands()
-          // }).catch(() => {
-          //   this.loading = false
-          //   this.$message({
-          //     type: 'error',
-          //     message: '添加失败！'
-          //   })
-          // })
-          console.log(this.brandForm)
+          this.loading = true
+          brandSave(this.brandForm).then(res => {
+            console.log(res.data)
+            if(res.data.status === 1) {
+              this.$message({
+                type: 'success',
+                message: res.data.message
+              })
+              this.loadBrandList()
+            }else {
+              this.$message({
+                type: 'error',
+                message: res.data.message
+              })
+            }
+          })
+          this.loading = false
+          this.dialogFormVisible = false
         }
       })
     },
-    resetForm (formName) {
-      this.imageUrl = false
-      // this.$refs[formName].resetFields()
-      this.dialogFormVisible = false
-    },
     handleCancel () {
-      this.imageUrl = false
       this.dialogFormVisible = false
-    },
-    loadBrands () {
-      brandList().then(res => {
-        this.$store.dispatch('setBrandList', res.data.brands)
-        // this.brandList = res.data.brands
-      }).then(() => {
-        this.loading = false
+      this.$message({
+        type: 'info',
+        message: '已取消操作'
       })
     },
     handleBrandEdit (brand) {
-      console.log(brand.brandName)
+      this.formTitle = '品牌编辑'
       this.brandForm = brand
       this.dialogFormVisible = true
     },
-    handleBrandDel (id) {
+    handleBrandDel (brandId) {
       this.$confirm('此操作将删除该品牌, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
       }).then(() => {
-        brandDel({id: id}).then(res => {
-          if(res.data.status === 2) {
-            this.loadBrands()
+        brandDel({id: brandId}).then(res => {
+          if(res.data.status === 1) {
+            this.loadBrandList()
             this.$message({
               type: 'success',
-              message: '删除成功'
+              message: res.data.message
             })
           }
         })
       }).catch(() => {
         this.$message({
           type: 'info',
-          message: '已取消删除'
+          message: '已取消操作'
         })
       })
     },
-    handleBrandDetail (id) {
+    handleBrandDetail (brandId) {
       this.$router.push({
-        path: '/provider/brandDetail?id=' + id
+        path: '/provider/brandDetail?id=' + brandId
       })
     }
   },
   mounted () {
-    this.loadBrands()
-  },
-  computed: {
-    ...mapGetters([
-      'brandList'
-    ])
+    this.loadBrandList()
   }
 }
 </script>
 <style scoped>
-  .avatar {
-    width: 178px;
-    height: 178px;
-    display: block;
-  }
-  .time {
-    font-size: 13px;
-    color: #999;
-  }
-  
-  .bottom {
-    margin-top: 13px;
-    line-height: 12px;
-  }
-
-  .button-group {
-    float: right;
-  }
-
   .image {
     display: block;
     width: 100%;
     height: 225px;
     cursor: pointer;
   }
-
+  .time {
+    font-size: 13px;
+    color: #999;
+  }
+  .bottom {
+    margin-top: 13px;
+    line-height: 12px;
+  }
   .el-card {
-    margin-bottom: 30px;
+    margin: 15px 0;
     transition: all .3s
   }
   .el-card:hover {
     transform: scaleX(1.03) scaleY(1.03);
   }
-  .router-fade-enter-active, .router-fade-leave-active {
-    transition: opacity .3s;
-  }
-  .router-fade-enter, .router-fade-leave-active {
-    /*transform: translateX(30px);*/
-    opacity: 0;
+  .logo {
+    display: block;
+    width: 178px;
+    height: 178px;
   }
 </style>

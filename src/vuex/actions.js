@@ -13,9 +13,3 @@ export const setPartner = ({ commit }, partner) => {
 export const setWareList = ({ commit }, warelist) => {
 	commit('SET_WARELIST', warelist)
 }
-export const setBrandList = ({ commit }, brandlist) => {
-	commit('SET_BRAND_LIST', brandlist)
-}
-export const selectedBrand = ({ commit }, brand) => {
-	commit('SELECTED_BRAND', brand)
-}

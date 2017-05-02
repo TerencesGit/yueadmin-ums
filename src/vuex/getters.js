@@ -13,10 +13,3 @@ export const partnerInfo = state => {
 export const wareList = state => {
 	return state.wareList
 }
-export const brandList = state => {
-	return state.brandList
-}
-export const selectedBrand = state => {
-	console.log(state.selectedBrand)
-	return state.selectedBrand
-}
