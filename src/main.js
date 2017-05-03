@@ -12,10 +12,11 @@ import ElementUI from 'element-ui'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress'
 import moment from 'moment'
+import utils from '@/assets/js/utils'
 import 'element-ui/lib/theme-default/index.css'
 import 'font-awesome/css/font-awesome.min.css'
 import 'nprogress/nprogress.css'
-import '@/assets/css/base.css'
+import '@/assets/css/base.scss'
 NProgress.configure({ ease: 'ease', speed: 500, minimum: 0.5})
 NProgress.configure({ showSpinner: false })
 Vue.use(Router)
@@ -40,13 +41,13 @@ const router = new Router({
 })
 router.beforeEach((to, from, next) => {
 	if(to.path === '/logout') {
-		localStorage.removeItem('sessionId')
+		utils.delCookie('sessionId')
 		return next('/login')
 	}
 	if(to.path === '/register' || to.path === '/login') {
 		return next()
 	}
-	let sessionId = localStorage.getItem('sessionId')
+	let sessionId = utils.getCookie('sessionId')
 	if (!sessionId && to.path != '/login') {
 		next('/login')
 	} else {

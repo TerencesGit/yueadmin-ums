@@ -10,7 +10,7 @@
       </el-input>
       <el-button :plain="true" type="primary" class="pull-right" @click="addWare">添加商品</el-button>
     </el-row>
-    <el-table :data="filteredWare" v-loading.body="loading" style="width: 100%">
+    <el-table :data="filteredWare" v-loading="loading" style="width: 100%">
       <el-table-column prop="ware_code" label="商品编码" sortable width="200"></el-table-column>
       <el-table-column prop="ware_name" label="商品名称" width="100"></el-table-column>
       <el-table-column prop="provider_id" label="供应商" width="150"></el-table-column>
@@ -47,7 +47,7 @@
         :current-page="currentPage"
         :page-sizes="[10, 20, 30, 40]"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="wareList.length"
+        :total="100"
         class="pull-right">
       </el-pagination>
     </el-row>

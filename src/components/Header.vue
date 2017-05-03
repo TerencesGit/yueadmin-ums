@@ -20,6 +20,7 @@
 import { mapActions } from 'vuex'
 import { mapGetters } from 'vuex'
 import { requestExit } from '../api'
+import utils from '@/assets/js/utils'
 export default {
 	data () {
 		return {
@@ -38,7 +39,7 @@ export default {
       }).then(() => {
       	requestExit().then(res => {
       		if(res.data.status === 1) {
-      			localStorage.removeItem('sessionId')
+      			utils.delCookie('sessionId')
       			this.$router.push('/login')
       			this.$message({
 		          type: 'success',

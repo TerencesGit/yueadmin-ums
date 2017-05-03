@@ -35,6 +35,7 @@
 </template>
 <script>
 import { requestLogin } from '../api'
+import utils from '../assets/js/utils'
 export default {
   data() {
     var validateCode = (rule, value, callback) => {
@@ -78,7 +79,16 @@ export default {
           this.logging = true
           requestLogin(this.loginForm).then(res => {
             if (res.data.status === 1) {
-              localStorage.setItem('sessionId', res.data.sessionID)
+              utils.setCookie('sessionId', res.data.sessionID)
+              if (this.loginForm.remember) {
+                let uname = escape(btoa(this.loginForm.username))
+                let upass = escape(btoa(this.loginForm.password))
+                utils.setCookie('uname', uname, '7d')
+                utils.setCookie('upass', upass, '7d')
+              } else {
+                utils.delCookie('uname')
+                utils.delCookie('upass')
+              }
               this.$message({
                 type: 'success',
                 message: res.data.message
@@ -111,8 +121,13 @@ export default {
       }
     }
   },
-  created () {
+  mounted () {
     this.createCode()
+    if (utils.getCookie('uname') && utils.getCookie('upass')) {
+      this.loginForm.username = atob(unescape(utils.getCookie('uname')))
+      this.loginForm.password = atob(unescape(utils.getCookie('upass')))
+      this.loginForm.remember = true
+    }
   }
 }
 </script>

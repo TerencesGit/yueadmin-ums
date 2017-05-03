@@ -1,70 +1,75 @@
 <template>
   <section>
-    <el-row class="panel">
-      <h3 class="panel-heading">添加商品</h3>
-      <el-col :span="16" :offset="4">
-        <el-form :model="wareForm" :rules="wareRules" ref="wareForm" label-width="160px" v-loading="loading">
-          <el-form-item label="商品名称" prop="name">
-            <el-input v-model="wareForm.name"></el-input>
-          </el-form-item>
-          <el-form-item label="供应商" prop="provider">
-            <el-input v-model="wareForm.provider"></el-input>
-          </el-form-item>
-          <el-form-item label="商品类别" prop="kind">
-            <el-input v-model="wareForm.kind"></el-input>
-          </el-form-item>
-          <el-form-item label="建议售价" prop="price">
-            <el-input v-model="wareForm.price"></el-input>
-          </el-form-item>
-          <el-form-item label="行程天数" prop="days">
-            <el-input v-model="wareForm.days"></el-input>
-          </el-form-item>
-          <el-form-item label="商品关键字" prop="keyWords">
-            <el-input v-model="wareForm.keyWords"></el-input>
-          </el-form-item>
-          <el-form-item label="父商品" prop="parent">
-            <el-input v-model="wareForm.parent"></el-input>
-          </el-form-item>
-          <el-form-item label="商品销售时间段" prop="date1">
-            <el-date-picker v-model="wareForm.dateRange" type="datetimerange" class="form-control" placeholder="选择时间范围"></el-date-picker>
-          </el-form-item>
-          <el-form-item label="订单占位时长" prop="minute">
-            <el-input v-model="wareForm.minute"></el-input>
-          </el-form-item>
-          <el-form-item label="城市代码" prop="city">
-             <el-input v-model="wareForm.city"></el-input>
-          </el-form-item>
-          <el-form-item label="商品状态" prop="status">
-             <el-radio-group v-model="wareForm.status">
-              <el-radio label="上架"></el-radio>
-              <el-radio label="下架"></el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="结算类型" prop="settle">
-             <el-radio-group v-model="wareForm.settle">
-              <el-radio label="自动结算"></el-radio>
-              <el-radio label="手动结算"></el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="可售渠道" prop="channel">
-            <el-radio-group v-model="wareForm.channel">
-              <el-radio label="web渠道"></el-radio>
-              <el-radio label="H5渠道"></el-radio>
-              <el-radio label="app渠道"></el-radio>
-              <el-radio label="其他渠道"></el-radio>
-            </el-radio-group>
-          </el-form-item>
-          
-          <el-form-item label="商品描述" prop="desc">
-            <el-input type="textarea" v-model="wareForm.desc"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="submitForm('wareForm')">添加</el-button>
-            <el-button @click="resetForm('wareForm')">重置</el-button>
-            <el-button type="default" @click="back">返回</el-button>
-          </el-form-item>
-        </el-form>
-      </el-col>
+    <el-row class="panel panel-primary">
+      <div class="panel-heading">
+        <span class="panel-title">添加商品</span>
+        <a href="#" class="pull-right">返回</a>
+      </div>
+      <div class="panel-body">
+        <el-col :span="16" :offset="4">
+          <el-form :model="wareForm" :rules="wareRules" ref="wareForm" label-width="160px" v-loading="loading">
+            <el-form-item label="商品名称" prop="name">
+              <el-input v-model="wareForm.name"></el-input>
+            </el-form-item>
+            <el-form-item label="供应商" prop="provider">
+              <el-input v-model="wareForm.provider"></el-input>
+            </el-form-item>
+            <el-form-item label="商品类别" prop="kind">
+              <el-input v-model="wareForm.kind"></el-input>
+            </el-form-item>
+            <el-form-item label="建议售价" prop="price">
+              <el-input v-model="wareForm.price"></el-input>
+            </el-form-item>
+            <el-form-item label="行程天数" prop="days">
+              <el-input v-model="wareForm.days"></el-input>
+            </el-form-item>
+            <el-form-item label="商品关键字" prop="keyWords">
+              <el-input v-model="wareForm.keyWords"></el-input>
+            </el-form-item>
+            <el-form-item label="父商品" prop="parent">
+              <el-input v-model="wareForm.parent"></el-input>
+            </el-form-item>
+            <el-form-item label="商品销售时间段" prop="date1">
+              <el-date-picker v-model="wareForm.dateRange" type="datetimerange" class="form-control" placeholder="选择时间范围"></el-date-picker>
+            </el-form-item>
+            <el-form-item label="订单占位时长" prop="minute">
+              <el-input v-model="wareForm.minute"></el-input>
+            </el-form-item>
+            <el-form-item label="城市代码" prop="city">
+               <el-input v-model="wareForm.city"></el-input>
+            </el-form-item>
+            <el-form-item label="商品状态" prop="status">
+               <el-radio-group v-model="wareForm.status">
+                <el-radio label="上架"></el-radio>
+                <el-radio label="下架"></el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="结算类型" prop="settle">
+               <el-radio-group v-model="wareForm.settle">
+                <el-radio label="自动结算"></el-radio>
+                <el-radio label="手动结算"></el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="可售渠道" prop="channel">
+              <el-radio-group v-model="wareForm.channel">
+                <el-radio label="web渠道"></el-radio>
+                <el-radio label="H5渠道"></el-radio>
+                <el-radio label="app渠道"></el-radio>
+                <el-radio label="其他渠道"></el-radio>
+              </el-radio-group>
+            </el-form-item>
+            
+            <el-form-item label="商品描述" prop="desc">
+              <el-input type="textarea" v-model="wareForm.desc"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="submitForm('wareForm')">添加</el-button>
+              <el-button @click="resetForm('wareForm')">重置</el-button>
+              <el-button type="default" @click="back">返回</el-button>
+            </el-form-item>
+          </el-form>
+        </el-col>
+      </div>
     </el-row>
   </section>
 </template>
