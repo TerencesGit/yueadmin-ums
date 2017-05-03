@@ -2,6 +2,9 @@
   box-sizing: border-box;
 }
 body {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   margin: 0;
   color: #333;
   background: url(../img/login_bg.jpg) fixed no-repeat;
@@ -9,7 +12,21 @@ body {
 }
 a {
   text-decoration: none;
-  color: inherit;
+  color: #337ab7;
+}
+a:focus, a:hover {
+  color: #23527c;
+}
+input[type="text"],
+input[type="password"] {
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  transition: all .3s;
+}
+input:focus {
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+}
+.is-error input:focus {
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #c76161;
 }
 .clearfix:after,
 .clearfix:before,
@@ -54,6 +71,14 @@ a {
 .el-button--block {
   width: 100%
 }
+.slide-fade-enter-active {
+  transition: all .5s ease;
+}
+.slide-fade-enter {
+  transform: translateY(-30px);
+  opacity: 0;
+}
+/** bootstrap style **/
 .panel {
   margin-bottom: 20px;
   border-radius: 4px;
@@ -79,9 +104,33 @@ a {
 .panel-body {
   padding: 30px;
 }
+dl {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+.dl-horizontal dt {
+  float: left;
+  width: 160px;
+  overflow: hidden;
+  clear: left;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dl-horizontal dd {
+  margin-left: 180px;
+}
+.page-header {
+  padding-bottom: 9px;
+  margin: 0 0 20px;
+  border-bottom: 1px solid #eee;
+}
 .form-control {
   width: 100% !important;
 }
+
+/* element-ui style */
 .uploader .el-upload {
   border: 1px dashed #d9d9d9;
   border-radius: 6px;
@@ -104,21 +153,4 @@ a {
   line-height: 36px; 
   font-size: 20px; 
   font-weight: bold
-}
-dl {
-  margin-top: 10px;
-  margin-bottom: 20px;
-  font-size: 16px;
-}
-.dl-horizontal dt {
-  float: left;
-  width: 160px;
-  overflow: hidden;
-  clear: left;
-  text-align: right;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.dl-horizontal dd {
-  margin-left: 180px;
 }

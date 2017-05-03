@@ -6,7 +6,7 @@
         icon="search"
         v-model="criteria"
         :on-icon-click="handleIconClick"
-        style="width: 300px;float: left">
+        style="width: 300px; float: left">
       </el-input>
       <el-button :plain="true" type="primary" class="pull-right" @click="addWare">添加商品</el-button>
     </el-row>

@@ -30,13 +30,21 @@ Vue.filter('DateFormat', function(value){
 Vue.filter('TimeFormat', function(value){
 	return moment(value).format('YYYY-MM-DD HH:mm:ss')
 })
+Vue.directive('title', {
+  inserted (el, binding) {
+    document.title = el.dataset.title
+  }
+})
 const router = new Router({
   routes  
 })
 router.beforeEach((to, from, next) => {
 	if(to.path === '/logout') {
 		localStorage.removeItem('sessionId')
-		next('/login')
+		return next('/login')
+	}
+	if(to.path === '/register' || to.path === '/login') {
+		return next()
 	}
 	let sessionId = localStorage.getItem('sessionId')
 	if (!sessionId && to.path != '/login') {

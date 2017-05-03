@@ -37,17 +37,17 @@ export default {
         type: 'warning'
       }).then(() => {
       	requestExit().then(res => {
-      		if(res.data.status === 2) {
+      		if(res.data.status === 1) {
       			localStorage.removeItem('sessionId')
       			this.$router.push('/login')
       			this.$message({
 		          type: 'success',
-		          message: '退出成功!'
+		          message: res.data.message
 		        })
       		} else {
       			this.$message({
 		          type: 'error',
-		          message: '退出失败!'
+		          message: '退出失败'
 		        })
       		}
       	})

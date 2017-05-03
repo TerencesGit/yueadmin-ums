@@ -1,22 +1,33 @@
 <template>
-  <transition name="slide-fade"
-  >
+  <transition name="slide-fade">
     <div class="container">
-      <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-width="90px" class="demo-ruleForm" :class="{'animated shake': invalid}">
+      <div v-title :data-title="this.$route.name"></div>
+      <el-form :model="loginForm" :rules="loginRules" ref="loginForm" class="login-form" :class="{'animated shake': invalid}">
         <h2 class="page-header">欢迎登录</h2>
-        <el-form-item label="用户名" prop="name">
-          <el-input v-model.string="ruleForm2.name" placeholder="请输入用户名"></el-input>
+        <el-form-item label="用户名" prop="username" label-width="90px">
+          <el-input v-model.string="loginForm.username" placeholder="请输入用户名"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="pass">
-          <el-input type="password" v-model="ruleForm2.pass" auto-complete="off" placeholder="请输入密码"></el-input>
+        <el-form-item label="密 码" prop="password" label-width="90px">
+          <el-input type="password" v-model="loginForm.password" placeholder="请输入密码"></el-input>
         </el-form-item>
-        <el-form-item label="确认密码" prop="checkPass">
-          <el-input type="password" v-model="ruleForm2.checkPass" auto-complete="off" placeholder="确认密码"></el-input>
+        <el-form-item label="验证码" prop="authcode" label-width="90px">
+          <el-input type="text" v-model="loginForm.authcode" placeholder="请输入验证码" style="float: left; width: 70%; margin-right: 15px;"></el-input>
+          <el-button style="width: 67px; padding: 8px; font-size: 18px" @click="createCode">{{ randomCode }}</el-button>
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" class="el-button--block"  @keyup.enter="submitForm('ruleForm2')" @click="submitForm('ruleForm2')" :loading="logging">
-            提交
+        <el-form-item label="记住密码" label-width="90px" style="margin-bottom: 5px">
+          <el-checkbox-group v-model="loginForm.remember">
+            <el-checkbox name="type"></el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item style="margin-bottom: 5px">
+          <el-button type="primary" class="el-button--block"  @keyup.enter="submitForm('loginForm')" @click="submitForm('loginForm')" :loading="logging">
+            提 交
           </el-button>
+        </el-form-item>
+        <el-form-item style="margin: 0; text-align: center;">
+          <router-link to="/register">尚未注册？</router-link>
+          <span style="margin: 0 10px">|</span>
+          <router-link to="/forgetPass">忘记密码</router-link>
         </el-form-item>
       </el-form>    
     </div>
@@ -24,62 +35,38 @@
 </template>
 <script>
 import { requestLogin } from '../api'
-import NProgress from 'nprogress'
 export default {
   data() {
-    // var checkAge = (rule, value, callback) => {
-    //   if (!value) {
-    //     return callback(new Error('用户名不能为空'));
-    //   }
-    //   setTimeout(() => {
-    //     if (!Number.isInteger(value)) {
-    //       callback(new Error('请输入数字值'));
-    //     } else {
-    //       if (value < 18) {
-    //         callback(new Error('必须年满18岁'));
-    //       } else {
-    //         callback();
-    //       }
-    //     }
-    //   }, 1000);
-    // };
-    var validatePass = (rule, value, callback) => {
+    var validateCode = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请输入密码'));
+        callback(new Error('请输入验证码'))
+      } else if (value.toUpperCase() !== this.randomCode.toUpperCase()) {
+        callback(new Error('验证码错误'))
       } else {
-        if (this.ruleForm2.checkPass !== '') {
-          this.$refs.ruleForm2.validateField('checkPass');
-        }
-        callback();
+        callback()
       }
-    };
-    var validatePass2 = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请再次输入密码'));
-      } else if (value !== this.ruleForm2.pass) {
-        callback(new Error('两次输入密码不一致!'));
-      } else {
-        callback();
-      }
-    };
+    }
     return {
       invalid: false,
       logging: false,
-      ruleForm2: {
-        name: '',
-        pass: '',
-        checkPass: ''
+      randomCode: '',
+      loginForm: {
+        username: '',
+        password: '',
+        authcode: '',
+        remember: false
       },
-      rules2: {
-        name: [
+      loginRules: {
+        username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 5, message: '长度不少于5个字符', trigger: 'blur' }
         ],
-        pass: [
-          { required: true, validator: validatePass, trigger: 'blur' }
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 8, max: 20, message: '长度在 8 到 20 个字符', trigger: 'blur'}
         ],
-        checkPass: [
-          { required: true, validator: validatePass2, trigger: 'blur' }
+        authcode: [
+          { required: true, validator: validateCode, trigger: 'blur'}
         ]
       }
     };
@@ -89,71 +76,57 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid && !this.logging) {
           this.logging = true
-          NProgress.start()
-          NProgress.inc()
-          requestLogin(this.ruleForm2).then(res => {
-            if (res.data.status === 0) {
-              this.$message({
-                type: 'error',
-                message: '用户名不存在'
-              })
-            } else if (res.data.status === 1) {
-              this.$message({
-                type: 'error',
-                message: '密码错误'
-              })
-            } else if (res.data.status === 2) {
+          requestLogin(this.loginForm).then(res => {
+            if (res.data.status === 1) {
               localStorage.setItem('sessionId', res.data.sessionID)
               this.$message({
                 type: 'success',
-                message: '登录成功'
+                message: res.data.message
               })
               this.$router.push({ path: '/account/home' })
             } else {
               this.$message({
                 type: 'error',
-                message: '登录失败，请重试'
+                message: res.data.message
               })
+              this.createCode()
             }
             this.logging = false
           })
           .catch(function (error) {
             console.log(error);
           })
-          NProgress.done()
         } else {
           this.invalid = true
           console.log('error submit!!');
           return false;
         }
       })
+    },
+    createCode () {
+      this.randomCode = ''
+      const ALPHABET = 'abcdefghijklmnopqrstuvwxyzQWERTYUIOPASDFGHJKLZXCVBNM1234567890'
+      for (let i = 0; i < 4; i++) {
+        this.randomCode += ALPHABET.charAt(Math.floor(Math.random() * ALPHABET.length))
+      }
     }
+  },
+  created () {
+    this.createCode()
   }
 }
 </script>
-<style scoped lang="scss">
+<style scoped>
   .container {
     overflow: hidden
   }
-	.demo-ruleForm {
+	.login-form {
 		width: 430px;
 		margin: 8% auto 0;
 		padding: 30px;
 		border-radius: 5px;
 		background: #fff
 	}
-	.page-header {
-		padding-bottom: 9px;
-    margin: 0 0 20px;
-    border-bottom: 1px solid #eee;
-	}
-  .slide-fade-enter-active {
-    transition: all .5s ease;
-  }
-  .slide-fade-enter {
-    transform: translateY(-30px);
-    opacity: 0;
-  }
   .animated {
     -webkit-animation-duration: 1s;
     animation-duration: 1s;

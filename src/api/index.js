@@ -14,12 +14,15 @@ axios.interceptors.request.use(function (config) {
   return config
 }, function (error) {
   // 请求错误
+  console.log('request error')
   return Promise.reject(error)
 })
 // 登录
-export const requestLogin = data => { return axios.post('/signinPost', data)}
+export const requestLogin = data => { return axios.post('/login', data) }
+// 注册
+export const requestRegister = data => { return axios.post('/register', data) }
 // 登出
-export const requestExit = () => { return axios.get('/logoutAsync')}
+export const requestExit = () => { return axios.get('/logoutAsync') }
 // 获取侧边栏
 export const getUserPermission = () => { return axios.get('/user/permission')}
 // 品牌管理

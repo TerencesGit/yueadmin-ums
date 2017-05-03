@@ -1,5 +1,6 @@
 import Hello from '@/components/Hello'
 import Login from '@/view/login'
+import Register from '@/view/register'
 import NotFound from '@/view/NotFound'
 import NoPermission from '@/view/NoPermission'
 
@@ -20,16 +21,22 @@ const routes = [
   },
   {
     path: '/login',
-    name: 'login',
+    name: '欢迎登录',
     component: Login
   },
   {
+    path: '/register',
+    name: '欢迎注册',
+    component: Register
+  },
+  {
     path: '/account',
-    name: 'account',
+    name: '账户主页',
     component: Layout,
     children: [
     	{
     		path: 'home',
+        name: '账户首页',
     		component: Home
     	}
     ]
