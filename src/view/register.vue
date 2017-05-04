@@ -36,7 +36,7 @@
         </el-form-item>
       </el-form>
       <el-dialog title="注册协议" v-model="dialogVisible">
-        <div class="content">
+        <div class="content" style="height: 350px; overflow-y: auto">
           <h4>京东用户注册协议</h4>
           <p> 本协议是您与京东网站（简称"本站"，网址：www.jd.com）所有者（以下简称为"京东"）之间就京东网站服务等相关事宜所订立的契约，请您仔细阅读本注册协议，您点击"同意并继续"按钮后，本协议即构成对双方有约束力的法律文件。</p>
           <h5> 第1条 本站服务条款的确认和接纳</h5>

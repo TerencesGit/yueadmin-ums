@@ -36,6 +36,14 @@ Vue.directive('title', {
     document.title = el.dataset.title
   }
 })
+Vue.component('back-button', {
+	template: '<button class="back-button" @click="back">返回</button>',
+	methods: {
+		back () {
+			this.$router.back()
+		}
+	}
+})
 const router = new Router({
   routes  
 })

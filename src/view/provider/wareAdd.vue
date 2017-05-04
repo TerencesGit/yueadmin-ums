@@ -1,9 +1,9 @@
 <template>
   <section>
     <el-row class="panel panel-primary">
-      <div class="panel-heading">
+      <div class="panel-heading clearfix">
         <span class="panel-title">添加商品</span>
-        <a href="#" class="pull-right">返回</a>
+        <back-button class="pull-right button-text"></back-button>
       </div>
       <div class="panel-body">
         <el-col :span="16" :offset="4">
@@ -65,7 +65,6 @@
             <el-form-item>
               <el-button type="primary" @click="submitForm('wareForm')">添加</el-button>
               <el-button @click="resetForm('wareForm')">重置</el-button>
-              <el-button type="default" @click="back">返回</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -148,9 +147,6 @@ export default {
     }
   },
   methods: {
-    back () {
-      this.$router.back()
-    },
     submitForm (formName) {
       let _this = this
       this.$refs[formName].validate((valid) => {

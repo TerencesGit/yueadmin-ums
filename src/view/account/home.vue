@@ -17,7 +17,6 @@
 	</el-row>
 </template>
 <script>
-// import { getPartnerList } from '../../api/api'
 export default {
   data () {
     return {
@@ -35,15 +34,6 @@ export default {
           name: '平台管理员'
         }
       ]
-    }
-  },
-  methods: {
-    getPart () {
-      let param = ''
-      getPartnerList(param).then(res => {
-        console.log(res.data.funcs)
-        this.funcs = res.data.funcs
-      })
     }
   }
 }

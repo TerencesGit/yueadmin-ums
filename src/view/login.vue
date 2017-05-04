@@ -20,7 +20,7 @@
           </el-checkbox-group>
         </el-form-item>
         <el-form-item style="margin-bottom: 5px">
-          <el-button type="primary" class="el-button--block"  @keyup.enter="submitForm('loginForm')" @click="submitForm('loginForm')" :loading="logging">
+          <el-button type="primary" class="el-button--block" :loading="logging" @click="submitForm('loginForm')">
             提 交
           </el-button>
         </el-form-item>
