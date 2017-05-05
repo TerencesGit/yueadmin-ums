@@ -10,7 +10,7 @@
 </template>
 <script>
 import '@/assets/ueditor/ueditor.config.js'
-import '@/assets/ueditor/ueditor.all.js'
+import '@/assets/ueditor/ueditor.all.min.js'
 import '@/assets/ueditor/ueditor.parse.min.js'
 import '@/assets/ueditor/lang/zh-cn/zh-cn.js'
 export default {

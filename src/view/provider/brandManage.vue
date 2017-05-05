@@ -6,8 +6,8 @@
       </el-col>
     </el-row>
     <el-row :gutter="20" v-loading="loading">
-      <el-col :xs="12" :sm="8" :md="8" :lg="6" v-for="(item, index) in brandList">
-        <transition name="router-fade" mode="out-in">
+      <el-col :xs="12" :sm="8" :md="8" :lg="6" v-for="(item, index) in brandList" :key="item.id">
+        <transition name="el-fade-in-linear">
           <el-card :body-style="{ padding: '5px' }">
             <img :src="item.logoUrl" class="image" @click="handleBrandDetail(item._id)">
             <div style="padding: 14px;">
@@ -100,6 +100,8 @@ export default {
       brandList().then(res => {
         this.brandList = res.data.brands
       }).then(() => {
+        this.loading = false
+      }).catch(() => {
         this.loading = false
       })
     },

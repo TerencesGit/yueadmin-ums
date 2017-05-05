@@ -5,16 +5,17 @@ import NotFound from '@/view/NotFound'
 import NoPermission from '@/view/NoPermission'
 
 import Layout from '@/components/Layout'
+
 import Home from '@/view/account/home'
-import brandManage from '@/view/provider/brandManage'
-import brandDetail from '@/view/provider/brandDetail'
 
-import wareManage from '@/view/provider/wareManage'
-import addWare from '@/view/provider/wareAdd'
-import editWare from '@/view/provider/wareEdit'
+const brandManage = resolve => require(['@/view/provider/brandManage'], resolve)
+const brandDetail = resolve => require(['@/view/provider/brandDetail'], resolve)
+const wareManage = resolve => require(['@/view/provider/wareManage'], resolve)
+const addWare = resolve => require(['@/view/provider/addWare'], resolve)
+const editWare = resolve => require(['@/view/provider/editWare'], resolve)
 
-import html5Editor from '@/view/tools/VueHtml5Editor'
-import UEditor from '@/view/tools/UEditor'
+const html5Editor = resolve => require(['@/view/tools/VueHtml5Editor'], resolve)
+const UEditor = resolve => require(['@/view/tools/UEditor'], resolve)
 
 const routes = [
   {

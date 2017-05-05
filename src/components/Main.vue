@@ -2,7 +2,7 @@
 	<div class="main transition" :class="{'spread': sidebarStatus}">
 		<div class="wrapper">
 			<div class="container-fluid">
-				<transition name="router-fade" mode="out-in">
+				<transition name="fade" mode="out-in">
 					<router-view></router-view>
 				</transition>
 				<div class="wrap-footer"></div>
@@ -35,7 +35,6 @@ export default {
 <style scoped lang="scss">
 	.main {
 		position: absolute;
-		z-index: 1;
     top: 60px;
     left: 240px;
     right: 0;
@@ -78,11 +77,11 @@ export default {
 			color: #2A3542;
 		}
 	}
-	.router-fade-enter-active, .router-fade-leave-active {
-	  transition: opacity .3s;
+	.fade-enter-active, .fade-leave-active {
+	  transition: all .3s;
 	}
-	.router-fade-enter, .router-fade-leave-active {
-		transform: translateX(30px);
+	.fade-enter, .fade-leave-active {
 	  opacity: 0;
+		transform: translateX(30px);
 	}
 </style>

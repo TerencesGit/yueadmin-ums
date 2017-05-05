@@ -106,13 +106,6 @@ button {
 .el-button--block {
   width: 100%
 }
-.slide-fade-enter-active {
-  transition: all .5s ease;
-}
-.slide-fade-enter {
-  transform: translateY(-30px);
-  opacity: 0;
-}
 /** bootstrap style **/
 .panel {
   margin-bottom: 20px;

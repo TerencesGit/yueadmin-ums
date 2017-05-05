@@ -3,7 +3,7 @@
     <div class="grid-content bg-purple">
       <h1>悦视觉后台管理</h1>
     </div>
-	  <el-col :span="6" v-for="item in items">
+	  <el-col :span="6" v-for="item in items" :key="item.id">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span style="line-height: 36px; font-weight: bold">{{ item.name }}</span>

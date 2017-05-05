@@ -31,7 +31,7 @@ export const brandAdd = data => { return axios.post('/brand/provider/brandAdd', 
 export const brandSave = data => { return axios.post('/brand/provider/brandSave', data)}
 export const brandDel = params => { return axios.get('/brand/provider/brandDel', {params: params})}
 export const brandDetail = params => { return axios.get('/brand/provider/brandDetail', {params: params})}
-
+// 商品管理
 export const getWareList = () => { return axios.get('/user/getWareList')}
 export const addWare = data => { return axios.post('/user/addWare', data)}
 export const getWareDetail = params => { return axios.get('/user/wareDetail', {params: params})}

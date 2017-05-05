@@ -1,5 +1,6 @@
 <template>
   <section>
+    <div v-title :data-title="this.$route.name"></div>
     <el-row class="m-b">
       <el-input
         placeholder="输入商品名称"

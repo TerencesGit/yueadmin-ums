@@ -8,10 +8,10 @@
         </a>
       </div>
       <div class="divide-line"></div>
-  		<el-menu :default-active="$route.path" class="el-menu-vertical-demo" theme="dark" :unique-opened=true router>
-        <el-submenu :index="index+''" v-for="(menu, index) in routers">
+  		<el-menu :default-active="$route.path" class="el-menu-vertical-demo" theme="dark" :unique-opened="true" router>
+        <el-submenu :index="index+''" v-for="(menu, index) in routers" :key="menu.id">
           <template slot="title"><i class="fa fa-lg" :class="menu.icon"></i>{{ menu.name }}</template>
-            <el-menu-item :index="submenu.index" v-for="submenu in menu.children">
+            <el-menu-item :index="submenu.index" v-for="submenu in menu.children" :key="submenu.id">
             	<router-link :to="submenu.link">{{ submenu.name }}</router-link>
             </el-menu-item>
         </el-submenu>

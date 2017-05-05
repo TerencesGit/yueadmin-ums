@@ -37,5 +37,28 @@ export default {
 			} else if (unit === "d") {
 				return number * 1000 * 60 * 60 * 24
 			}
-		}
+		},
+		randomCode (length) {
+      length = length || 4;
+      var code = '';
+      const ALPHABET = 'abcdefghijklmnopqrstuvwxyzQWERTYUIOPASDFGHJKLZXCVBNM1234567890'
+      for (let i = 0; i < length; i++) {
+        code += ALPHABET.charAt(Math.floor(Math.random() * ALPHABET.length))
+      }
+      return code;
+    },
+    canvasCode (canvasEle) {
+      const canvas = document.getElementById(canvasEle);
+      const cxt = canvas.getContext('2d');
+      const authCode = this.randomCode();
+      const linear = cxt.createLinearGradient(10, 10, 60, 30);  
+            linear.addColorStop(0,'purple');  
+            linear.addColorStop(.5,'orange');  
+            linear.addColorStop(1,'green');
+      cxt.clearRect(0, 0, 100, 100);
+      cxt.font = "22px Microsoft Yahei";
+      cxt.fillStyle = linear;
+      cxt.fillText(authCode, 10, 25);
+      return authCode;
+    }
 }

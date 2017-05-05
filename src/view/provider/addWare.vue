@@ -1,5 +1,6 @@
 <template>
   <section>
+    <div v-title :data-title="this.$route.name"></div>
     <el-row class="panel panel-primary">
       <div class="panel-heading clearfix">
         <span class="panel-title">添加商品</span>

@@ -14,8 +14,8 @@
           <el-input type="password" v-model="loginForm.checkPass" auto-complete="off" placeholder="再次输入密码"></el-input>
         </el-form-item>
         <el-form-item label="验证码" prop="authcode" label-width="90px">
-          <el-input type="text" v-model="loginForm.authcode" placeholder="请输入验证码" style="float: left; width: 70%; margin-right: 15px;"></el-input>
-          <el-button style="width: 67px; padding: 8px; font-size: 18px" @click="createCode">{{ randomCode }}</el-button>
+          <el-input type="text" v-model="loginForm.authcode" placeholder="请输入验证码" style="float: left; width: 65%; margin-right: 15px;"></el-input>
+          <canvas id="canvasCode" width="80px" height="35px" class="canvas-code" @click="drawCode"></canvas>
         </el-form-item>
         <el-form-item prop="agreement">
           <el-checkbox-group v-model="loginForm.agreement">
@@ -111,6 +111,7 @@
   </transition>
 </template>
 <script>
+import utils from '../assets/js/utils'
 import { requestRegister } from '../api'
 export default {
   data() {
@@ -136,7 +137,7 @@ export default {
     var validateCode = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入验证码'))
-      } else if (value.toUpperCase() !== this.randomCode.toUpperCase()) {
+      } else if (value.toUpperCase() !== this.authCode.toUpperCase()) {
         callback(new Error('验证码错误'))
       } else {
         callback()
@@ -155,7 +156,7 @@ export default {
       invalid: false,
       logging: false,
       checked: true,
-      randomCode: '',
+      authCode: '',
       loginForm: {
         name: '',
         pass: '',
@@ -185,12 +186,11 @@ export default {
     };
   },
   methods: {
-    submitForm(formName) {
+    submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid && !this.logging) {
           this.logging = true
           requestRegister(this.loginForm).then(res => {
-            console.log(res.data)
             if (res.data.status === 1) {
               this.$message({
                 type: 'success',
@@ -202,6 +202,7 @@ export default {
                 type: 'error',
                 message: res.data.message
               })
+              this.drawCode()
             }
             this.logging = false
           })
@@ -212,16 +213,12 @@ export default {
         }
       })
     },
-    createCode () {
-      this.randomCode = ''
-      const ALPHABET = 'abcdefghijklmnopqrstuvwxyzQWERTYUIOPASDFGHJKLZXCVBNM1234567890'
-      for (let i = 0; i < 4; i++) {
-        this.randomCode += ALPHABET.charAt(Math.floor(Math.random() * ALPHABET.length))
-      }
+    drawCode () {
+      this.authCode = utils.canvasCode('canvasCode')
     }
   },
-  created () {
-    this.createCode()
+  mounted () {
+    this.drawCode()
   }
 }
 </script>
@@ -236,6 +233,19 @@ export default {
 		border-radius: 5px;
 		background: #fff
 	}
+  .canvas-code {
+    float: right;
+    cursor: pointer;
+    border-radius: 4px;
+    background-image: linear-gradient(-45deg, #111, #666, #222, #777);
+  }
+  .slide-fade-enter-active {
+    transition: all .5s;
+  }
+  .slide-fade-enter, .slide-fade-leave-active {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
   .animated {
     -webkit-animation-duration: 1s;
     animation-duration: 1s;
