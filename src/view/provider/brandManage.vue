@@ -34,7 +34,7 @@
             class="uploader"
             name="brandLogo"
             accept="image/jpeg, image/png"
-            action="http://localhost:3000/brand/provider/brandUpload"
+            action="/uploadImgUrl"
             :show-file-list="false"
             :on-success="handleSuccess"
             :on-progress="uploadProgress"
