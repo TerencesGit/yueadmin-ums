@@ -3,7 +3,7 @@
     <el-card class="box-card">
       <div slot="header" class="clearfix">
         <span class="card-title">品牌详情</span>
-        <el-button style="float: right;" type="primary" @click="back">返回</el-button>
+        <back-button class="pull-right el-button el-button--primary"></back-button>
       </div>
       <div class="card-body" v-loading="loading">
         <el-col :span="12" :offset="6">
@@ -56,9 +56,6 @@ export default {
         this.loading = false
       })
     },
-    back () {
-      this.$router.back()
-    }
   },
   mounted () {
     this.loadBrandDetail()

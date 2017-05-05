@@ -12,6 +12,7 @@ import ElementUI from 'element-ui'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress'
 import moment from 'moment'
+import VueHtml5Editor from 'vue-html5-editor'
 import utils from '@/assets/js/utils'
 import 'element-ui/lib/theme-default/index.css'
 import 'font-awesome/css/font-awesome.min.css'
@@ -22,6 +23,41 @@ NProgress.configure({ showSpinner: false })
 Vue.use(Router)
 Vue.use(Vuex)
 Vue.use(ElementUI)
+const editorOptions = {
+    image: {
+        // 文件最大体积，单位字节  max file size 
+        sizeLimit: 512 * 1024,
+        // 上传参数,默认把图片转为base64而不上传 
+        // upload config,default null and convert image to base64 
+        upload: {
+            url: 'http://localhost:3000/brand/provider/brandUpload',
+            headers: {},
+            params: {},
+            fieldName: 'image'
+        },
+        // 压缩参数,默认使用localResizeIMG进行压缩,设置为null禁止压缩 
+        // compression config,default resize image by localResizeIMG (https://github.com/think2011/localResizeIMG) 
+        // set null to disable compression 
+        compress: {
+            width: 1600,
+            height: 1600,
+            quality: 80
+        },
+        // 响应数据处理,最终返回图片链接 
+        // handle response data，return image url 
+        uploadHandler(responseText){
+            //default accept json data like  {ok:false,msg:"unexpected"} or {ok:true,data:"image url"} 
+            var json = JSON.parse(responseText)
+            if (!json.ok) {
+                alert(json.msg)
+            } else {
+                return json.data
+            }
+        }
+    },
+    language: "zh-cn"
+}
+Vue.use(VueHtml5Editor, editorOptions)
 Vue.prototype.$moment = moment
 Vue.prototype.$nprogress = NProgress
 Vue.config.productionTip = false

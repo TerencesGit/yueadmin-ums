@@ -35,6 +35,7 @@ export default {
 <style scoped lang="scss">
 	.main {
 		position: absolute;
+		z-index: 1;
     top: 60px;
     left: 240px;
     right: 0;
