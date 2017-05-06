@@ -85,14 +85,14 @@ const router = new Router({
 })
 router.beforeEach((to, from, next) => {
 	if(to.path === '/logout') {
-		utils.delCookie('sessionId')
+		utils.delCookie('isLogin')
 		return next('/login')
 	}
 	if(to.path === '/register' || to.path === '/login') {
 		return next()
 	}
-	let sessionId = utils.getCookie('sessionId')
-	if (!sessionId && to.path != '/login') {
+	let isLogin = utils.getCookie('isLogin')
+	if (!isLogin && to.path != '/login') {
 		next('/login')
 	} else {
 		NProgress.start()

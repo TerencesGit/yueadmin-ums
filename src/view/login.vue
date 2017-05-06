@@ -79,15 +79,15 @@ export default {
           this.logging = true
           requestLogin(this.loginForm).then(res => {
             if (res.data.status === 1) {
-              utils.setCookie('sessionId', res.data.sessionID)
+              utils.setCookie('isLogin', 'true')
               if (this.loginForm.remember) {
-                let uname = escape(btoa(this.loginForm.username))
-                let upass = escape(btoa(this.loginForm.password))
-                utils.setCookie('uname', uname, '7d')
-                utils.setCookie('upass', upass, '7d')
+                let name = btoa(escape(btoa(this.loginForm.username).split('').reverse().join()))
+                let pass = btoa(escape(btoa(this.loginForm.password).split('').reverse().join()))
+                utils.setCookie('username', name, '7d')
+                utils.setCookie('userkey', pass, '7d')
               } else {
-                utils.delCookie('uname')
-                utils.delCookie('upass')
+                utils.delCookie('username')
+                utils.delCookie('userkey')
               }
               this.$message({
                 type: 'success',
@@ -119,9 +119,9 @@ export default {
   },
   mounted () {
     this.drawCode()
-    if (utils.getCookie('uname') && utils.getCookie('upass')) {
-      this.loginForm.username = atob(unescape(utils.getCookie('uname')))
-      this.loginForm.password = atob(unescape(utils.getCookie('upass')))
+    if (utils.getCookie('username') && utils.getCookie('userkey')) {
+      this.loginForm.username = atob(unescape(atob(utils.getCookie('username'))).split(',').reverse().join(''))
+      this.loginForm.password = atob(unescape(atob(utils.getCookie('userkey'))).split(',').reverse().join(''))
       this.loginForm.remember = true
     }
   }

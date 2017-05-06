@@ -39,7 +39,7 @@ export default {
       }).then(() => {
       	requestExit().then(res => {
       		if(res.data.status === 1) {
-      			utils.delCookie('sessionId')
+      			utils.delCookie('isLogin')
       			this.$router.push('/login')
       			this.$message({
 		          type: 'success',
