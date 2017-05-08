@@ -106,7 +106,7 @@ router.afterEach((to, from, next) => {
 /* response interceptors */
 axios.interceptors.response.use(function (res) {
   if (res.data.status ===  '401') {
-  	localStorage.removeItem('sessionId')
+  	utils.delCookie('isLogin')
     router.push('/login')
     Message.info({
    	  message: '长时间未操作,请重新登录'

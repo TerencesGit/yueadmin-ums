@@ -1,6 +1,6 @@
 <template>
 	<div id="layout">
-		<AsideComp></AsideComp>
+		<!-- <AsideComp></AsideComp> -->
     <HeaderComp></HeaderComp>
     <keep-alive>
       <MainComp></MainComp>
@@ -9,7 +9,7 @@
 </template>
 <script>
 import AsideComp from './Aside'
-import HeaderComp from './Header'
+import HeaderComp from './Top'
 import MainComp from './Main'
 import { getUserPermission } from '../api'
 export default {

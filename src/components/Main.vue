@@ -35,10 +35,10 @@ export default {
 <style scoped lang="scss">
 	.main {
 		position: absolute;
-    top: 60px;
-    left: 240px;
+    top: 110px;
+    left: 0;
     right: 0;
-    height: calc(100% - 60px);
+    height: calc(100% - 110px);
     .wrapper {
 	    min-height: 100%;
 	    height: auto !important;

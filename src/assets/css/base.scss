@@ -65,14 +65,23 @@ button {
 }
 .clearfix:after,
 .clearfix:before,
+.container:after,
+.container:before,
 .container-fluid:after,
 .container-fluid:before {
   display: table;
   content: '';
 }
 .clearfix:after,
+.container:after,
 .container-fluid:after {
   clear: both
+}
+.container-fluid {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
 }
 .pull-right {
   float: right

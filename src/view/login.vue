@@ -83,11 +83,11 @@ export default {
               if (this.loginForm.remember) {
                 let name = btoa(escape(btoa(this.loginForm.username).split('').reverse().join()))
                 let pass = btoa(escape(btoa(this.loginForm.password).split('').reverse().join()))
-                utils.setCookie('username', name, '7d')
-                utils.setCookie('userkey', pass, '7d')
+                utils.setCookie('uname', name, '7d')
+                utils.setCookie('ukey', pass, '7d')
               } else {
-                utils.delCookie('username')
-                utils.delCookie('userkey')
+                utils.delCookie('uname')
+                utils.delCookie('ukey')
               }
               this.$message({
                 type: 'success',
@@ -119,9 +119,9 @@ export default {
   },
   mounted () {
     this.drawCode()
-    if (utils.getCookie('username') && utils.getCookie('userkey')) {
-      this.loginForm.username = atob(unescape(atob(utils.getCookie('username'))).split(',').reverse().join(''))
-      this.loginForm.password = atob(unescape(atob(utils.getCookie('userkey'))).split(',').reverse().join(''))
+    if (utils.getCookie('uname') && utils.getCookie('ukey')) {
+      this.loginForm.username = atob(unescape(atob(utils.getCookie('uname'))).split(',').reverse().join(''))
+      this.loginForm.password = atob(unescape(atob(utils.getCookie('ukey'))).split(',').reverse().join(''))
       this.loginForm.remember = true
     }
   }
