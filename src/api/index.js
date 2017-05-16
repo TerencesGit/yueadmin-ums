@@ -18,20 +18,18 @@ axios.interceptors.request.use(function (config) {
   return Promise.reject(error)
 })
 // 登录
-export const requestLogin = data => { return axios.post('/login', data) }
+export const requestLogin = data => { return axios.post('/ysj/auth/login.json', data) }
+// export const requestLogin = params => { return axios.get('/ysj/auth/login.json', {params: params})}
+
+// 获取用户权限
+export const getPermissionList = () => { return axios.get('/ysj/permission/getPermissionList.json')}
+
 // 注册
 export const requestRegister = data => { return axios.post('/register', data) }
 // 登出
-export const requestExit = () => { return axios.get('/logoutAsync') }
-// 获取侧边栏
-export const getUserPermission = () => { return axios.get('/user/permission')}
-// 品牌管理
-export const brandList = () => { return axios.get('/brand/provider/brandList')}
-export const brandAdd = data => { return axios.post('/brand/provider/brandAdd', data)}
-export const brandSave = data => { return axios.post('/brand/provider/brandSave', data)}
-export const brandDel = params => { return axios.get('/brand/provider/brandDel', {params: params})}
-export const brandDetail = params => { return axios.get('/brand/provider/brandDetail', {params: params})}
-// 商品管理
-export const getWareList = () => { return axios.get('/user/getWareList')}
-export const addWare = data => { return axios.post('/user/addWare', data)}
-export const getWareDetail = params => { return axios.get('/user/wareDetail', {params: params})}
+// export const requestExit = () => { return axios.get('/logoutAsync') }
+
+export const requestExit = params => { return axios.get('/ysj/auth/logout.json', {params: params})}
+
+//商户管理页面-获取用户分页
+export const getBusinessList = params => { return axios.get('/ysj/yueShop/paginationYueShops.json', {params: params})}

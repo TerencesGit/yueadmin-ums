@@ -92,6 +92,9 @@ button {
 .m-t {
   margin-top: 15px
 }
+.m-b-5 {
+  margin-bottom: 5px
+}
 .m-b {
   margin-bottom: 15px
 }
@@ -112,7 +115,8 @@ button {
 .transition {
   transition: all .3s
 }
-.el-button--block {
+.el-button--block,
+.el-select--block {
   width: 100%
 }
 /** bootstrap style **/

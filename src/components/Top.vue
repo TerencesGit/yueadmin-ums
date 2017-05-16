@@ -18,7 +18,7 @@
 						<a href="#">咨询及通告</a>
 						<a href="#">公告</a>
 						<a href="#">修改密码</a>
-						<a href="#">退出</a>
+						<a href="javascript:;" @click="logout">退出</a>
 					</div>
 				</div>
 			</div>
@@ -42,19 +42,49 @@
 	</header>
 </template>
 <script>
-  export default {
-    data() {
-      return {
-        activeIndex: '1',
-        activeIndex2: '1'
-      };
+import { requestExit } from '../api'
+import utils from '@/assets/js/utils'
+export default {
+  data() {
+    return {
+      activeIndex: '1',
+      activeIndex2: '1'
+    };
+  },
+  methods: {
+    handleSelect(key, keyPath) {
+      console.log(key, keyPath);
     },
-    methods: {
-      handleSelect(key, keyPath) {
-        console.log(key, keyPath);
-      }
+    logout () {
+    	this.$confirm('确定退出系统?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+      	requestExit().then(res => {
+      		if(res.data.status === 1) {
+      			utils.delCookie('isLogin')
+      			this.$router.push('/login')
+      			this.$message({
+		          type: 'success',
+		          message: res.data.message
+		        })
+      		} else {
+      			this.$message({
+		          type: 'error',
+		          message: '退出失败'
+		        })
+      		}
+      	})
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消操作'
+        });          
+      })
     }
   }
+}
 </script>
 <style scoped lang="scss">
 	.top {

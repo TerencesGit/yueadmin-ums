@@ -55,8 +55,8 @@
   </section>
 </template>
 <script>
-import { getWareList } from '../../api'
-import { mapGetters } from 'vuex'
+// import { getWareList } from '../../api'
+// import { mapGetters } from 'vuex'
 export default {
   data () {
     return {
@@ -107,15 +107,15 @@ export default {
     }   
   },
   mounted () {
-    this.getWareList()
+    // this.getWareList()
   },
-  computed: {
-    ...mapGetters([
-      'wareList'
-    ]),
-    filteredWare () {
-      return this.wareList.filter(ware => ware.ware_name.indexOf(this.criteria) !== -1)
-    }
-  }
+  // computed: {
+  //   ...mapGetters([
+  //     'wareList'
+  //   ]),
+  //   filteredWare () {
+  //     return this.wareList.filter(ware => ware.ware_name.indexOf(this.criteria) !== -1)
+  //   }
+  // }
 }
 </script>

@@ -29,7 +29,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/baseUrl': {
-        target: 'http://localhost:3000/',
+        target: 'http://www.yueshijue.com',
         changeOrigin: true,
         pathRewrite: {
           '^/baseUrl': ''

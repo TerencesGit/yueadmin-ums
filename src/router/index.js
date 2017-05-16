@@ -6,16 +6,9 @@ import NoPermission from '@/view/NoPermission'
 
 import Layout from '@/components/Layout'
 
-import Home from '@/view/account/home'
-
-const brandManage = resolve => require(['@/view/provider/brandManage'], resolve)
-const brandDetail = resolve => require(['@/view/provider/brandDetail'], resolve)
-const wareManage = resolve => require(['@/view/provider/wareManage'], resolve)
-const addWare = resolve => require(['@/view/provider/addWare'], resolve)
-const editWare = resolve => require(['@/view/provider/editWare'], resolve)
-
-const html5Editor = resolve => require(['@/view/tools/VueHtml5Editor'], resolve)
-const UEditor = resolve => require(['@/view/tools/UEditor'], resolve)
+import Home from '@/view/User/account/home'
+import businessManage from '@/view/Finance/installmentLoan/businessManage'
+import loanManage from '@/view/Finance/installmentLoan/loanManage'
 
 const routes = [
   {
@@ -46,24 +39,30 @@ const routes = [
     ]
   },
   {
-    path: '/provider',
-    name: 'provider',
+    path: '/installmentLoan',
+    name: '分期贷平台',
     component: Layout,
     children: [
-      { path: 'brandManage', component: brandManage, name: '品牌管理' },
-      { path: 'brandDetail', component: brandDetail, name: '品牌详情' },
-      { path: 'wareManage', component: wareManage, name: '商品管理' },
-      { path: 'addWare',component: addWare, name: '商品添加' },
-      { path: 'editWare',component: editWare, name: '商品编辑' },
-    ]
-  },
-  {
-    path: '/tools',
-    name: 'tools',
-    component: Layout,
-    children: [
-      { path: 'vueHtml5Editor', component: html5Editor, name: 'Html5富文本编辑' },
-      { path: 'UEditor', component: UEditor, name: 'UEditor富文本编辑' },
+      {
+        path: 'businessManage',
+        name: '商户管理',
+        component: businessManage
+      },
+      {
+        path: 'customerManage',
+        name: 'C端用户管理',
+        component: Home
+      },
+      {
+        path: 'loanManage',
+        name: '分期贷管理',
+        component: loanManage
+      },
+      {
+        path: 'financeManage',
+        name: '金融机构管理',
+        component: Home
+      }
     ]
   },
   {

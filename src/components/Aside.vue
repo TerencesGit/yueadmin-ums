@@ -24,47 +24,51 @@ import { mapGetters } from 'vuex'
 export default {
   data () {
     return {
-      // routers: [
-      //   {
-      //     name: '账户管理',
-      //     icon: 'fa-user',
-      //     children: [
-      //       {name: '账户首页', link: '/account/home', index: '/account/home'}
-      //       // {name: '账户编辑', link: '/account/edit', index: '1-2'},
-      //       // {name: '账户安全', link: '/account/security', index: '1-3'}
-      //     ]
-      //   },
-      //   {
-      //     name: '供应商',
-      //     icon: 'fa-paw',
-      //     children: [
-      //       {name: '商品管理', link: '/supplier/wareManage', index: '2-1'}
-      //     ]
-      //   },
-      //   {
-      //     name: '分销商',
-      //     icon: 'fa-sitemap',
-      //     children: [
-      //       {name: '订单管理', link: '/distributor/orderManage', index: '3-1'}
-      //     ]
-      //   },
-      //   {
-      //     name: '平台管理员',
-      //     icon: 'fa-desktop',
-      //     children: [
-      //       {name: '商品上架审核', link: '/admin/wareAudit', index: '4-1'}
-      //     ]
-      //   }
-      // ]
+      routers: [
+        {
+          name: '分期贷平台管理',
+          icon: 'fa-user',
+          children: [
+            {name: '商户管理', link: '/installmentLoan/businessManage', index: '/installmentLoan/businessManage'},
+            {name: 'C端客户管理', link: '/installmentLoan/customerManage', index: '/installmentLoan/customerManage'},
+            {name: '分期贷订单管理', link: '/installmentLoan/loanManage', index: '/installmentLoan/loanManage'},
+            {name: '金融机构管理', link: '/installmentLoan/financeManage', index: '/installmentLoan/financeManage'},
+            // {name: '账户编辑', link: '/account/edit', index: '1-2'},
+            // {name: '账户安全', link: '/account/security', index: '1-3'}
+          ]
+        },
+        {
+          name: '我的企业',
+          icon: 'fa-paw',
+          children: [
+            {name: '企业信息', link: '/myBusiness/businessInfo', index: '/myBusiness/businessInfo'},
+            {name: '二维码分享', link: '/myBusiness/QRCodeShare', index: '/myBusiness/QRCodeShare'},
+          ]
+        },
+        {
+          name: '分销商',
+          icon: 'fa-sitemap',
+          children: [
+            {name: '订单管理', link: '/distributor/orderManage', index: '3-1'}
+          ]
+        },
+        {
+          name: '平台管理员',
+          icon: 'fa-desktop',
+          children: [
+            {name: '商品上架审核', link: '/admin/wareAudit', index: '4-1'}
+          ]
+        }
+      ]
     }
   },
   computed: {
     ...mapGetters([
       'sidebarStatus'
     ]),
-    ...mapGetters({
-      routers: 'userPermission'
-    }),
+    // ...mapGetters({
+    //   routers: 'userPermission'
+    // }),
     ...mapGetters({
       partner: 'partnerInfo'
     }),

@@ -1,6 +1,6 @@
 <template>
 	<div id="layout">
-		<!-- <AsideComp></AsideComp> -->
+		<AsideComp></AsideComp>
     <HeaderComp></HeaderComp>
     <keep-alive>
       <MainComp></MainComp>
@@ -9,9 +9,9 @@
 </template>
 <script>
 import AsideComp from './Aside'
-import HeaderComp from './Top'
+import HeaderComp from './Header'
 import MainComp from './Main'
-import { getUserPermission } from '../api'
+import { getPermissionList } from '../api'
 export default {
   name: 'layout',
   components: {
@@ -20,11 +20,14 @@ export default {
     MainComp
   },
   created () {
-    getUserPermission().then(res => {
+    let sessionId = localStorage.getItem('sessionId')
+    console.log(sessionId)
+    getPermissionList({sessionId: sessionId}).then(res => {
+      console.log(res)
       let data = res.data
-      this.$store.dispatch('setUserPermission', data.permission)
-      this.$store.dispatch('setUserName', data.name)
-      this.$store.dispatch('setPartner', data.partner)
+      this.$store.dispatch('setUserPermission', data.result)
+      // this.$store.dispatch('setUserName', data.name)
+      // this.$store.dispatch('setPartner', data.partner)
     })
     .catch(function (error) {
       console.log(error)

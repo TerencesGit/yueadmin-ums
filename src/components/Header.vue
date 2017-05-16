@@ -37,18 +37,21 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-      	requestExit().then(res => {
-      		if(res.data.status === 1) {
+      	let sessionId = utils.getCookie('sessionId')
+      	requestExit({sessionId: sessionId}).then(res => {
+      		console.log(res)
+      		if(res.data.code === 0) {
       			utils.delCookie('isLogin')
+      			localStorage.removeItem('sessionId')
       			this.$router.push('/login')
       			this.$message({
 		          type: 'success',
-		          message: res.data.message
+		          message: '已退出'
 		        })
       		} else {
       			this.$message({
 		          type: 'error',
-		          message: '退出失败'
+		          message: res.data.message
 		        })
       		}
       	})
