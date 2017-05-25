@@ -30,7 +30,7 @@
           </el-checkbox-group>
         </el-form-item>
         <el-form-item class="m-b-5">
-          <el-button type="primary" class="el-button--block" :loading="logging" @click="submitForm('loginForm')">
+          <el-button type="primary" class="el-button--block" :loading="logging" @click="submitForm">
             提 交
           </el-button>
         </el-form-item>
@@ -92,9 +92,9 @@ export default {
     };
   },
   methods: {
-    submitForm (formName) {
+    submitForm () {
       let self = this;
-      this.$refs[formName].validate((valid) => {
+      this.$refs.loginForm.validate((valid) => {
         console.log(this.loginForm)
         if (valid && !this.logging) {
           this.logging = true
@@ -103,9 +103,9 @@ export default {
             if (res.data.code === 0) {
               let result = res.data.result;
               console.log(result)
-              utils.setCookie('isLogin', 'true')
               localStorage.setItem('sessionId', result.session)
-              console.log(localStorage.getItem('sessionId'))
+              localStorage.setItem('user', JSON.stringify(result.user))
+              console.log(localStorage.getItem('user'))
               if (this.loginForm.remember) {
                 let name = btoa(escape(btoa(this.loginForm.username).split('').reverse().join()))
                 let pass = btoa(escape(btoa(this.loginForm.password).split('').reverse().join()))
@@ -117,7 +117,7 @@ export default {
               }
               this.$message({
                 type: 'success',
-                message: res.data.message
+                message: '登录成功'
               })
               this.$router.push({ path: '/account/home' })
             } else {
@@ -142,6 +142,9 @@ export default {
     },
     drawCode () {
       this.authCode = utils.canvasCode('canvasCode')
+    },
+    keyDown(e) {
+      e && e.keyCode === 13 && this.submitForm()
     }
   },
   mounted () {
@@ -151,6 +154,8 @@ export default {
       this.loginForm.password = atob(unescape(atob(utils.getCookie('ukey'))).split(',').reverse().join(''))
       this.loginForm.remember = true
     }
+    let codeInput = document.querySelectorAll('.el-input__inner')[2]
+    codeInput.addEventListener('keydown', this.keyDown)
   }
 }
 </script>

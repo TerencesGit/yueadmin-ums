@@ -9,7 +9,7 @@ import App from './App'
 import routes from './router'
 import store from './vuex/store'
 import ElementUI from 'element-ui'
-import { Message } from 'element-ui'
+import { Message, Loading } from 'element-ui'
 import NProgress from 'nprogress'
 import moment from 'moment'
 import utils from '@/assets/js/utils'
@@ -55,8 +55,8 @@ router.beforeEach((to, from, next) => {
 	if(to.path === '/register' || to.path === '/login') {
 		return next()
 	}
-	let isLogin = utils.getCookie('isLogin')
-	if (!isLogin && to.path != '/login') {
+	let sessionId = localStorage.getItem('sessionId')
+	if (!sessionId && to.path != '/login') {
 		next('/login')
 	} else {
 		NProgress.start()
@@ -68,9 +68,21 @@ router.afterEach((to, from, next) => {
   NProgress.done()
 })
 /* response interceptors */
+// 添加请求拦截器
+// var globalLoading;
+axios.interceptors.request.use(function (config) {
+  // globalLoading = Loading.service({fullscreen: true})
+  return config
+}, function (error) {
+  // 请求错误
+  console.log('request error')
+  return Promise.reject(error)
+})
 axios.interceptors.response.use(function (res) {
+	// globalLoading.close()
   if (res.data.code ===  999) {
-  	utils.delCookie('isLogin')
+  	// utils.delCookie('isLogin')
+  	localStorage.clear()
     Message.info({
    	  message: '长时间未操作,请重新登录'
     })
