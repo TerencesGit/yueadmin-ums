@@ -48,20 +48,21 @@ const router = new Router({
   routes  
 })
 router.beforeEach((to, from, next) => {
-	if(to.path === '/logout') {
-		utils.delCookie('isLogin')
-		return next('/login')
-	}
-	if(to.path === '/register' || to.path === '/login') {
-		return next()
-	}
-	let sessionId = localStorage.getItem('sessionId')
-	if (!sessionId && to.path != '/login') {
-		next('/login')
-	} else {
-		NProgress.start()
-		next()
-	}
+	// if(to.path === '/logout') {
+	// 	utils.delCookie('isLogin')
+	// 	return next('/login')
+	// }
+	// if(to.path === '/register' || to.path === '/login') {
+	// 	return next()
+	// }
+	// let sessionId = localStorage.getItem('sessionId')
+	// if (!sessionId && to.path != '/login') {
+	// 	next('/login')
+	// } else {
+		
+	// }
+  NProgress.start()
+  next()
 })
 router.afterEach((to, from, next) => {
   console.log(to.path)

@@ -1,4 +1,4 @@
-# vue-yueadmin
+# yueadmin-ums
 
 > A Vue.js project
 

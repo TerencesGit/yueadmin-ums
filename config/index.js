@@ -23,7 +23,7 @@ module.exports = {
   },
   dev: {
     env: require('./dev.env'),
-    port: 8081,
+    port: 8085,
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
@@ -35,13 +35,13 @@ module.exports = {
           '^/baseUrl': ''
         }
       },
-      '/uploadImgUrl': {
-         target: 'http://localhost:3000/upload/imageUpload',
-         changeOrigin: true,
-         pathRewrite: {
-           '^/uploadImgUrl': ''
-         }
-       }
+      // '/uploadImgUrl': {
+      //    target: 'http://localhost:3000/upload/imageUpload',
+      //    changeOrigin: true,
+      //    pathRewrite: {
+      //      '^/uploadImgUrl': ''
+      //    }
+      //  }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README

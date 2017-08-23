@@ -1,20 +1,16 @@
-import Hello from '@/components/Hello'
-import Login from '@/view/login'
-import Register from '@/view/register'
-import NotFound from '@/view/NotFound'
-import NoPermission from '@/view/NoPermission'
-
 import Layout from '@/components/Layout'
 
-import Home from '@/view/User/account/home'
-import businessManage from '@/view/Finance/installmentLoan/businessManage'
-import loanManage from '@/view/Finance/installmentLoan/loanManage'
+import Login from '@/pages/login'
+import Register from '@/pages/register'
+import NotFound from '@/pages/NotFound'
+import NoPermission from '@/pages/NoPermission'
+
+import Home from '@/pages/home'
 
 const routes = [
   {
     path: '/',
-    name: 'Hello',
-    component: Hello
+    redirect: '/account/home'
   },
   {
     path: '/login',
@@ -36,33 +32,6 @@ const routes = [
         name: '账户首页',
     		component: Home
     	}
-    ]
-  },
-  {
-    path: '/installmentLoan',
-    name: '分期贷平台',
-    component: Layout,
-    children: [
-      {
-        path: 'businessManage',
-        name: '商户管理',
-        component: businessManage
-      },
-      {
-        path: 'customerManage',
-        name: 'C端用户管理',
-        component: Home
-      },
-      {
-        path: 'loanManage',
-        name: '分期贷管理',
-        component: loanManage
-      },
-      {
-        path: 'financeManage',
-        name: '金融机构管理',
-        component: Home
-      }
     ]
   },
   {
