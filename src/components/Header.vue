@@ -24,6 +24,7 @@ import utils from '@/assets/js/utils'
 export default {
 	data () {
 		return {
+			username: 'Transform',
 			home: '/account/home'
 		}
 	},
@@ -66,7 +67,6 @@ export default {
   computed: {
 	  ...mapGetters([
   		'sidebarStatus',
-  		'username'
   	])
   },
 }

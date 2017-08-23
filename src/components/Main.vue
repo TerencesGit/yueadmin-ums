@@ -39,6 +39,9 @@ export default {
     left: 240px;
     right: 0;
     height: calc(100% - 60px);
+		&.spread {
+			left: 64px;
+		}
     .wrapper {
 	    min-height: 100%;
 	    height: auto !important;
@@ -46,9 +49,6 @@ export default {
 	    margin-bottom: -40px;
 	    background: #f0f3f4;
 	  }
-	}
-	.main.spread {
-		left: 0;
 	}
   .container-fluid {
     margin-right: auto;
