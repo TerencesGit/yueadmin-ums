@@ -1,16 +1,16 @@
 import Layout from '@/components/Layout'
-
 import Login from '@/pages/login'
 import Register from '@/pages/register'
 import NotFound from '@/pages/NotFound'
 import NoPermission from '@/pages/NoPermission'
+import Welcome from '@/pages/welcome'
 
-import Home from '@/pages/home'
+import AccountHome from '@/pages/account/home'
 
 const routes = [
   {
     path: '/',
-    redirect: '/account/home'
+    redirect: '/welcome'
   },
   {
     path: '/login',
@@ -23,6 +23,17 @@ const routes = [
     component: Register
   },
   {
+    path: '/',
+    component: Layout,
+    children: [
+      {
+        path: 'welcome',
+        name: '欢迎',
+        component: Welcome
+      }
+    ]
+  },
+  {
     path: '/account',
     name: '账户主页',
     component: Layout,
@@ -30,7 +41,7 @@ const routes = [
     	{
     		path: 'home',
         name: '账户首页',
-    		component: Home
+    		component: AccountHome
     	}
     ]
   },
