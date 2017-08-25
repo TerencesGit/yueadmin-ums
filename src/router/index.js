@@ -5,7 +5,7 @@ import NotFound from '@/pages/NotFound'
 import NoPermission from '@/pages/NoPermission'
 import Welcome from '@/pages/welcome'
 
-import AccountHome from '@/pages/account/home'
+import AccountInfo from '@/pages/account/infocenter'
 
 const routes = [
   {
@@ -35,13 +35,13 @@ const routes = [
   },
   {
     path: '/account',
-    name: '账户主页',
+    name: '我的账户',
     component: Layout,
     children: [
     	{
-    		path: 'home',
-        name: '账户首页',
-    		component: AccountHome
+    		path: 'infocenter',
+        name: '账户中心',
+    		component: AccountInfo
     	}
     ]
   },
