@@ -38,7 +38,8 @@
 							</li>
 							<li class="list-group-item">
 								<label>QQ</label>
-								<span>{{accountForm.qq}}</span>
+								<span v-if="accountForm.qq">{{accountForm.qq}}</span>
+								<span v-else>未设置</span>
 							</li>
 							<li class="list-group-item">
 								<label>生日</label>
@@ -46,7 +47,8 @@
 							</li>
 							<li class="list-group-item">
 								<label>籍贯</label>
-								<span>{{accountForm.origin}}</span>
+								<span v-if="originName">{{originName}}</span>
+								<span v-else>未设置</span>
 							</li>
 							<li class="list-group-item">
 								<label>部门</label>
@@ -84,17 +86,17 @@
 		<!-- 账户信息编辑 -->
 		<el-dialog :visible.sync="accountFormVisible" title="账户信息编辑">
 			<el-row>
-				<el-col :span="16" :offset="4">
+				<el-col :span="18" :offset="3">
 					<el-form :model="accountForm" ref="accountForm" :rules="rules" label-width="120px">
 						<el-form-item label="姓名：" prop="name">
-							<el-input v-model="accountForm.name"></el-input>
+							<el-input v-model="accountForm.name" placeholder="输入姓名"></el-input>
 						</el-form-item>
 						<el-form-item label="性别：" prop="gender">
 							<el-radio class="radio" v-model="accountForm.gender" :label="1">男</el-radio>
   						<el-radio class="radio" v-model="accountForm.gender" :label="0">女</el-radio>
 						</el-form-item>
 						<el-form-item label="QQ：" prop="qq">
-							<el-input v-model="accountForm.qq"></el-input>
+							<el-input v-model="accountForm.qq" placeholder="输入QQ"></el-input>
 						</el-form-item>
 						<el-form-item label="生日：">
 							<el-date-picker
@@ -105,6 +107,40 @@
 					      style="width: 100%"
 					      @change="dateChange">
 					    </el-date-picker>
+						</el-form-item>
+						<el-form-item label="籍贯：">
+							<el-row :gutter="5">
+								<el-col :span="7">
+									<el-select v-model="region.province" placeholder="选择省" @change="provinceChange">
+								    <el-option
+								      v-for="item in regionList.province"
+								      :key="item.id"
+								      :label="item.name"
+								      :value="item.id">
+								    </el-option>
+								  </el-select>
+								</el-col>
+								<el-col :span="7">
+									<el-select v-model="region.city" placeholder="选择市" @change="cityChange">
+								    <el-option
+								      v-for="item in regionList.city"
+								      :key="item.id"
+								      :label="item.name"
+								      :value="item.id">
+								    </el-option>
+								  </el-select>
+								</el-col>
+								<el-col :span="7">
+									<el-select v-model="region.area" placeholder="选择区/县" @change="areaChange">
+								    <el-option
+								      v-for="item in regionList.area"
+								      :key="item.id"
+								      :label="item.name"
+								      :value="item.id">
+								    </el-option>
+								  </el-select>
+								</el-col>
+							</el-row>
 						</el-form-item>
 						<el-form-item label="身份证号：" prop="idcard">
 							<el-input v-model="accountForm.idcard"></el-input>
@@ -144,6 +180,7 @@
 	</section>
 </template>
 <script>
+	import Region from '@/assets/js/region'
 	export default {
 		data() {
 			return {
@@ -162,6 +199,18 @@
 					organize: '技术部',
 					idcardPicFront: '',
 					idcardPicBack: '',
+					originId: 5,
+				},
+				originName: '',
+				region: {
+					province: '',
+					city: '',
+					area: ''
+				},
+				regionList: {
+					province: [],
+					city: [],
+					area: [],
 				},
 				avatarUrl: '',
 				idcardFrontUrl: '',
@@ -190,7 +239,7 @@
 					email: '2630243397@qq.com',
 					birthday: '1992-08-08',
 					qq: '12345678',
-					origin: '山东-济南',
+					origin: 5,
 					location: '北京',
 					mobile: '',
 					idcard: '130110199208081234',
@@ -198,6 +247,22 @@
 					organize: '技术部',
 					idcardPicFront: '',
 					idcardPicBack: '',
+				}
+				let origin = Region.filter(region => region.id === this.accountForm.origin)[0];
+				console.log(origin.level)
+				if (origin.level === 1) {
+					this.originName = this.region.province = origin.name
+				} else if (origin.level === 2) {
+					this.originName = this.region.city = origin.name;
+					this.region.province = Region.filter(region => region.id === origin.pid)[0].name;
+					this.regionList.city = Region.filter(region => region.pid === origin.pid);
+				} else if (origin.level === 3) {
+					this.originName = this.region.area = origin.name;
+					let city = Region.filter(region => region.id === origin.pid)[0];
+					this.region.city = city.name;
+					this.region.province = Region.filter(region => region.id === city.pid)[0].name;
+					this.regionList.city = Region.filter(region => region.id === origin.pid);
+					this.regionList.area = Region.filter(region => region.pid === city.id);
 				}
 				this.avatarUrl = this.accountForm.avatar;
 			},
@@ -258,12 +323,27 @@
       	this.$refs.accountForm.validate(valid => {
       		let data = Object.assign({}, this.accountForm)
       		console.log(data)
-
       	})
+      },
+      provinceChange (pid) {
+      	this.region.city = '';
+      	this.originId = pid;
+      	this.regionList.city = Region.filter(region => region.pid === pid)
+      },
+      cityChange (cid) {
+      	console.log(cid)
+      	this.region.area = '';
+      	this.originId = cid;
+      	this.regionList.area = Region.filter(region => region.pid === cid)
+      },
+      areaChange(aid) {
+      	console.log(aid)
+      	this.originId = aid;
       }
 		},
 		mounted() {
 			this.getAccountInfo()
+			this.regionList.province = Region.filter(region => region.level === 1)
 		}
 	}
 </script>
