@@ -20,8 +20,9 @@
 						<h3>{{accountForm.name}}</h3>
 						<ul class="list-group">
 							<li class="list-group-item active">
-								<span>账户信息</span>
-								<a href="javascript:;" title="编辑" @click="handleEdit"><i class="el-icon-edit"></i></a>
+								<a href="javascript:;" title="编辑" @click="handleEdit">		   账户信息
+									<i class="el-icon-edit"></i>
+								</a>
 							</li>
 							<li class="list-group-item">
 								<label>邮箱</label>
@@ -226,7 +227,6 @@
 						{ type: 'date', message: '请选择出生日期', trigger: 'change' },
 					],
 				},
-				
 			}
 		},
 		methods: {
@@ -380,8 +380,10 @@
 	.list-group-item {
 		&.active {
 			a {
-				margin-left: 15px;
-				color: #fff
+				color: #fff;
+				i {
+					margin-left: 10px;
+				}
 			}
 		}
 	}

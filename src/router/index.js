@@ -5,7 +5,8 @@ import NotFound from '@/pages/NotFound'
 import NoPermission from '@/pages/NoPermission'
 import Welcome from '@/pages/welcome'
 
-import AccountInfo from '@/pages/account/infocenter'
+import AccountCenter from '@/pages/account/infocenter'
+import AccountSettings from '@/pages/account/settings'
 
 const routes = [
   {
@@ -41,8 +42,13 @@ const routes = [
     	{
     		path: 'infocenter',
         name: '账户中心',
-    		component: AccountInfo
-    	}
+    		component: AccountCenter
+    	},
+      {
+        path: 'settings',
+        name: '账户设置',
+        component: AccountSettings
+      }
     ]
   },
   {
