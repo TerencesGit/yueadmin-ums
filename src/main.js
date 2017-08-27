@@ -11,11 +11,13 @@ import store from './vuex/store'
 import ElementUI from 'element-ui'
 import NProgress from 'nprogress'
 import moment from 'moment'
+import Mock from './mock'
 import 'element-ui/lib/theme-default/index.css'
 import 'font-awesome/css/font-awesome.min.css'
 import 'nprogress/nprogress.css'
 import '@/assets/css/base.scss'
 NProgress.configure({ ease: 'ease', speed: 500, minimum: 0.5, showSpinner: false})
+Mock.bootstrap()
 Vue.use(Vuex)
 Vue.use(Router)
 Vue.use(ElementUI)
@@ -41,6 +43,21 @@ Vue.component('back-button', {
 		}
 	}
 })
+Vue.prototype.$catchError = (err) => {
+  if(err.response) {
+    let res = err.response;
+    if(res.status) {
+      let status = res.status;
+      if(status === 400) {
+        ElementUI.Message('请求错误')
+      } else {
+        ElementUI.Message('服务器响应错误')
+      }
+    }
+  } else {
+    ElementUI.Message('服务器响应超时')
+  }
+}
 const router = new Router({
   routes  
 })

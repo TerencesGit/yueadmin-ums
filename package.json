@@ -10,6 +10,8 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios-mock-adapter": "^1.9.0",
+    "mockjs": "^1.0.1-beta3",
     "vue": "^2.3.0",
     "vue-router": "^2.3.0"
   },

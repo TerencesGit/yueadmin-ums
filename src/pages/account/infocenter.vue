@@ -2,7 +2,7 @@
 	<section>
 		<el-row :gutter="20">
 			<el-col :span="7">
-				<el-card>
+				<el-card v-loading="loading">
 					<div class="account-info">
 						<el-popover
 						  ref="avatarPop"
@@ -35,7 +35,7 @@
 							</li>
 							<li class="list-group-item">
 								<label>性别</label>
-								<span>{{accountForm.gender ? '男' : '女'}}</span>
+								<span>{{gender}}</span>
 							</li>
 							<li class="list-group-item">
 								<label>QQ</label>
@@ -44,7 +44,8 @@
 							</li>
 							<li class="list-group-item">
 								<label>生日</label>
-								<span>{{accountForm.birthday}}</span>
+								<span v-if="accountForm.birthday">{{accountForm.birthday}}</span>
+								<span v-else>未设置</span>
 							</li>
 							<li class="list-group-item">
 								<label>籍贯</label>
@@ -53,7 +54,8 @@
 							</li>
 							<li class="list-group-item">
 								<label>部门</label>
-								<span>{{accountForm.organize}}</span>
+								<span v-if="accountForm.organize">{{accountForm.organize}}</span>
+								<span v-else>未知</span>
 							</li>
 						</ul>
 					</div>
@@ -182,26 +184,11 @@
 </template>
 <script>
 	import Region from '@/assets/js/region'
+	import { getUserInfo } from '@/api'
 	export default {
 		data() {
 			return {
-				accountForm: {
-					name: 'Transform',
-					avatar: 'https://avatars1.githubusercontent.com/u/20084997?v=4&s=460',
-					gender: 1,
-					email: '2630243397@qq.com',
-					birthday: '1992-08-08',
-					qq: '12345678',
-					origin: '山东-济南',
-					location: '北京',
-					mobile: '',
-					idcard: '130110199208081234',
-					partner: '悦视觉全球摄影',
-					organize: '技术部',
-					idcardPicFront: '',
-					idcardPicBack: '',
-					originId: 5,
-				},
+				accountForm: {},
 				originName: '',
 				region: {
 					province: '',
@@ -232,39 +219,39 @@
 		methods: {
 			// 获取用户信息
 			getAccountInfo() {
-				this.accountForm = {
-					name: 'Transform',
-					avatar: '',
-					gender: 1,
-					email: '2630243397@qq.com',
-					birthday: '1992-08-08',
-					qq: '12345678',
-					origin: 5,
-					location: '北京',
-					mobile: '',
-					idcard: '130110199208081234',
-					partner: '悦视觉全球摄影',
-					organize: '技术部',
-					idcardPicFront: '',
-					idcardPicBack: '',
+				this.loading = true;
+				let params = {
+					accountId: 1001
 				}
-				let origin = Region.filter(region => region.id === this.accountForm.origin)[0];
-				console.log(origin.level)
-				if (origin.level === 1) {
-					this.originName = this.region.province = origin.name
-				} else if (origin.level === 2) {
-					this.originName = this.region.city = origin.name;
-					this.region.province = Region.filter(region => region.id === origin.pid)[0].name;
-					this.regionList.city = Region.filter(region => region.pid === origin.pid);
-				} else if (origin.level === 3) {
-					this.originName = this.region.area = origin.name;
-					let city = Region.filter(region => region.id === origin.pid)[0];
-					this.region.city = city.name;
-					this.region.province = Region.filter(region => region.id === city.pid)[0].name;
-					this.regionList.city = Region.filter(region => region.id === origin.pid);
-					this.regionList.area = Region.filter(region => region.pid === city.id);
-				}
-				this.avatarUrl = this.accountForm.avatar;
+				getUserInfo(params).then(res => {
+					console.log(res)
+					this.loading = false;
+					if(res.data.code === '0001') {
+						this.accountForm = res.data.result.account;
+						this.avatarUrl = this.accountForm.avatar;
+						let origin = Region.filter(region => region.id === this.accountForm.origin)[0];
+						if(origin.level === 1) {
+							this.originName = this.region.province = origin.name
+						} else if (origin.level === 2) {
+							this.originName = this.region.city = origin.name;
+							this.region.province = Region.filter(region => region.id === origin.pid)[0].name;
+							this.regionList.city = Region.filter(region => region.pid === origin.pid);
+						} else if (origin.level === 3) {
+							this.originName = this.region.area = origin.name;
+							let city = Region.filter(region => region.id === origin.pid)[0];
+							this.region.city = city.name;
+							this.region.province = Region.filter(region => region.id === city.pid)[0].name;
+							this.regionList.city = Region.filter(region => region.id === origin.pid);
+							this.regionList.area = Region.filter(region => region.pid === city.id);
+						}
+					} else {
+						this.$message.error(res.data.message)
+					}
+				}).catch(err => {
+					this.loading = false;
+					// console.log(err)
+					this.$catchError(err)
+				})
 			},
 			// 图片上传校验
 			beforeAvatarUpload(file) {
@@ -340,6 +327,11 @@
       	console.log(aid)
       	this.originId = aid;
       }
+		},
+		computed: {
+			gender() {
+				return this.accountForm.gender === 1 ? '男' : this.accountForm.gender === 0 ? '女' : '未知'
+			}
 		},
 		mounted() {
 			this.getAccountInfo()
