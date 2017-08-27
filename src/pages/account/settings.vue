@@ -1,7 +1,7 @@
 <template>
 	<section>
 	  <!-- 账号设置 -->
-		<el-card class="card-primary">
+		<el-card class="card-primary" v-loading="loading">
 			<div slot="header">
 				账号设置
 			</div>
@@ -65,13 +65,13 @@
 			<el-row>
 				<el-col :span="14" :offset="5">
 					<el-form :model="mobileForm" ref="mobileForm" :rules="rules" label-width="120px">
-						<el-form-item v-if="!isBindMobile" label="手机号：" prop="mobile">
+						<el-form-item v-if="!account.mobile" label="手机号：" prop="mobile">
 							<el-input v-model.trim="mobileForm.mobile" placeholder="输入手机号码" style="width: 90%"></el-input>
 						</el-form-item>
-						<el-form-item v-if="isBindMobile" label="当前手机号：">
+						<el-form-item v-if="account.mobile" label="当前手机号：">
 							<span>{{mobile}}</span>
 						</el-form-item>
-						<el-form-item v-if="isBindMobile" label="新手机号：" prop="mobile">
+						<el-form-item v-if="account.mobile" label="新手机号：" prop="mobile">
 							<el-input v-model.trim="mobileForm.mobile" placeholder="输入新手机号" style="width: 90%"></el-input>
 						</el-form-item>
 						<el-form-item label="验证码：" prop="smsCode">
@@ -95,6 +95,7 @@
 	</section>
 </template>
 <script>
+	import { getUserInfo } from '@/api'
 	import Md5 from '@/assets/js/md5'
 	export default {
 		data () {
@@ -121,13 +122,8 @@
         }, 0);
       }
 			return {
-				isEmailVerify: true,
-				isBindMobile: true,
-				account: {
-					mobile: '13212345678',
-					email: '26302433@qq.com',
-					emailVerified: 0
-				},
+				loading: false,
+				account: {},
 				passwordVisible: false,
 				passwordForm: {
 					oldPass: '',
@@ -163,6 +159,23 @@
 			}
 		},
 		methods: {
+			getAccountInfo() {
+				this.loading = true
+				let params = {
+					accountId: 1001
+				}
+				getUserInfo(params).then(res => {
+					this.loading = false
+					if(res.data.code === '0001') {
+						this.account = res.data.result.account
+					} else {
+						this.$message.error(res.data.message)
+					}
+				}).catch(err => {
+					this.loading = false
+					console.log(err)
+				})
+			},
 			modifyPass() {
 				this.passwordVisible = true
 			},
@@ -234,6 +247,9 @@
 			mobile() {
 				return this.account.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
 			}
+		},
+		mounted () {
+			this.getAccountInfo()
 		}
 	}
 </script>

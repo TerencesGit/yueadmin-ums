@@ -18,6 +18,7 @@ const UserList = [
 		organize: '技术部',
 		idcardPicFront: '',
 		idcardPicBack: '',
+		emailVerified: 0
 	},
 ]
 const retObj = {
