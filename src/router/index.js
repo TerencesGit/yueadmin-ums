@@ -12,7 +12,7 @@ import RegistedPartner from '@/pages/account/registedpartner'
 const routes = [
   {
     path: '/',
-    redirect: '/welcome'
+    redirect: '/login'
   },
   {
     path: '/login',

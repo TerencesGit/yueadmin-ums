@@ -4,6 +4,7 @@ const UserList = [
 	{
 		accountId: 1001,
 		name: 'Transform',
+		password: '12345678',
 		// avatar: '',
 		avatar: 'https://avatars1.githubusercontent.com/u/20084997?v=4&s=460',
 		gender: 1,
@@ -18,6 +19,7 @@ const UserList = [
 		organize: '技术部',
 		idcardPicFront: '',
 		idcardPicBack: '',
+		isAdmin: 1
 	},
 ]
 const retObj = {
@@ -28,6 +30,43 @@ const retObj = {
 export default {
 	bootstrap () {
 		let mock = new MockAdapter(axios)
+		mock.onPost('/login').reply(config => {
+			let { username, password, isAdmin } = JSON.parse(config.data);
+			console.log(username, password, isAdmin)
+			let user = UserList.filter(user => user.name === username && 
+				user.isAdmin === isAdmin)[0];
+			console.log(user)
+			if(user) {
+				if(user.password === password) {
+					return new Promise((resolve, reject) => {
+						setTimeout(() => {
+							retObj.result.account = UserList[0];
+							resolve([200, retObj])
+						}, 1000)
+					})
+				} else {
+					let retObj = {
+						code: '1002',
+						message: '密码错误'
+					}
+					return new Promise((resolve, reject) => {
+						setTimeout(() => {
+							resolve([200, retObj])
+						}, 1000)
+					})
+				}
+			} else {
+				let retObj = {
+					code: '1001',
+					message: '用户名不存在'
+				}
+				return new Promise((resolve, reject) => {
+					setTimeout(() => {
+						resolve([200, retObj])
+					}, 1000)
+				})
+			}
+		})
 		mock.onGet('/account/info').reply(config => {
 			let { accountId } = config.params;
 			if(!accountId) {
