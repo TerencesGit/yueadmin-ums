@@ -217,6 +217,24 @@
 			}
 		},
 		methods: {
+			// 地区格式化
+			formatRegion() {
+				let origin = Region.filter(region => region.id === this.accountForm.origin)[0];
+				if(origin.level === 1) {
+					this.originName = this.region.province = origin.name
+				} else if (origin.level === 2) {
+					this.originName = this.region.city = origin.name;
+					this.region.province = Region.filter(region => region.id === origin.pid)[0].name;
+					this.regionList.city = Region.filter(region => region.pid === origin.pid);
+				} else if (origin.level === 3) {
+					this.originName = this.region.area = origin.name;
+					let city = Region.filter(region => region.id === origin.pid)[0];
+					this.region.city = city.name;
+					this.region.province = Region.filter(region => region.id === city.pid)[0].name;
+					this.regionList.city = Region.filter(region => region.id === origin.pid);
+					this.regionList.area = Region.filter(region => region.pid === city.id);
+				}
+			},
 			// 获取用户信息
 			getAccountInfo() {
 				this.loading = true;
@@ -229,21 +247,7 @@
 					if(res.data.code === '0001') {
 						this.accountForm = res.data.result.account;
 						this.avatarUrl = this.accountForm.avatar;
-						let origin = Region.filter(region => region.id === this.accountForm.origin)[0];
-						if(origin.level === 1) {
-							this.originName = this.region.province = origin.name
-						} else if (origin.level === 2) {
-							this.originName = this.region.city = origin.name;
-							this.region.province = Region.filter(region => region.id === origin.pid)[0].name;
-							this.regionList.city = Region.filter(region => region.pid === origin.pid);
-						} else if (origin.level === 3) {
-							this.originName = this.region.area = origin.name;
-							let city = Region.filter(region => region.id === origin.pid)[0];
-							this.region.city = city.name;
-							this.region.province = Region.filter(region => region.id === city.pid)[0].name;
-							this.regionList.city = Region.filter(region => region.id === origin.pid);
-							this.regionList.area = Region.filter(region => region.pid === city.id);
-						}
+						this.formatRegion()
 					} else {
 						this.$message.error(res.data.message)
 					}

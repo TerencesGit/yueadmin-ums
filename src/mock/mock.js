@@ -39,7 +39,7 @@ export default {
 					}
 					setTimeout(() => {
 						reject(res)
-					}, 1000)
+					}, 500)
 				})
 			}
 			let user = UserList.filter(user => user.accountId === accountId)[0]
@@ -48,7 +48,7 @@ export default {
 					retObj.result.account = user;
 					setTimeout(() => {
 						resolve([200, retObj])
-					}, 1000)
+					}, 500)
 				} else {
 					let retObj = {
 						code: '1001',
@@ -56,7 +56,7 @@ export default {
 					}
 					setTimeout(() => {
 						resolve([200, retObj])
-					}, 1000)
+					}, 500)
 				}
 			})
 		})

@@ -7,6 +7,7 @@ import Welcome from '@/pages/welcome'
 
 import AccountCenter from '@/pages/account/infocenter'
 import AccountSettings from '@/pages/account/settings'
+import RegistedPartner from '@/pages/account/registedpartner'
 
 const routes = [
   {
@@ -48,7 +49,12 @@ const routes = [
         path: 'settings',
         name: '账户设置',
         component: AccountSettings
-      }
+      },
+      {
+        path: 'registedpartner',
+        name: '注册我的企业',
+        component: RegistedPartner
+      },
     ]
   },
   {

@@ -1,7 +1,7 @@
 <template>
 	<section>
 	  <!-- 账号设置 -->
-		<el-card class="card-primary">
+		<el-card class="card-primary" v-loading="loading">
 			<div slot="header">
 				账号设置
 			</div>
@@ -26,13 +26,13 @@
 				</li>
 				<li v-if="account.mobile" class="account-item">
 					<i class="el-icon-circle-check"></i>
-					<label>修改手机号码</label>
-					<span>当前手机号码： {{mobile}}</span>
+					<label>修改手机号</label>
+					<span>当前手机号： {{mobile}}</span>
 					<el-button size="small" type="info" @click="modifyMobile">修改</el-button>
 				</li>
 				<li v-else class="account-item">
 					<i class="el-icon-warning"></i>
-					<label>绑定手机号码</label>
+					<label>绑定手机号</label>
 					<span>绑定手机号，可用于快速登录账号。</span>
 					<el-button size="small" type="success" @click="bindMobile">立即绑定</el-button>
 				</li>
@@ -65,13 +65,13 @@
 			<el-row>
 				<el-col :span="14" :offset="5">
 					<el-form :model="mobileForm" ref="mobileForm" :rules="rules" label-width="120px">
-						<el-form-item v-if="!isBindMobile" label="手机号：" prop="mobile">
-							<el-input v-model.trim="mobileForm.mobile" placeholder="输入手机号码" style="width: 90%"></el-input>
+						<el-form-item v-if="!account.mobile" label="手机号：" prop="mobile">
+							<el-input v-model.trim="mobileForm.mobile" placeholder="输入手机号" style="width: 90%"></el-input>
 						</el-form-item>
-						<el-form-item v-if="isBindMobile" label="当前手机号：">
+						<el-form-item v-if="account.mobile" label="当前手机号：">
 							<span>{{mobile}}</span>
 						</el-form-item>
-						<el-form-item v-if="isBindMobile" label="新手机号：" prop="mobile">
+						<el-form-item v-if="account.mobile" label="新手机号：" prop="mobile">
 							<el-input v-model.trim="mobileForm.mobile" placeholder="输入新手机号" style="width: 90%"></el-input>
 						</el-form-item>
 						<el-form-item label="验证码：" prop="smsCode">
@@ -95,6 +95,7 @@
 	</section>
 </template>
 <script>
+	import { getUserInfo } from '@/api'
 	import Md5 from '@/assets/js/md5'
 	export default {
 		data () {
@@ -110,19 +111,18 @@
       }
       const validateMobile = (rule, value, callback) => {
         if (!value) {
-          return callback(new Error('请输入手机号码'));
+          return callback(new Error('请输入手机号'));
         }
         setTimeout(() => {
           if (!value.match(/^(13|14|15|17|18)\d{9}$/)) {
-            callback(new Error('请输入正确手机号码'));
+            callback(new Error('请输入正确手机号'));
           } else {
           	callback()
           }
         }, 0);
       }
 			return {
-				isEmailVerify: true,
-				isBindMobile: true,
+				loading: false,
 				account: {
 					mobile: '13212345678',
 					email: '26302433@qq.com',
@@ -160,9 +160,29 @@
 				},
 				disabled: false,
 				buttonText: '获取验证码',
+				sendEmail: false,
 			}
 		},
 		methods: {
+			getAccountInfo() {
+				this.loading = true;
+				let params = {
+					accountId: 1001
+				}
+				getUserInfo(params).then(res => {
+					console.log(res)
+					this.loading = false;
+					if(res.data.code === '0001') {
+						this.account = res.data.result.account;
+					} else {
+						this.$message.error(res.data.message)
+					}
+				}).catch(err => {
+					this.loading = false;
+					// console.log(err)
+					this.$catchError(err)
+				})
+			},
 			modifyPass() {
 				this.passwordVisible = true
 			},
@@ -181,7 +201,10 @@
 				})
 			},
 			verifyEmail() {
-				this.$message(`验证信息已发送到${this.account.email}，请注意查收`)
+				!this.sendEmail && 
+				this.$message(`验证信息已发送到${this.account.email}，请注意查收`) || 
+				this.$notify({ type: 'warning', title: '提示', message: '邮件已发送，不可重复发送' })
+				this.sendEmail = true;
 			},
 			bindMobile() {
 				this.mobileFormVisible = true; 
@@ -234,6 +257,9 @@
 			mobile() {
 				return this.account.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
 			}
+		},
+		mounted () {
+			this.getAccountInfo()
 		}
 	}
 </script>
