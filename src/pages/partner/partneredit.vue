@@ -2,7 +2,7 @@
 	<section>
 		<el-card class="card-primary">
 			<div slot="header">
-				注册我的企业
+				编辑企业信息
 			</div>
 			<el-row>
 				<el-col :span="22" :offset="1">
@@ -104,7 +104,7 @@
 							<el-input type="textarea" :rows="3" v-model="partnerForm.note" placeholder="请输入企业简介"></el-input>
 						</el-form-item>
 						<el-form-item label="" class="button-item">
-							<el-button @click="resetForm">重 置</el-button>
+							<el-button @click="back">返回</el-button>
 							<el-button type="primary" @click="submitForm">提 交</el-button>
 						</el-form-item>
 					</el-form>
@@ -114,6 +114,7 @@
 	</section>
 </template>
 <script>
+	import { readPartnerInfo } from '@/api'
 	export default {
 		data() {
 			const validateMobile = (rule, value, callback) => {
@@ -178,6 +179,20 @@
 			}
 		},
 		methods: {
+			getPartnerInfo() {
+				readPartnerInfo().then(res => {
+					console.log(res)
+					if(res.data.code === '0001') {
+						this.partnerForm = res.data.result.partnerInfo
+						this.logoUrl = res.data.result.partnerInfo.logo
+					} else {
+						this.$message.error(res.data.message)
+					}
+				}).catch(err => {
+					console.log(err)
+					this.$catchError(err)
+				})
+			},
 			handleLogoSuccess(res, file) {
         this.logoUrl = URL.createObjectURL(file.raw);
         this.partnerForm.logo = URL.createObjectURL(file.raw);
@@ -198,8 +213,8 @@
         }
         return isJPG && isLt2M;
       },
-      resetForm() {
-      	this.$refs.partnerForm.resetFields()
+      back() {
+      	this.$router.back()
       },
 			submitForm() {
 				this.$refs.partnerForm.validate(valid => {
@@ -218,7 +233,7 @@
 			}
 		},
 		mounted() {
-
+			this.getPartnerInfo()
 		}
 	}
 </script>

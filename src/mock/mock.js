@@ -22,6 +22,26 @@ const UserList = [
 		isAdmin: 1
 	},
 ]
+const PartnerList= [
+	{
+		name: '悦视觉全球摄影',
+		shortName: '悦视觉',
+		email: '20170828@qq.com',
+		telphone: '19920170828',
+		mobile: '19920170828',
+		post: '100123',
+		logo: 'https://avatars1.githubusercontent.com/u/20084997?v=4&s=460',
+		memberNum: '',
+		idcardNum: '',
+		idcardPicFront: '',
+		contactName: 'XXX',
+		contactAddress: '北京市朝阳区',
+		licenseNum: '12345678',
+		licensePic: '',
+		corporationName: 'XXX',
+		note: '悦视觉全球摄影简介'
+	}
+]
 const retObj = {
 	code: '0001',
 	message: '操作成功',
@@ -97,6 +117,14 @@ export default {
 						resolve([200, retObj])
 					}, 500)
 				}
+			})
+		})
+		mock.onGet('/partner/info').reply(config => {
+			retObj.result.partnerInfo = PartnerList[0]
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				})
 			})
 		})
 	}

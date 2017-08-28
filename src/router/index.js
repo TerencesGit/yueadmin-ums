@@ -9,6 +9,8 @@ import AccountCenter from '@/pages/account/infocenter'
 import AccountSettings from '@/pages/account/settings'
 import RegistedPartner from '@/pages/account/registedpartner'
 
+import PartnerEdit from '@/pages/partner/partneredit'
+
 const routes = [
   {
     path: '/',
@@ -55,6 +57,18 @@ const routes = [
         name: '注册我的企业',
         component: RegistedPartner
       },
+    ]
+  },
+  {
+    path: '/partner',
+    name: '企业管理',
+    component: Layout,
+    children: [
+      {
+        path: 'infoedit',
+        name: '信息编辑',
+        component: PartnerEdit,
+      }
     ]
   },
   {
