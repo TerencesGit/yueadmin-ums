@@ -5,7 +5,7 @@
 				组织部门管理
 			</div>
 			<el-row :gutter="15">
-				<el-col :span="6" class="tree">
+				<el-col :span="6" class="tree" v-loading="loading">
 					<el-tree 
 						:data="organizeTree" 
 						:props="defaultProps"
@@ -17,31 +17,31 @@
 					</el-tree>
 				</el-col>
 				<el-col :span="18" v-if="organizeTree.length !== 0">
-					<el-row class="toolbar">
-						<el-button type="success" @click="handleAdd">
+					<el-row class="button-group">
+						<el-button size="small" type="success" @click="handleAdd">
 							<i class="fa fa-plus-square"></i>
 							新增
 						</el-button>
-						<el-button type="warning" @click="handleAdd">
+						<el-button size="small" type="warning" @click="handleAdd">
 							<i class="fa fa-edit"></i>
 							编辑
 						</el-button>
-						<el-button type="danger" @click="handleAdd">
+						<el-button size="small" type="danger" @click="handleAdd">
 							<i class="el-icon-delete"></i>
 							删除
 						</el-button>
-						<el-button type="primary" icon="setting" @click="handleAdd">
+						<el-button size="small" type="primary" icon="setting" @click="handleAdd">
 						权限
 						</el-button>
-						<el-button type="info" @click="handleAdd">
+						<el-button size="small" type="info" @click="handleAdd">
 							<i class="fa fa-unlock"></i>
 							启用 
 						</el-button>
-						<el-button plain type="danger" @click="handleAdd">
+						<el-button plain size="small" type="danger" @click="handleAdd">
 							<i class="fa fa-ban"></i>
 							禁用 
 						</el-button>
-						<el-button type="success" @click="handleAdd">
+						<el-button size="small" type="success" @click="handleAdd">
 							<i class="fa fa-user"></i>
 							注册员工 
 						</el-button>
@@ -51,13 +51,32 @@
 					</h3>
 					<el-table
 						border
-			      :data="tableData"
+			      :data="staffList"
+			      v-loading="tableLoading" 
 			      style="width: 100%">
 			      <el-table-column type="index" width="60"></el-table-column>
-			      <el-table-column prop="name" label="姓名" width="180"></el-table-column>
-			      <el-table-column prop="date" label="注册时间" width="180"></el-table-column>
-			      <el-table-column prop="address" label="地址"></el-table-column>
+			      <el-table-column prop="name" label="姓名" width="80"></el-table-column>
+			      <el-table-column prop="mobile" label="手机号" width="130" :formatter="formatMobile"></el-table-column>
+			      <el-table-column prop="createTime" label="注册时间" width="180" :formatter="formatTime"></el-table-column>
+			      <el-table-column prop="address" label="籍贯"></el-table-column>
+			      <el-table-column label="操作">
+			      	<template scope="scope">
+			      		<el-button type="primary" size="small">查看</el-button>
+			      		<el-button type="danger" size="small">删除</el-button>
+			      	</template>
+			      </el-table-column>
 			    </el-table>
+			    <el-row class="toolbar">
+			    	<el-pagination
+				      @size-change="handleSizeChange"
+				      @current-change="handleCurrentChange"
+				      :current-page="currentPage"
+				      :page-sizes="[5, 10, 15, 20]"
+				      :page-size="pageSize"
+				      layout="total, sizes, prev, pager, next, jumper"
+				      :total="total">
+				    </el-pagination>
+			    </el-row>
 				</el-col>
 			</el-row>
 		</el-card>
@@ -82,27 +101,79 @@
 	</section>
 </template>
 <script>
+	import { readOrganizeTree, getUserList } from '@/api'
 	export default {
 		data() {
 			return {
 				organizeTree: [],
         defaultProps: {
+          label: 'name',
           children: 'children',
-          label: 'label'
         },
-        tableData: [],
+        staffList: [],
 	      checkedNode: null,
 	      orgFormVisible: false,
 	      organizeForm: {
 	      	name: '',
 	      	note: ''
-	      }
+	      },
+	      loading: false,
+	      tableLoading: false,
+	      currentPage: 1,
+	      pageSize: 10,
+	      total: 0
 			}
 		},
 		methods: {
+			formatMobile(row) {
+				return row.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
+			},
+			formatTime(row) {
+				return this.$moment(row.createTime).format('YYYY-MM-DD ')
+			},
+			handleSizeChange(val) {
+				this.pageSize = val
+			},
+			handleCurrentChange(val) {
+				this.currentPage = val
+			},
+			// 获取组织部门树
+			getOrganizeTree() {
+				this.loading = true
+				readOrganizeTree().then(res => {
+					console.log(res)
+					if(res.data.code === '0001') {
+						this.organizeTree = res.data.result.organizeTree
+					} else {
+						this.$message(res.data.message)
+					}
+					this.loading = false
+				}).catch(err => {
+					this.loading = false
+					console.log(err)
+				})
+			},
+			// 获取部门员工
+			getStaffList() {
+				this.tableLoading = true
+				getUserList().then(res => {
+					this.tableLoading = false
+					console.log(res)
+					if(res.data.code === '0001') {
+						this.staffList = res.data.result.userList;
+						this.total = res.data.result.userList.length;
+					} else {
+						this.$message.error(res.data.message)
+					}
+				}).catch(err => {
+					this.tableLoading = false
+					console.log(err)
+				})
+			},
 			handleNodeClick(data) {
         this.checkedNode = Object.assign({}, data)
         console.log(this.checkedNode);
+        this.getStaffList()
       },
       handleAdd() {
       	if (!this.checkedNode) {
@@ -110,6 +181,9 @@
       	}
       	this.orgFormVisible = true
       }
+		},
+		mounted () {
+			this.getOrganizeTree()
 		}
 	}
 </script>
@@ -127,7 +201,7 @@
       background: #bbb
     }
 	}
-	.toolbar {
+	.button-group {
 		padding: 10px 20px;
 		margin-bottom: 20px;
 		box-shadow: 1px 1px 1px 1px #ddd;

@@ -1,6 +1,7 @@
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
-const UserList = [
+import { UserList } from './data/user'
+const UserLists = [
 	{
 		accountId: 1001,
 		name: 'Transform',
@@ -42,6 +43,62 @@ const PartnerList= [
 		note: '悦视觉全球摄影简介'
 	}
 ]
+const OrganizeTree = [
+	{
+		orgId: 100,
+		name: '我的企业',
+		children: [
+			{
+				parentId: 1000,
+				orgId: 1001,
+				name: '运营部',
+				children: [
+					{
+						parentId: 1001,
+						orgId: 10011,
+						name: '设计部',
+					},
+				]
+			},
+			{
+				parentId: 1000,
+				orgId: 1002,
+				name: '销售部',
+				children: [
+					{
+						parentId: 1002,
+						orgId: 10021,
+						name: '设计部',
+					},
+				]
+			},
+			{
+				parentId: 1000,
+				orgId: 1003,
+				name: '财务部',
+				children: [
+					{
+						parentId: 1003,
+						orgId: 10031,
+						name: '会计部',
+					},
+				]
+			},
+			{
+				parentId: 1000,
+				orgId: 1004,
+				name: '技术部',
+				children: [
+					{
+						parentId: 1004,
+						orgId: 10041,
+						name: '运维部',
+					},
+				]
+			},
+		]
+	}
+]
 const retObj = {
 	code: '0001',
 	message: '操作成功',
@@ -53,14 +110,14 @@ export default {
 		mock.onPost('/login').reply(config => {
 			let { username, password, isAdmin } = JSON.parse(config.data);
 			console.log(username, password, isAdmin)
-			let user = UserList.filter(user => user.name === username && 
+			let user = UserLists.filter(user => user.name === username && 
 				user.isAdmin === isAdmin)[0];
 			console.log(user)
 			if(user) {
 				if(user.password === password) {
 					return new Promise((resolve, reject) => {
 						setTimeout(() => {
-							retObj.result.account = UserList[0];
+							retObj.result.account = UserLists[0];
 							resolve([200, retObj])
 						}, 1000)
 					})
@@ -101,7 +158,7 @@ export default {
 					}, 500)
 				})
 			}
-			let user = UserList.filter(user => user.accountId === accountId)[0]
+			let user = UserLists.filter(user => user.accountId === accountId)[0]
 			return new Promise((resolve, reject) => {
 				if(user) {
 					retObj.result.account = user;
@@ -125,6 +182,25 @@ export default {
 				setTimeout(() => {
 					resolve([200, retObj])
 				})
+			})
+		})
+		mock.onGet('/partner/readOrganizeTree').reply(config => {
+			retObj.result.organizeTree = OrganizeTree;
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+						resolve([200, retObj])
+				}, 500)
+			})
+		})
+		mock.onGet('/account/list').reply(config => {
+			UserList.sort(() => {
+  			return 0.5 - Math.random()
+  		})
+			retObj.result.userList = UserList
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+						resolve([200, retObj])
+				}, 500)
 			})
 		})
 	}
