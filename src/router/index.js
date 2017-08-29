@@ -10,6 +10,7 @@ import AccountSettings from '@/pages/account/settings'
 import RegistedPartner from '@/pages/account/registedpartner'
 
 import PartnerEdit from '@/pages/partner/partneredit'
+import PartnerOrgManage from '@/pages/partner/organizeManage'
 
 const routes = [
   {
@@ -68,6 +69,11 @@ const routes = [
         path: 'infoedit',
         name: '信息编辑',
         component: PartnerEdit,
+      },
+      {
+        path: 'organizemanage',
+        name: '组织部门管理',
+        component: PartnerOrgManage,
       }
     ]
   },
