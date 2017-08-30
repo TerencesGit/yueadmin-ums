@@ -28,13 +28,13 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/baseUrl': {
-        target: 'http://www.yueshijue.com',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/baseUrl': ''
-        }
-      },
+      // '/baseUrl': {
+      //   target: 'http://www.yueshijue.com',
+      //   changeOrigin: true,
+      //   pathRewrite: {
+      //     '^/baseUrl': ''
+      //   }
+      // },
       // '/uploadImgUrl': {
       //    target: 'http://localhost:3000/upload/imageUpload',
       //    changeOrigin: true,

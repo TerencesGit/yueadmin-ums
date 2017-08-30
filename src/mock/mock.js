@@ -107,6 +107,7 @@ const retObj = {
 export default {
 	bootstrap () {
 		let mock = new MockAdapter(axios)
+		// 登录
 		mock.onPost('/login').reply(config => {
 			let { username, password, isAdmin } = JSON.parse(config.data);
 			console.log(username, password, isAdmin)
@@ -144,6 +145,7 @@ export default {
 				})
 			}
 		})
+		// 用户信息
 		mock.onGet('/account/info').reply(config => {
 			let { accountId } = config.params;
 			if(!accountId) {
@@ -176,6 +178,7 @@ export default {
 				}
 			})
 		})
+		// 企业信息
 		mock.onGet('/partner/info').reply(config => {
 			retObj.result.partnerInfo = PartnerList[0]
 			return new Promise((resolve, reject) => {
@@ -184,6 +187,7 @@ export default {
 				})
 			})
 		})
+		// 组织部门树
 		mock.onGet('/partner/readOrganizeTree').reply(config => {
 			retObj.result.organizeTree = OrganizeTree;
 			return new Promise((resolve, reject) => {
@@ -192,6 +196,7 @@ export default {
 				}, 500)
 			})
 		})
+		// 用户列表
 		mock.onGet('/account/list').reply(config => {
 			UserList.sort(() => {
   			return 0.5 - Math.random()
@@ -200,6 +205,27 @@ export default {
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 						resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 新增/编辑组织树
+		mock.onPost('/partner/saveOrganizeTree').reply(config => {
+			let { orgId, name, note, parentId } = JSON.parse(config.data)
+			console.log(orgId, name, note, parentId)
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 删除部门
+		mock.onPost('/partner/deleteOrganize').reply(config => {
+			let { orgId } = JSON.parse(config.data)
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
 				}, 500)
 			})
 		})
