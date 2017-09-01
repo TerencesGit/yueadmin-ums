@@ -7,7 +7,7 @@
 			</div>
 			<el-row :gutter="15">
 				<el-col :span="6" class="tree" v-loading="loading">
-					<el-tree 
+					<!-- <el-tree 
 						:data="organizeTree" 
 						:props="defaultProps"
 						empty-text="暂无部门"
@@ -15,9 +15,11 @@
 						default-expand-all
 						:expand-on-click-node="false"
 						@node-click="handleNodeClick">
-					</el-tree>
+					</el-tree> -->
+					<ul id="organizeTree" class="ztree"></ul>
 				</el-col>
-				<el-col :span="18" v-if="organizeTree.length !== 0">
+				<el-col :span="18" v-if="organizeTree.length === 0">
+					<!-- 工具栏 -->
 					<el-row class="button-group">
 						<el-button size="small" type="success" @click="handleAdd">
 							<i class="fa fa-plus-square"></i>
@@ -31,18 +33,18 @@
 							<i class="el-icon-delete"></i>
 							删除
 						</el-button>
-						<el-button size="small" type="primary" icon="setting" @click="handleAdd">
-						权限
+						<el-button size="small" type="primary" icon="setting" @click="handleFunc">
+							权限
 						</el-button>
-						<el-button size="small" type="info" @click="handleAdd">
+						<el-button size="small" type="info" :disabled="disabled" @click="handleStatus">
 							<i class="fa fa-unlock"></i>
 							启用 
 						</el-button>
-						<el-button plain size="small" type="danger" @click="handleAdd">
+						<el-button plain size="small" type="danger" :disabled="!disabled" @click="handleStatus">
 							<i class="fa fa-ban"></i>
 							禁用 
 						</el-button>
-						<el-button size="small" type="success" @click="handleAdd">
+						<el-button size="small" type="success" @click="handleRegister">
 							<i class="fa fa-user"></i>
 							注册员工 
 						</el-button>
@@ -58,16 +60,18 @@
 			      style="width: 100%">
 			      <el-table-column type="index" width="60"></el-table-column>
 			      <el-table-column prop="name" label="姓名" width="80"></el-table-column>
-			      <el-table-column prop="mobile" label="手机号" width="130" :formatter="formatMobile"></el-table-column>
-			      <el-table-column prop="createTime" label="注册时间" width="180" :formatter="formatTime"></el-table-column>
-			      <el-table-column prop="address" label="籍贯"></el-table-column>
-			      <el-table-column label="操作">
+			      <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
+			      <el-table-column prop="mobile" label="手机号" width="120" :formatter="formatMobile"></el-table-column>
+			      <el-table-column prop="createTime" label="注册时间" width="120" :formatter="formatTime"></el-table-column>
+			      <el-table-column prop="organize" label="部门"></el-table-column>
+			      <el-table-column label="操作" width="160">
 			      	<template scope="scope">
-			      		<el-button type="primary" size="small">查看</el-button>
-			      		<el-button type="danger" size="small">移除</el-button>
+			      		<el-button type="primary" size="small" @click="handleShow(scope.row)">查看</el-button>
+			      		<el-button type="danger" size="small" @click="handleRemove(scope.row)">移除</el-button>
 			      	</template>
 			      </el-table-column>
 			    </el-table>
+			    <!-- 分页 -->
 			    <el-row class="toolbar">
 			    	<el-pagination
 				      @size-change="handleSizeChange"
@@ -82,6 +86,7 @@
 				</el-col>
 			</el-row>
 		</el-card>
+		<!-- 部门表单 -->
 		<el-dialog :visible.sync="orgFormVisible" :title="orgFormTitle">
 			<el-row>
 				<el-col :span="18" :offset="3">
@@ -100,10 +105,58 @@
 				<el-button type="primary" @click="submitForm">确定</el-button>
 			</div>
 		</el-dialog>
+		<!-- 权限设置 -->
+		<el-dialog :visible.sync="funcListVisible" title="权限设置">
+			<div slot="footer">
+				<el-button @click="funcListVisible = false">取消</el-button>
+				<el-button type="primary" @click="funcListVisible = false">确定</el-button>
+			</div>
+		</el-dialog>
+		<!-- 注册员工 -->
+		<el-dialog :visible.sync="registFormVisible" title="注册员工">
+			<div slot="footer">
+				<el-button @click="registFormVisible = false">取消</el-button>
+				<el-button type="primary" @click="registFormVisible = false">确定</el-button>
+			</div>
+		</el-dialog>
+		<!-- 员工信息 -->
+		<el-dialog :visible.sync="staffInfoVisible" title="员工信息">
+			<el-row>
+				<el-col :span="18" :offset="3">
+					<el-form :model="staffInfo" label-width="160px">
+						<el-form-item label="姓名：">
+							<span>{{staffInfo.name}}</span>
+						</el-form-item>
+						<el-form-item label="邮箱：">
+							<span>{{staffInfo.email}}</span>
+						</el-form-item>
+						<el-form-item label="手机号：">
+							<span>{{staffInfo.mobile}}</span>
+						</el-form-item>
+						<el-form-item label="注册时间：">
+							<span>{{staffInfo.createTime}}</span>
+						</el-form-item>
+						<el-form-item label="所属部门：">
+							<span>{{staffInfo.organize}}</span>
+						</el-form-item>
+						<el-form-item label="籍贯：">
+							<span>{{staffInfo.address}}</span>
+						</el-form-item>
+					</el-form>
+				</el-col>
+			</el-row>
+			<div slot="footer">
+				<el-button @click="staffInfoVisible = false">取消</el-button>
+				<el-button type="primary" @click="staffInfoVisible = false">确定</el-button>
+			</div>
+		</el-dialog>
 	</section>
 </template>
 <script>
-	import { readOrganizeTree, getUserList, saveOrganizeTree, deleteOrganize } from '@/api'
+	import '@/assets/plugins/zTree/css/zTreeStyle.css'
+	import '@/assets/plugins/zTree/js/jquery.min.js'
+	import '@/assets/plugins/zTree/js/jquery.ztree.all.min.js'
+	import { readOrganizeTree, getUserList, saveOrganizeTree, deleteOrganize, setOrganizeStatus, removeUser } from '@/api'
 	export default {
 		data() {
 			return {
@@ -115,6 +168,9 @@
         staffList: [],
 	      checkedNode: null,
 	      orgFormVisible: false,
+	      funcListVisible: false,
+	      registFormVisible: false,
+	      staffInfoVisible: false,
 	      orgFormTitle: '',
 	      organizeForm: {
 	      	orgId: '',
@@ -135,6 +191,7 @@
 	      		{ required: true, message: '请输入部门简介', trigger: 'blur'}
 	      	],
 	      },
+	      staffInfo: {},
 	      submitType: 0
 			}
 		},
@@ -151,13 +208,54 @@
 			handleCurrentChange(val) {
 				this.currentPage = val
 			},
+			// 节点点击事件
+			nodeClick(event, treeId, treeNode) {
+				if(this.checkedNode === treeNode) return;
+				this.checkedNode = treeNode;
+				this.getStaffList(treeNode)
+			},
 			// 获取组织部门树
 			getOrganizeTree() {
 				this.loading = true
 				readOrganizeTree().then(res => {
 					console.log(res)
 					if(res.data.code === '0001') {
-						this.organizeTree = res.data.result.organizeTree
+						// this.organizeTree = res.data.result.organizeTree
+						const organizes = res.data.result.organizeTree;
+				    const setting = {
+				      view: {
+				        selectedMulti: false,
+				      },
+				      data: {
+				        simpleData: {
+				          enable: true
+				        }
+				      },
+				      callback: {
+				      	onClick: this.nodeClick
+				      }
+				    }
+				    const zNode = [];
+				    organizes.forEach(org => {
+				      var iconSkin;
+				      if(!org.parentId){
+				        iconSkin = 'root'
+				      }else{
+				        iconSkin = 'folder'
+				      }
+				      let treeObj = {
+				        id: org.orgId,
+				        orgId: org.orgId,
+				        pId: org.parentId,
+				        name: org.name,
+				        note: org.note,
+				        status: org.status,
+				        open: true,
+				        iconSkin: iconSkin,
+				      };
+				      zNode.push(treeObj)
+				    })
+				    $.fn.zTree.init($('#organizeTree'), setting, zNode);
 					} else {
 						this.$message(res.data.message)
 					}
@@ -167,10 +265,20 @@
 					console.log(err)
 				})
 			},
+			//获取被选中的单个节点
+			getSeletedNode() {
+				let treeObj = $.fn.zTree.getZTreeObj("organizeTree");
+			  this.checkedNode = treeObj.getSelectedNodes()[0];
+			},
 			// 获取部门员工
-			getStaffList() {
-				this.tableLoading = true
-				getUserList().then(res => {
+			getStaffList(org) {
+				this.tableLoading = true;
+				let data = {
+					orgId: org.orgId,
+					name: org.name
+				}
+				console.log(data)
+				getUserList(data).then(res => {
 					this.tableLoading = false
 					console.log(res)
 					if(res.data.code === '0001') {
@@ -184,19 +292,11 @@
 					console.log(err)
 				})
 			},
-			handleNodeClick(data) {
-        if(!data.parentId) return;
-        if(this.checkedNode && this.checkedNode.orgId === data.orgId) return;
-        this.checkedNode = data;
-        console.log(this.checkedNode);
-        this.getStaffList()
-      },
       // 新增部门
       handleAdd() {
-      	if (!this.checkedNode) {
+      	if(!this.checkedNode) {
       		return this.$notify.warning({title: '提示', message: '请选择部门'})
       	}
-      	console.log(this.checkedNode)
       	this.submitType = 0
       	this.orgFormTitle = '新增部门'
       	this.organizeForm = {
@@ -226,12 +326,6 @@
       	this.$refs.organizeForm.validate(valid => {
       		if(valid) {
       			let data = Object.assign({}, this.organizeForm)
-      			// if(this.submitType === 0) {
-      			// 	console.log(data)
-
-      			// } else if (this.submitType === 1) {
-      			// 	console.log(data)
-      			// }
       			saveOrganizeTree(data).then(res => {
       				console.log(res)
       				if(res.data.code === '0001') {
@@ -254,6 +348,10 @@
       	if (!this.checkedNode) {
       		return this.$notify.warning({title: '提示', message: '请选择部门'})
       	}
+      	// console.log(this.checkedNode)
+      	if(this.checkedNode.children) {
+      		return this.$notify.error({title: '提示', message: '该部门有下级部门，不可删除'})
+      	}
       	this.$confirm(`确定删除${this.checkedNode.name}？`, '提示', {type: 'warning'}).then(() => {
       		let data = {
 	      		orgId: this.checkedNode.orgId
@@ -272,7 +370,72 @@
       		console.log(err)
       		this.$message('已取消操作')
       	})
+      },
+      // 权限设置
+      handleFunc() {
+      	if (!this.checkedNode) {
+      		return this.$notify.warning({title: '提示', message: '请选择部门'})
+      	}
+      	this.funcListVisible = true
+      },
+      // 状态设置
+      handleStatus() {
+      	if (!this.checkedNode) {
+      		return this.$notify.warning({title: '提示', message: '请选择部门'})
+      	}
+      	let data = {
+      		orgId: this.checkedNode.orgId,
+      		status: this.checkedNode.status
+      	}
+      	setOrganizeStatus(data).then(res => {
+      		if(res.data.code === '0001') {
+      			this.$message.success(res.data.message)
+      			this.checkedNode.status = this.checkedNode.status === 1 ? 0 : 1;
+      		} else {
+      			this.$message.error(res.data.message)
+      		}
+      	}).catch(err => {
+      		console.log(err)
+      	})
+      },
+      // 注册员工
+      handleRegister() {
+      	if (!this.checkedNode) {
+      		return this.$notify.warning({title: '提示', message: '请选择部门'})
+      	}
+      	this.registFormVisible = true
+      },
+      // 员工信息
+      handleShow(row) {
+      	this.staffInfo = Object.assign({}, row)
+      	this.staffInfoVisible = true
+      },
+      // 移除员工
+      handleRemove(row) {
+      	this.$confirm(`确定将 ${row.name} 从该部门移除？`, '提示', {type: 'warning'}).then(() => {
+      		let data = {
+	      		userId: row.userId
+	      	}
+      		removeUser(data).then(res => {
+      			console.log(res)
+      			if(res.data.code === '0001') {
+      				this.$message.success(res.data.message)
+      				this.getStaffList(this.checkedNode)
+      			} else {
+      				this.$message.error(res.data.message)
+      			}
+      		}).catch(err => {
+      			console.log(err)
+      		})
+      	}).catch(err => {
+      		this.$message('已取消操作')
+      	})
       }
+		},
+		computed: {
+			disabled() {
+				return this.checkedNode && this.checkedNode.status === 1 ? true : false
+			}
 		},
 		mounted () {
 			this.getOrganizeTree()
@@ -280,6 +443,24 @@
 	}
 </script>
 <style scoped lang="scss">
+	.ztree {
+		width: 100%;
+		min-height: 400px;
+		max-height: 600px;
+		overflow-y: auto;
+		border: 1px solid #ddd;
+		
+		&::-webkit-scrollbar {
+      width: 4px;
+      border-radius: 5px;
+      background: #bbb
+    }
+    li {
+    	overflow: hidden;
+  		text-overflow: ellipsis;
+  		white-space: nowrap;
+    }
+	}
 	.el-card {
 		min-height: 500px
 	}
