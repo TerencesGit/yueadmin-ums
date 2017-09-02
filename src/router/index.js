@@ -8,6 +8,7 @@ import Welcome from '@/pages/welcome'
 import AccountCenter from '@/pages/account/infocenter'
 import AccountSettings from '@/pages/account/settings'
 import RegistedPartner from '@/pages/account/registedpartner'
+import WaittingVerify from '@/pages/account/waittingverify'
 
 import PartnerEdit from '@/pages/partner/partneredit'
 import PartnerOrgManage from '@/pages/partner/organizeManage'
@@ -57,6 +58,11 @@ const routes = [
         path: 'registedpartner',
         name: '注册我的企业',
         component: RegistedPartner
+      },
+      {
+        path: 'waittingverify',
+        name: '等待企业审核',
+        component: WaittingVerify
       },
     ]
   },

@@ -106,7 +106,7 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid && !this.logging) {
           let data = Object.assign({}, this.loginForm)
-          // data.password = Md5.hex_md5(data.password)
+          data.password = Md5.hex_md5(data.password)
           this.logging = true;
           requestLogin(data).then(res => {
             console.log(res)

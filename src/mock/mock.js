@@ -100,10 +100,47 @@ export default {
 					user.idcardPicBack = idcardPicBack;
 				}
 			})
+			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 					resolve([200, retObj])
-				}, 6000)
+				}, 500)
+			})
+		})
+		// 更新密码
+		mock.onPost('/accountInter/updatePwd.do').reply(config => {
+			let userId = sessionStorage.getItem('userId');
+			console.log(config.data)
+			let { oldPassword, newPassword } = JSON.parse(config.data);
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {}
+			}
+			_AdminList.filter(user => {
+				if(user.userId == userId && user.password == oldPassword) {
+					user.password = newPassword
+				} else {
+					retObj = {
+						code: '1003',
+						message: '原密码错误',
+						result: {}
+					}
+				}
+			})
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 新建商家信息
+		mock.onPost('/accountInter/createPartner.do').reply(config => {
+			let partnerInfo = JSON.parse(config.data);
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+						resolve([200, retObj])
+				}, 500)
 			})
 		})
 		// 获取企业信息

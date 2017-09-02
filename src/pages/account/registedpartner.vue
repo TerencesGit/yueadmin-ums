@@ -114,6 +114,7 @@
 	</section>
 </template>
 <script>
+	import { createPartner } from '@/api'
 	export default {
 		data() {
 			const validateMobile = (rule, value, callback) => {
@@ -206,7 +207,14 @@
 					if(valid) {
 						let data = Object.assign({}, this.partnerForm)
 						console.log(data)
-
+						createPartner(data).then(res => {
+							console.log(res)
+							if(res.data.code === '0001') {
+								this.$router.push('waittingverify')
+							} else {
+								this.$message.error(res.data.message)
+							}
+						})
 					} else {
 						this.$notify({
 							type: 'warning',

@@ -12,7 +12,7 @@
 					<span>建议您定期更改密码以保护账户安全。</span>
 					<el-button size="small" type="info" @click="modifyPass">修改</el-button>
 				</li>
-				<li v-if="account.emailVerified === 1" class="account-item">
+				<li v-if="userInfo.emailVerified === 1" class="account-item">
 					<i class="el-icon-circle-check"></i>
 					<label>邮箱验证</label>
 					<span>验证后，可用于快速找回密码。</span>
@@ -24,7 +24,7 @@
 					<span>验证后，可用于快速找回密码。</span>
 					<el-button size="small" type="success" @click="verifyEmail">立即验证</el-button>
 				</li>
-				<li v-if="account.mobile" class="account-item">
+				<li v-if="userInfo.mobile" class="account-item">
 					<i class="el-icon-circle-check"></i>
 					<label>修改手机号</label>
 					<span>当前手机号： {{mobile}}</span>
@@ -65,13 +65,13 @@
 			<el-row>
 				<el-col :span="14" :offset="5">
 					<el-form :model="mobileForm" ref="mobileForm" :rules="rules" label-width="120px">
-						<el-form-item v-if="!account.mobile" label="手机号：" prop="mobile">
+						<el-form-item v-if="!userInfo.mobile" label="手机号：" prop="mobile">
 							<el-input v-model.trim="mobileForm.mobile" placeholder="输入手机号" style="width: 90%"></el-input>
 						</el-form-item>
-						<el-form-item v-if="account.mobile" label="当前手机号：">
+						<el-form-item v-if="userInfo.mobile" label="当前手机号：">
 							<span>{{mobile}}</span>
 						</el-form-item>
-						<el-form-item v-if="account.mobile" label="新手机号：" prop="mobile">
+						<el-form-item v-if="userInfo.mobile" label="新手机号：" prop="mobile">
 							<el-input v-model.trim="mobileForm.mobile" placeholder="输入新手机号" style="width: 90%"></el-input>
 						</el-form-item>
 						<el-form-item label="验证码：" prop="smsCode">
@@ -95,7 +95,7 @@
 	</section>
 </template>
 <script>
-	import { getUserInfo } from '@/api'
+	import { getMyinfo, updatePwd, } from '@/api'
 	import Md5 from '@/assets/js/md5'
 	export default {
 		data () {
@@ -123,11 +123,7 @@
       }
 			return {
 				loading: false,
-				account: {
-					mobile: '13212345678',
-					email: '26302433@qq.com',
-					emailVerified: 0
-				},
+				userInfo: {},
 				passwordVisible: false,
 				passwordForm: {
 					oldPass: '',
@@ -164,48 +160,58 @@
 			}
 		},
 		methods: {
-			getAccountInfo() {
+			// 用户信息
+			getUserInfo() {
 				this.loading = true;
-				let params = {
-					accountId: 1001
-				}
-				getUserInfo(params).then(res => {
+				getMyinfo().then(res => {
 					console.log(res)
 					this.loading = false;
 					if(res.data.code === '0001') {
-						this.account = res.data.result.account;
+						this.userInfo = res.data.result.userInfo;
 					} else {
 						this.$message.error(res.data.message)
 					}
 				}).catch(err => {
-					this.loading = false;
 					// console.log(err)
+					this.loading = false;
 					this.$catchError(err)
 				})
 			},
 			modifyPass() {
 				this.passwordVisible = true
 			},
+			// 修改密码
 			submitPass () {
 				this.$refs.passwordForm.validate(valid => {
 					if(valid) {
-						// let data = Object.assign({}, this.passwordForm)
 						let data = {
-							oldPass: Md5.hex_md5(this.passwordForm.oldPass),
-							newPass: Md5.hex_md5(this.passwordForm.newPass),
+							oldPassword: Md5.hex_md5(this.passwordForm.oldPass),
+							newPassword: Md5.hex_md5(this.passwordForm.newPass),
 						}
-						console.log(data)
+						updatePwd(data).then(res => {
+							if(res.data.code === '0001') {
+								this.$message.success(res.data.message)
+							} else {
+								this.$message.error(res.data.message)
+							}
+						}).catch(err => {
+							console.log(err)
+							this.$catchError(err)
+						})
+						this.passwordVisible = false;
 					} else {
 						console.log('err submit')
 					}
 				})
 			},
+			// 验证邮箱
 			verifyEmail() {
 				!this.sendEmail && 
-				this.$message(`验证信息已发送到${this.account.email}，请注意查收`) || 
+				this.$message(`验证信息已发送到${this.userInfo.email}，请注意查收`) || 
 				this.$notify({ type: 'warning', title: '提示', message: '邮件已发送，不可重复发送' })
 				this.sendEmail = true;
 			},
+			// 
 			bindMobile() {
 				this.mobileFormVisible = true; 
 			},
@@ -224,6 +230,7 @@
 					}
 				}, 1000)	
 			},
+			// 获取短信验证码
 			getSmsCode() {
 				this.$refs.mobileForm.validateField('mobile', (errMessage) => {
 					console.log(errMessage)
@@ -235,6 +242,7 @@
 					}
 				})
 			},
+			// 绑定手机号
 			submitMobile() {
 				this.$refs.mobileForm.validate(valid => {
 					console.log(valid)
@@ -255,11 +263,12 @@
 		},
 		computed: {
 			mobile() {
-				return this.account.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
+				return this.userInfo.mobile && 
+							 this.userInfo.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
 			}
 		},
 		mounted () {
-			this.getAccountInfo()
+			this.getUserInfo()
 		}
 	}
 </script>
