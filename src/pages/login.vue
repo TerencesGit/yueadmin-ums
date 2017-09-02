@@ -113,9 +113,10 @@ export default {
             if (res.data.code === '0001') {
               let user = {
                 username: data.username,
-                password: escape(btoa(data.password)),
+                password: escape(btoa(this.loginForm.password)),
                 isAdmin: data.isAdmin
               }
+              console.log(res.data.result.userInfo.userId)
               localStorage.setItem('user', JSON.stringify(user))
               sessionStorage.setItem('userId', res.data.result.userInfo.userId)
               this.$message.success('登录成功')

@@ -23,14 +23,14 @@ export default {
 		mock.onPost('/login').reply(config => {
 			let { username, password, isAdmin } = JSON.parse(config.data);
 			console.log(username, password, isAdmin)
-			let user = _AdminList.filter(user => user.name === username && 
+			let loginUser = _AdminList.filter(user => user.email === username && 
 				user.isAdmin === isAdmin)[0];
-			console.log(user)
-			if(user) {
-				if(user.password === password) {
+			console.log(loginUser)
+			if(loginUser) {
+				if(loginUser.password === password) {
 					return new Promise((resolve, reject) => {
 						setTimeout(() => {
-							retObj.result.userInfo = _AdminList[0];
+							retObj.result.userInfo = loginUser;
 							resolve([200, retObj])
 						}, 1000)
 					})

@@ -58,7 +58,7 @@ const router = new Router({
   routes  
 })
 router.beforeEach((to, from, next) => {
-  let user = sessionStorage.getItem('account')
+  let user = sessionStorage.getItem('userId')
   let logRequired = to.path.indexOf('account') !== -1 || 
                     to.path.indexOf('admin') !== -1;
   if(logRequired && !user) {
