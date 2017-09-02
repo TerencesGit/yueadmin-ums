@@ -1,19 +1,22 @@
 <template>
-	<el-card class="card-primary">
-		<div slot="header">
-			等待审核
-		</div>
-		<div class="card-content">
-			<h3>
-				<i class="fa fa-check"></i>
-				提交成功！
-			</h3>
-			<p>
-				请等待管理员审核... 
-			</p>
-			<router-link to="/account/infocenter">返回账户中心</router-link>
-		</div>
-	</el-card>
+	<section>
+		<div v-title :data-title="this.$route.name"></div>
+		<el-card class="card-primary">
+			<div slot="header">
+				等待审核
+			</div>
+			<div class="card-content">
+				<h3>
+					<i class="fa fa-check"></i>
+					提交成功！
+				</h3>
+				<p>
+					请等待管理员审核... 
+				</p>
+				<router-link to="/account/infocenter">返回账户中心</router-link>
+			</div>
+		</el-card>
+	</section>
 </template>
 <style scoped lang="scss">
 	.el-card {

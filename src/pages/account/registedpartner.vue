@@ -1,5 +1,6 @@
 <template>
 	<section>
+		<div v-title :data-title="this.$route.name"></div>
 		<el-card class="card-primary">
 			<div slot="header">
 				注册我的企业

@@ -115,7 +115,7 @@
 	</section>
 </template>
 <script>
-	import { readPartnerInfo } from '@/api'
+	import { getMyPartner } from '@/api'
 	export default {
 		data() {
 			const validateMobile = (rule, value, callback) => {
@@ -181,7 +181,7 @@
 		},
 		methods: {
 			getPartnerInfo() {
-				readPartnerInfo().then(res => {
+				getMyPartner().then(res => {
 					console.log(res)
 					if(res.data.code === '0001') {
 						this.partnerForm = res.data.result.partnerInfo

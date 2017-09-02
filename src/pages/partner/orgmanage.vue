@@ -256,6 +256,7 @@
 				      zNode.push(treeObj)
 				    })
 				    $.fn.zTree.init($('#organizeTree'), setting, zNode);
+				    this.checkedNode = null;
 					} else {
 						this.$message(res.data.message)
 					}

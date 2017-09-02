@@ -1,10 +1,11 @@
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
-import { AdminList, UserList, PartnerList, OrganizeList } from './data/user'
+import { AdminList, UserList, PartnerList, OrganizeList, FunctionTree } from './data/user'
 let _AdminList = AdminList,
 		_UserList = UserList,
 		_PartnerList = PartnerList,
-		_Organizes = OrganizeList;
+		_Organizes = OrganizeList,
+		_FunctionTree = FunctionTree;
 const retObj = {
 	code: '0001',
 	message: '操作成功',
@@ -250,6 +251,61 @@ export default {
 		mock.onPost('/partner/removeUser').reply(config => {
 			let { userId } = JSON.parse(config.data)
 			_UserList = _UserList.filter(user => user.userId !== userId)
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取功能树
+		mock.onGet('/adminInter/getFunctionTree.do').reply(config => {
+			retObj.result = {
+				functionTree: _FunctionTree
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 创建功能点
+		mock.onPost('/adminInter/createFunction.do').reply(config => {
+			let { parentId, name, funcDesc } = JSON.parse(config.data);
+			_FunctionTree.push({
+				funcId: new Date().getTime(),
+				name,
+				funcDesc,
+				status: 1,
+				parentId,
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新功能点
+		mock.onPost('/adminInter/updateFunction.do').reply(config => {
+			let { funcId, name, funcDesc } = JSON.parse(config.data);
+			_FunctionTree.filter(func => {
+				if(func.funcId === funcId) {
+					func.name = name;
+					func.funcDesc = funcDesc
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 删除功能点
+		mock.onPost('/adminInter/delFunction.do').reply(config => {
+			let { funcId } = JSON.parse(config.data)
+			_FunctionTree = _FunctionTree.filter(func => func.funcId !== funcId)
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {

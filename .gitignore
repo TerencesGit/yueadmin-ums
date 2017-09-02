@@ -8,4 +8,4 @@ yarn-error.log*
 api
 assets
 components
-mock/data
+data

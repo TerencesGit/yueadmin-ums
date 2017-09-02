@@ -11,7 +11,9 @@ import RegistedPartner from '@/pages/account/registedpartner'
 import WaittingVerify from '@/pages/account/waittingverify'
 
 import PartnerEdit from '@/pages/partner/partneredit'
-import PartnerOrgManage from '@/pages/partner/organizeManage'
+import PartnerOrgManage from '@/pages/partner/orgmanage'
+
+import SystemFuncManage from '@/pages/system/funcmanage'
 
 const routes = [
   {
@@ -84,6 +86,18 @@ const routes = [
     ]
   },
   {
+    path: '/system',
+    name: '系统管理',
+    component: Layout,
+    children: [
+      {
+        path: 'funcmanage',
+        name: '功能管理',
+        component: SystemFuncManage,
+      }
+    ]
+  },
+  {
     path: '/NoPermission',
     name: 'nopermission',
     component: NoPermission
@@ -93,9 +107,9 @@ const routes = [
     name: 'notfound',
     component: NotFound
   },
-  // {
-  // 	path: '*',
-  // 	redirect: '/NotFound'
-  // }
+  {
+  	path: '*',
+  	redirect: '/NotFound'
+  }
 ]
 export default routes

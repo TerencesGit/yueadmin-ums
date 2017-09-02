@@ -20,6 +20,9 @@ export default {
 }
 </script>
 <style scoped>
+  h3 {
+    margin: 15px 0;
+  }
   .wrap {
     position: fixed;
     width: 100%;

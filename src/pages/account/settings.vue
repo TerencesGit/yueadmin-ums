@@ -1,5 +1,6 @@
 <template>
 	<section>
+		<div v-title :data-title="this.$route.name"></div>
 	  <!-- 账号设置 -->
 		<el-card class="card-primary" v-loading="loading">
 			<div slot="header">

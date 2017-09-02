@@ -1,5 +1,6 @@
 <template>
 	<section>
+			<div v-title :data-title="this.$route.name"></div>
 		<el-row :gutter="20">
 			<el-col :span="7">
 				<el-card v-loading="loading">
