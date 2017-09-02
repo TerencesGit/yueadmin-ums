@@ -14,47 +14,47 @@
 						  popper-class="text-center">
 						</el-popover>
 						<div class="avatar" v-popover:avatarPop @click="uploadAvatar">
-							<img v-if="accountForm.avatar" :src="accountForm.avatar">
+							<img v-if="userForm.avatar" :src="userForm.avatar">
 							<img v-else src="../../assets/img/avatar.gif" alt="头像">
 						</div>
-						<h3>{{accountForm.name}}</h3>
+						<h3>{{userForm.name}}</h3>
 						<ul class="list-group">
 							<li class="list-group-item active">
 								<a href="javascript:;" title="编辑" @click="handleEdit">		   账户信息
-									<i class="el-icon-edit"></i>
+									<i class="fa fa-edit fa-lg"></i>
 								</a>
 							</li>
 							<li class="list-group-item">
 								<label>邮箱</label>
-								<span>{{accountForm.email}}</span>
+								<span>{{userForm.email}}</span>
 							</li>
 							<li class="list-group-item">
-								<label>手机</label>
-								<span v-if="accountForm.mobile">{{accountForm.mobile}}</span>
+								<label>姓名</label>
+								<span v-if="userForm.realname">{{userForm.realname}}</span>
 								<span v-else>未设置</span>
 							</li>
 							<li class="list-group-item">
 								<label>性别</label>
-								<span>{{gender}}</span>
+								<span>{{sexual}}</span>
 							</li>
 							<li class="list-group-item">
 								<label>QQ</label>
-								<span v-if="accountForm.qq">{{accountForm.qq}}</span>
+								<span v-if="userForm.qq">{{userForm.qq}}</span>
 								<span v-else>未设置</span>
 							</li>
 							<li class="list-group-item">
 								<label>生日</label>
-								<span v-if="accountForm.birthday">{{accountForm.birthday}}</span>
+								<span v-if="userForm.birthday">{{userForm.birthday}}</span>
 								<span v-else>未设置</span>
 							</li>
-							<li class="list-group-item">
+							<!-- <li class="list-group-item">
 								<label>籍贯</label>
-								<span v-if="originName">{{originName}}</span>
+								<span v-if="userForm.areaName">{{userForm.areaName}}</span>
 								<span v-else>未设置</span>
-							</li>
+							</li> -->
 							<li class="list-group-item">
 								<label>部门</label>
-								<span v-if="accountForm.organize">{{accountForm.organize}}</span>
+								<span v-if="userForm.orgName">{{userForm.orgName}}</span>
 								<span v-else>未知</span>
 							</li>
 						</ul>
@@ -64,7 +64,12 @@
 			<el-col :span="17">
 				<el-card class="card-primary">
 					<div slot="header">
-						<span>公司动态</span>
+						<span>企业信息</span>
+					</div>
+					<div class="partner-info">
+						<img :src="partnerInfo.logo" :title="partnerInfo.name">
+						<h3>{{partnerInfo.name}}</h3>
+						<p>{{partnerInfo.note}}</p>
 					</div>
 				</el-card>
 			</el-col>
@@ -87,23 +92,26 @@
 			</div>
 		</el-dialog>
 		<!-- 账户信息编辑 -->
-		<el-dialog :visible.sync="accountFormVisible" title="账户信息编辑">
+		<el-dialog :visible.sync="userFormVisible" title="账户信息编辑">
 			<el-row>
 				<el-col :span="18" :offset="3">
-					<el-form :model="accountForm" ref="accountForm" :rules="rules" label-width="120px">
-						<el-form-item label="姓名：" prop="name">
-							<el-input v-model="accountForm.name" placeholder="输入姓名"></el-input>
+					<el-form :model="userForm" ref="userForm" :rules="rules" label-width="120px">
+						<el-form-item label="用户名：" prop="name">
+							<el-input v-model="userForm.name" placeholder="输入用户名"></el-input>
 						</el-form-item>
-						<el-form-item label="性别：" prop="gender">
-							<el-radio class="radio" v-model="accountForm.gender" :label="1">男</el-radio>
-  						<el-radio class="radio" v-model="accountForm.gender" :label="0">女</el-radio>
+						<el-form-item label="真实姓名：" prop="realname">
+							<el-input v-model="userForm.realname" placeholder="输入真实姓名"></el-input>
+						</el-form-item>
+						<el-form-item label="性别：" prop="sexual">
+							<el-radio class="radio" v-model="userForm.sexual" :label="1">男</el-radio>
+  						<el-radio class="radio" v-model="userForm.sexual" :label="0">女</el-radio>
 						</el-form-item>
 						<el-form-item label="QQ：" prop="qq">
-							<el-input v-model="accountForm.qq" placeholder="输入QQ"></el-input>
+							<el-input v-model="userForm.qq" placeholder="输入QQ"></el-input>
 						</el-form-item>
 						<el-form-item label="生日：">
 							<el-date-picker
-					      v-model="accountForm.birthday"
+					      v-model="userForm.birthday"
 					      type="date"
 					      placeholder="选择日期"
 					      :picker-options="pickerOptions"
@@ -145,8 +153,8 @@
 								</el-col>
 							</el-row>
 						</el-form-item>
-						<el-form-item label="身份证号：" prop="idcard">
-							<el-input v-model="accountForm.idcard"></el-input>
+						<el-form-item label="身份证号：" prop="idcardNum">
+							<el-input v-model="userForm.idcardNum"></el-input>
 						</el-form-item>
 						<el-form-item label="身份证正面：" prop="idcard">
 							<el-upload
@@ -176,7 +184,7 @@
 				</el-col> 
 			</el-row>
 			<div slot="footer">
-				<el-button @click="accountFormVisible = false">取消</el-button>
+				<el-button @click="userFormVisible = false">取消</el-button>
 				<el-button type="primary" @click="submitForm">确定</el-button>
 			</div>
 		</el-dialog>
@@ -184,11 +192,22 @@
 </template>
 <script>
 	import Region from '@/assets/js/region'
-	import { getUserInfo } from '@/api'
+	import { getMyinfo, updateMyInfo, getMyPartner } from '@/api'
 	export default {
 		data() {
 			return {
-				accountForm: {},
+				userForm: {
+					name: '',
+					realname: '',
+					sexual: '',
+					birthday: '',
+					qq: '',
+					idcardNum: '',
+					idcardPicFront: '',
+					idcardPicBack: '',
+					note: '',
+				},
+				partnerInfo: {},
 				originName: '',
 				region: {
 					province: '',
@@ -205,10 +224,13 @@
 				idcardBackUrl: '',
 				loading: false,
 				avatarVisible: false,
-				accountFormVisible: false,
+				userFormVisible: false,
 				rules: {
 					name: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' },
+						{ required: true, message: '请输入用户名', trigger: 'blur' },
+					],
+					realname: [
+						{ required: true, message: '请输入真实姓名', trigger: 'blur' },
 					],
 					birthday: [
 						{ type: 'date', message: '请选择出生日期', trigger: 'change' },
@@ -219,7 +241,7 @@
 		methods: {
 			// 地区格式化
 			formatRegion() {
-				let origin = Region.filter(region => region.id === this.accountForm.origin)[0];
+				let origin = Region.filter(region => region.id === this.userForm.origin)[0];
 				if(origin.level === 1) {
 					this.originName = this.region.province = origin.name
 				} else if (origin.level === 2) {
@@ -236,30 +258,28 @@
 				}
 			},
 			// 获取用户信息
-			getAccountInfo() {
+			getUserInfo() {
 				this.loading = true;
-				let params = {
-					accountId: 1001
-				}
-				getUserInfo(params).then(res => {
+				getMyinfo().then(res => {
 					console.log(res)
 					this.loading = false;
 					if(res.data.code === '0001') {
-						this.accountForm = res.data.result.account;
-						this.avatarUrl = this.accountForm.avatar;
+						this.userForm = res.data.result.userInfo;
+						this.avatarUrl = this.userForm.avatar;
 						this.formatRegion()
+						this.userForm.partnerId && this.getPartInfo()
 					} else {
 						this.$message.error(res.data.message)
 					}
 				}).catch(err => {
+					console.log(err)
 					this.loading = false;
-					// console.log(err)
 					this.$catchError(err)
 				})
 			},
 			// 图片上传校验
 			beforeAvatarUpload(file) {
-        const isJPG = file.type === 'image/jpeg' || file.type === 'png';
+        const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
         const isLt2M = file.size / 1024 / 1024 < 2;
         if (!isJPG) {
           this.$message.error('上传头像图片只能是 JPG 或 PNG 格式!');
@@ -272,24 +292,23 @@
 			// 头像上传成功
 			handleAvatarSuccess(res, file) {
         this.avatarUrl = URL.createObjectURL(file.raw);
-        this.accountForm.avatar = URL.createObjectURL(file.raw);
+        this.userForm.avatar = URL.createObjectURL(file.raw);
         this.$message.success('上传成功')
       },
       // 身份证正面上传成功
 			handleIdCardFrontSuccess(res, file) {
         this.idcardFrontUrl = URL.createObjectURL(file.raw);
-        this.accountForm.idcardPicFront = URL.createObjectURL(file.raw);
+        this.userForm.idcardPicFront = URL.createObjectURL(file.raw);
         this.$message.success('上传成功')
       },
       // 身份证背面上传成功
 			handleIdCardBackSuccess(res, file) {
         this.idcardBackUrl = URL.createObjectURL(file.raw);
-        this.accountForm.idcardPicBack = URL.createObjectURL(file.raw);
+        this.userForm.idcardPicBack = URL.createObjectURL(file.raw);
         this.$message.success('上传成功')
       },
       dateChange(val) {
-      	console.log(val)
-      	this.accountForm.birthday = val
+      	this.userForm.birthday = val
       },
       pickerOptions: {
       	disabledDate(time) {
@@ -302,18 +321,60 @@
       // 头像提交
       uploadSubmit() {
       	this.avatarVisible = false
-      	this.accountForm.avatar = this.avatarUrl
+      	this.userForm.avatar = this.avatarUrl
       	this.$message.success('更新成功')
       },
       // 账户信息编辑
       handleEdit() {
-      	this.accountFormVisible = true
+      	this.userFormVisible = true
       },
       // 账户信息提交
       submitForm() {
-      	this.$refs.accountForm.validate(valid => {
-      		let data = Object.assign({}, this.accountForm)
-      		console.log(data)
+      	this.$refs.userForm.validate(valid => {
+      		if(!valid) {
+      			this.$notify.error({
+      				title: '提示',
+      				message: '请将个人信息填写完整'
+      			})
+      			return;
+      		} 
+      		let data = {
+      			name: this.userForm.name,
+						realname: this.userForm.realname,
+						sexual: this.userForm.sexual,
+						birthday: this.userForm.birthday,
+						qq: this.userForm.qq,
+						idcardNum: this.userForm.idcardNum,
+						idcardPicFront: this.userForm.idcardPicFront,
+						idcardPicBack: this.userForm.idcardPicBack,
+						note: this.userForm.avatar,
+      		}
+      		updateMyInfo(data).then(res => {
+      			console.log(res)
+      			if(res.data.code === '0001') {
+      				this.$message.success(res.data.message)
+      				this.getUserInfo()
+      			} else {
+      				this.$message.error(res.data.message)
+      			}
+      		}).catch(err => {
+      			console.log(err)
+      			this.$catchError(err)
+      		})
+      		this.userFormVisible = false
+      	})
+      },
+      // 企业信息
+      getPartInfo() {
+      	getMyPartner().then(res => {
+      		console.log(res)
+      		if(res.data.code === '0001') {
+      			this.partnerInfo = res.data.result.partnerInfo
+      		} else {
+      			this.$message.error('获取企业信息失败')
+      		}
+      	}).catch(err => {
+      		console.log(err)
       	})
       },
       provinceChange (pid) {
@@ -333,12 +394,12 @@
       }
 		},
 		computed: {
-			gender() {
-				return this.accountForm.gender === 1 ? '男' : this.accountForm.gender === 0 ? '女' : '未知'
+			sexual() {
+				return this.userForm.sexual === 1 ? '男' : this.userForm.sexual === 0 ? '女' : '未知'
 			}
 		},
 		mounted() {
-			this.getAccountInfo()
+			this.getUserInfo()
 			this.regionList.province = Region.filter(region => region.level === 1)
 		}
 	}
@@ -381,6 +442,18 @@
 					margin-left: 10px;
 				}
 			}
+		}
+	}
+	.partner-info {
+		text-align: center;
+		h3 {
+			margin: 15px 0;
+		}
+		img {
+			width: 280px
+		}
+		p {
+			margin: 20px 0;
 		}
 	}
 </style>

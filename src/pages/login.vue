@@ -117,7 +117,7 @@ export default {
                 isAdmin: data.isAdmin
               }
               localStorage.setItem('user', JSON.stringify(user))
-              sessionStorage.setItem('account', JSON.stringify(res.data.result.account))
+              sessionStorage.setItem('userId', res.data.result.userInfo.userId)
               this.$message.success('登录成功')
               this.$router.push({ path: '/account/infocenter' })
               // if (this.loginForm.remember) {

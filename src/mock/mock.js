@@ -10,10 +10,15 @@ const retObj = {
 	message: '操作成功',
 	result: {}
 }
+const retExpireObj = {
+	code: '0000',
+	message: '尚未登录或当前会话已过期',
+	result: {}
+}
 export default {
 	bootstrap () {
 		let mock = new MockAdapter(axios)
-		// 登录
+		// 用户登录
 		mock.onPost('/login').reply(config => {
 			let { username, password, isAdmin } = JSON.parse(config.data);
 			console.log(username, password, isAdmin)
@@ -24,7 +29,7 @@ export default {
 				if(user.password === password) {
 					return new Promise((resolve, reject) => {
 						setTimeout(() => {
-							retObj.result.account = _AdminList[0];
+							retObj.result.userInfo = _AdminList[0];
 							resolve([200, retObj])
 						}, 1000)
 					})
@@ -51,42 +56,72 @@ export default {
 				})
 			}
 		})
-		// 用户信息
-		mock.onGet('/account/info').reply(config => {
-			let { accountId } = config.params;
-			if(!accountId) {
+		// 获取用户信息
+		mock.onGet('/accountInter/getMyinfo.do').reply(config => {
+			let userId = sessionStorage.getItem('userId');
+			if(!userId) {
 				return new Promise((resolve, reject) => {
-					const res = {
-						response: {
-							status: 400
-						}
-					}
 					setTimeout(() => {
-						reject(res)
+						resolve([200, retExpireObj])
 					}, 500)
 				})
 			}
-			let user = _AdminList.filter(user => user.accountId === accountId)[0]
+			let _userInfo = _AdminList.filter(user => user.userId == userId)[0]
 			return new Promise((resolve, reject) => {
-				if(user) {
-					retObj.result.account = user;
-					setTimeout(() => {
-						resolve([200, retObj])
-					}, 500)
-				} else {
-					let retObj = {
-						code: '1001',
-						message: '获取用户信息失败'
-					}
-					setTimeout(() => {
-						resolve([200, retObj])
-					}, 500)
+				retObj.result = {
+					userInfo: _userInfo
 				}
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
 			})
 		})
-		// 企业信息
-		mock.onGet('/partner/info').reply(config => {
-			retObj.result.partnerInfo = _PartnerList[0]
+		// 更新用户信息
+		mock.onPost('/accountInter/updateMyInfo.do').reply(config => {
+			let userId = sessionStorage.getItem('userId');
+			if(!userId) {
+				return new Promise((resolve, reject) => {
+					setTimeout(() => {
+						resolve([200, retExpireObj])
+					}, 500)
+				})
+			}
+			let { name, realname, sexual, qq, birthday, idcardNum, 
+				idcardPicFront, idcardPicBack } = JSON.parse(config.data);
+			_AdminList.filter(user => {
+				if(user.userId == userId) {
+					user.name = name;
+					user.realname = realname;
+					user.sexual = sexual;
+					user.qq = qq;
+					user.birthday = birthday;
+					user.idcardNum = idcardNum;
+					user.idcardPicFront = idcardPicFront;
+					user.idcardPicBack = idcardPicBack;
+				}
+			})
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 6000)
+			})
+		})
+		// 获取企业信息
+		mock.onGet('/accountInter/getMyPartner.do').reply(config => {
+			let userId = sessionStorage.getItem('userId');
+			if(!userId) {
+				return new Promise((resolve, reject) => {
+					setTimeout(() => {
+						resolve([200, retExpireObj])
+					}, 500)
+				})
+			}
+			let _userInfo = _AdminList.filter(user => user.userId == userId)[0];
+			let _partnerId = _userInfo.partnerId;
+			let _partnerInfo = _PartnerList.filter(p => p.partnerId == _partnerId)[0]
+			retObj.result = {
+				partnerInfo: _partnerInfo
+			}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 					resolve([200, retObj])

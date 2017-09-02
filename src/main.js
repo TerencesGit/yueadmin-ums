@@ -44,16 +44,12 @@ Vue.component('back-button', {
 	}
 })
 Vue.prototype.$catchError = (err) => {
-  if(err.response) {
-    let res = err.response;
-    if(res.status) {
-      let status = res.status;
-      if(status === 400) {
-        ElementUI.Message('请求错误')
-      } else {
-        ElementUI.Message('服务器响应错误')
-      }
-    }
+  if(!err.data) {
+    ElementUI.Message('服务器响应错误')
+    return;
+  }
+  if(err.data.code) {
+    ElementUI.Message(err.data.message)
   } else {
     ElementUI.Message('服务器响应超时')
   }
@@ -73,7 +69,6 @@ router.beforeEach((to, from, next) => {
   next()
 })
 router.afterEach((to, from, next) => {
-  // console.log(to.path)
   NProgress.done()
 })
 axios.interceptors.request.use(config => {
@@ -82,15 +77,16 @@ axios.interceptors.request.use(config => {
   return Promise.reject(error)
 })
 axios.interceptors.response.use(res =>{
-  if (res.data.code ===  999) {
-  	localStorage.clear()
-    return router.push('/login')
-  } else if (res.data.code === 403) {
-  	return router.push('/NoPermission')
+  if (res.data.code === '0000') {
+    router.push('/login')
+    return Promise.reject(res)
+  } else if (res.data.code === '9999') {
+  	router.push('/NoPermission')
+    return Promise.reject(res)
   }
   return res;
-}, error => {
-  return Promise.reject(error)
+}, err => {
+  return Promise.reject(err)
 })
 /* eslint-disable no-new */
 new Vue({
