@@ -7,15 +7,6 @@
 			</div>
 			<el-row :gutter="15">
 				<el-col :span="5" class="tree" v-loading="loading">
-					<!-- <el-tree 
-						:data="functionTree" 
-						:props="defaultProps"
-						empty-text="暂无部门"
-						highlight-current
-						default-expand-all
-						:expand-on-click-node="false"
-						@node-click="handleNodeClick">
-					</el-tree> -->
 					<ul id="functionTree" class="ztree"></ul>
 				</el-col>
 				<el-col :span="19" v-if="functionTree.length === 0">
@@ -54,7 +45,8 @@
 			      highlight-current-row
 			      v-loading="tableLoading" 
 			      style="width: 100%">
-			      <el-table-column type="index" width="60"></el-table-column>
+			      <!-- <el-table-column type="index" width="60"></el-table-column> -->
+			      <el-table-column prop="funcId" label="功能编号" width="100"></el-table-column>
 			      <el-table-column prop="name" label="名称"></el-table-column>
 			      <el-table-column prop="desc" label="描述"></el-table-column>
 			      <el-table-column prop="updateTime" label="更新时间" width="120" :formatter="formatTime"></el-table-column>

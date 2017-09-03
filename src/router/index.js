@@ -14,6 +14,7 @@ import PartnerEdit from '@/pages/partner/partneredit'
 import PartnerOrgManage from '@/pages/partner/orgmanage'
 
 import SystemFuncManage from '@/pages/system/funcmanage'
+import SystemRoleManage from '@/pages/system/rolemanage'
 
 const routes = [
   {
@@ -94,7 +95,12 @@ const routes = [
         path: 'funcmanage',
         name: '功能管理',
         component: SystemFuncManage,
-      }
+      },
+      {
+        path: 'rolemanage',
+        name: '角色管理',
+        component: SystemRoleManage,
+      },
     ]
   },
   {
