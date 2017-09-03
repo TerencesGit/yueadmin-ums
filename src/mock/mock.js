@@ -1,8 +1,7 @@
 import axios from 'axios'
 import MockAdapter from 'axios-mock-adapter'
-import { AdminList, UserList, PartnerList, OrganizeList, FunctionTree } from './data/user'
-let _AdminList = AdminList,
-		_UserList = UserList,
+import { UserList, PartnerList, OrganizeList, FunctionTree } from './data/user'
+let _UserList = UserList,
 		_PartnerList = PartnerList,
 		_Organizes = OrganizeList,
 		_FunctionTree = FunctionTree;
@@ -22,7 +21,7 @@ export default {
 		// 用户登录
 		mock.onPost('/login').reply(config => {
 			let { username, password, isAdmin } = JSON.parse(config.data);
-			let loginUser = _AdminList.filter(user => user.email === username && 
+			let loginUser = _UserList.filter(user => user.email === username && 
 				user.isAdmin === isAdmin)[0];
 			if(loginUser) {
 				if(loginUser.password === password) {
@@ -65,7 +64,7 @@ export default {
 					}, 500)
 				})
 			}
-			let _userInfo = _AdminList.filter(user => user.userId == userId)[0]
+			let _userInfo = _UserList.filter(user => user.userId == userId)[0]
 			let retObj = {
 				code: '0001',
 				message: '操作成功',
@@ -91,7 +90,7 @@ export default {
 			}
 			let { name, realname, sexual, qq, birthday, areaName, idcardNum, 
 				idcardPicFront, idcardPicBack } = JSON.parse(config.data);
-			_AdminList.filter(user => {
+			_UserList.filter(user => {
 				if(user.userId == userId) {
 					user.name = name;
 					user.realname = realname;
@@ -121,7 +120,7 @@ export default {
 				message: '操作成功',
 				result: {}
 			}
-			_AdminList.filter(user => {
+			_UserList.filter(user => {
 				if(user.userId == userId && user.password == oldPassword) {
 					user.password = newPassword
 				} else {
@@ -157,7 +156,7 @@ export default {
 					}, 500)
 				})
 			}
-			let _userInfo = _AdminList.filter(user => user.userId == userId)[0];
+			let _userInfo = _UserList.filter(user => user.userId == userId)[0];
 			let _partnerId = _userInfo.partnerId;
 			let _partnerInfo = _PartnerList.filter(p => p.partnerId == _partnerId)[0]
 			retObj.result = {
@@ -181,16 +180,34 @@ export default {
 			})
 		})
 		// 用户列表
-		mock.onGet('/account/list').reply(config => {
-			let { orgId, name } = config.params
-			_UserList.forEach(user => {
-				user.organize = name
+		mock.onGet('/user/list').reply(config => {
+			let { orgId, name } = config.params;
+			let currOrg = OrganizeList.filter(org => org.orgId == orgId)[0];
+			if(currOrg.parentId == 0) {
+				retObj.result = {
+					staffList: _UserList
+				}
+				return new Promise((resolve, reject) => {
+					setTimeout(() => {
+							resolve([200, retObj])
+					}, 500)
+				})
+			}
+			let orgList = OrganizeList.filter(org => org.orgId == orgId || org.parentId == orgId)
+			let _staffList = [];
+			orgList.forEach(org => {
+				let _adminList = _UserList.filter(user => user.orgId == org.orgId);
+				// console.log(_adminList.length)
+				_staffList = _adminList.length >= 1 ? _staffList.concat(_adminList) : _staffList
 			})
-			_UserList.sort(() => {
-  			return 0.5 - Math.random()
-  		})
+			// _UserList.forEach(user => {
+			// 	user.organize = name
+			// })
+			// _UserList.sort(() => {
+  	  // 		return 0.5 - Math.random()
+  	  // })
 			retObj.result = {
-				userList: _UserList
+				staffList: _staffList
 			}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
@@ -250,7 +267,25 @@ export default {
 				}, 500)
 			})
 		})
-		// 移除员工
+		// 重置员工部门
+		mock.onPost('/partner/setUserOrg').reply(config => {
+			let { userId } = JSON.parse(config.data)
+			console.log(userId)
+			_UserList.filter(user => {
+				console.log(user.userId)
+				if(user.userId == userId) {
+					user.orgId = '',
+					user.orgName = ''
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 删除用户
 		mock.onPost('/partner/removeUser').reply(config => {
 			let { userId } = JSON.parse(config.data)
 			_UserList = _UserList.filter(user => user.userId !== userId)

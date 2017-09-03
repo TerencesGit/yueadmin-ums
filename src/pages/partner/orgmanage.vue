@@ -6,7 +6,7 @@
 				组织部门管理
 			</div>
 			<el-row :gutter="15">
-				<el-col :span="6" class="tree" v-loading="loading">
+				<el-col :span="5" class="tree" v-loading="loading">
 					<!-- <el-tree 
 						:data="organizeTree" 
 						:props="defaultProps"
@@ -18,7 +18,7 @@
 					</el-tree> -->
 					<ul id="organizeTree" class="ztree"></ul>
 				</el-col>
-				<el-col :span="18" v-if="organizeTree.length === 0">
+				<el-col :span="19" v-if="organizeTree.length === 0">
 					<!-- 工具栏 -->
 					<el-row class="button-group">
 						<el-button size="small" type="success" @click="handleAdd">
@@ -59,15 +59,17 @@
 			      v-loading="tableLoading" 
 			      style="width: 100%">
 			      <el-table-column type="index" width="60"></el-table-column>
-			      <el-table-column prop="name" label="姓名" width="80"></el-table-column>
+			      <el-table-column prop="realname" label="姓名" width="120"></el-table-column>
 			      <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
-			      <el-table-column prop="mobile" label="手机号" width="120" :formatter="formatMobile"></el-table-column>
-			      <el-table-column prop="createTime" label="注册时间" width="120" :formatter="formatTime"></el-table-column>
-			      <el-table-column prop="organize" label="部门"></el-table-column>
-			      <el-table-column label="操作" width="160">
+			      <!-- <el-table-column prop="mobile" label="手机号" width="120" :formatter="formatMobile"></el-table-column> -->
+			      <el-table-column prop="createTime" label="注册时间" width="120"></el-table-column>
+			      <el-table-column prop="orgName" label="部门" :formatter="formatOrg"></el-table-column>
+			      <el-table-column label="操作" width="240">
 			      	<template scope="scope">
 			      		<el-button type="primary" size="small" @click="handleShow(scope.row)">查看</el-button>
-			      		<el-button type="danger" size="small" @click="handleRemove(scope.row)">移除</el-button>
+			      		<el-button v-if="scope.row.orgName" type="warning" size="small" @click="handleRemoveOrg(scope.row)">移除</el-button>
+			      		<el-button v-else type="success" size="small" @click="handleSetOrg(scope.row)">设置部门</el-button>
+			      		<el-button type="danger" size="small" @click="handleRemove(scope.row)">删除</el-button>
 			      	</template>
 			      </el-table-column>
 			    </el-table>
@@ -123,24 +125,28 @@
 		<el-dialog :visible.sync="staffInfoVisible" title="员工信息">
 			<el-row>
 				<el-col :span="18" :offset="3">
-					<el-form :model="staffInfo" label-width="160px">
+					<el-form :model="staffInfo" label-width="180px">
+						<el-form-item label="">
+							<img v-if="staffInfo.avatar" :src="staffInfo.avatar" alt="头像" class="avatar">
+							<img v-else src="../../assets/img/avatar.gif" alt="头像" class="avatar">
+						</el-form-item>
 						<el-form-item label="姓名：">
-							<span>{{staffInfo.name}}</span>
+							<span>{{staffInfo.realname}}</span>
 						</el-form-item>
 						<el-form-item label="邮箱：">
 							<span>{{staffInfo.email}}</span>
 						</el-form-item>
 						<el-form-item label="手机号：">
-							<span>{{staffInfo.mobile}}</span>
+							<span>{{staffInfo.mobile || '暂无'}}</span>
 						</el-form-item>
 						<el-form-item label="注册时间：">
 							<span>{{staffInfo.createTime}}</span>
 						</el-form-item>
 						<el-form-item label="所属部门：">
-							<span>{{staffInfo.organize}}</span>
+							<span>{{staffInfo.orgName || '暂无'}}</span>
 						</el-form-item>
-						<el-form-item label="籍贯：">
-							<span>{{staffInfo.address}}</span>
+						<el-form-item label="所在地：">
+							<span>{{staffInfo.areaName}}</span>
 						</el-form-item>
 					</el-form>
 				</el-col>
@@ -156,7 +162,7 @@
 	import '@/assets/plugins/zTree/css/zTreeStyle.css'
 	import '@/assets/plugins/zTree/js/jquery.min.js'
 	import '@/assets/plugins/zTree/js/jquery.ztree.all.min.js'
-	import { readOrganizeTree, getUserList, saveOrganizeTree, deleteOrganize, setOrganizeStatus, removeUser } from '@/api'
+	import { readOrganizeTree, getUserList, saveOrganizeTree, deleteOrganize, setOrganizeStatus, setUserOrg, removeUser } from '@/api'
 	export default {
 		data() {
 			return {
@@ -197,10 +203,10 @@
 		},
 		methods: {
 			formatMobile(row) {
-				return row.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
+				return row.mobile ? row.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '暂无'
 			},
-			formatTime(row) {
-				return this.$moment(row.createTime).format('YYYY-MM-DD ')
+			formatOrg(row) {
+				return row.orgName || '暂无'
 			},
 			handleSizeChange(val) {
 				this.pageSize = val
@@ -278,13 +284,13 @@
 					orgId: org.orgId,
 					name: org.name
 				}
-				console.log(data)
+				// console.log(data)
 				getUserList(data).then(res => {
 					this.tableLoading = false
 					console.log(res)
 					if(res.data.code === '0001') {
-						this.staffList = res.data.result.userList;
-						this.total = res.data.result.userList.length;
+						this.staffList = res.data.result.staffList;
+						this.total = res.data.result.staffList.length;
 					} else {
 						this.$message.error(res.data.message)
 					}
@@ -411,9 +417,38 @@
       	this.staffInfo = Object.assign({}, row)
       	this.staffInfoVisible = true
       },
-      // 移除员工
+      // 从部门移除员工
+      handleRemoveOrg(row) {
+      	this.$confirm(`确定将 ${row.realname} 从该部门移除？`, '提示', {type: 'warning'}).then(() => {
+      		let data = {
+	      		userId: row.userId
+	      	}
+      		setUserOrg(data).then(res => {
+      			console.log(res)
+      			if(res.data.code === '0001') {
+      				this.$message.success(res.data.message)
+      				this.getStaffList(this.checkedNode)
+      			} else {
+      				this.$message.error(res.data.message)
+      			}
+      		}).catch(err => {
+      			console.log(err)
+      		})
+      	}).catch(err => {
+      		console.log(err)
+      		this.$message('已取消操作')
+      	})
+      },
+      // 设置员工部门
+      handleSetOrg(row) {
+      	this.$notify.error({
+      		title: '提示',
+      		message: '暂无该功能！', 
+      	})
+      },
+      // 删除员工
       handleRemove(row) {
-      	this.$confirm(`确定将 ${row.name} 从该部门移除？`, '提示', {type: 'warning'}).then(() => {
+      	this.$confirm(`确定删除 ${row.realname}？`, '提示', {type: 'warning'}).then(() => {
       		let data = {
 	      		userId: row.userId
 	      	}
@@ -429,9 +464,10 @@
       			console.log(err)
       		})
       	}).catch(err => {
+      		console.log(err)
       		this.$message('已取消操作')
       	})
-      }
+      },
 		},
 		computed: {
 			disabled() {
@@ -480,5 +516,10 @@
 		margin-bottom: 20px;
 		box-shadow: 1px 1px 1px 1px #ddd;
 		background: #fff;
+	}
+	.avatar {
+		width: 150px;
+		border-radius: 50%;
+		border: 1px solid #ddd;
 	}
 </style>

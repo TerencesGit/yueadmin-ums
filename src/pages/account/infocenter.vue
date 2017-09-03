@@ -196,11 +196,11 @@
 </template>
 <script>
 	import Region from '@/assets/js/region'
-	import { mapGetters } from 'vuex'
 	import { getMyinfo, updateMyInfo, getMyPartner } from '@/api'
 	export default {
 		data() {
 			return {
+				userForm: {},
 				partnerInfo: {},
 				originName: '',
 				region: {
@@ -237,6 +237,7 @@
 			// 地区格式化
 			formatRegion() {
 				let origin = Region.filter(region => region.id === this.userForm.origin)[0];
+				if(!origin) return;
 				if(origin.level === 1) {
 					this.originName = this.region.province = origin.name
 				} else if (origin.level === 2) {
@@ -256,14 +257,13 @@
 			getUserInfo() {
 				this.loading = true;
 				getMyinfo().then(res => {
-					console.log(res)
+					// console.log(res)
 					this.loading = false;
 					if(res.data.code === '0001') {
+						this.userForm = res.data.result.userInfo;
 						this.$store.dispatch('saveUserInfo', res.data.result.userInfo)
-						// this.userForm = res.data.result.userInfo;
-						// this.avatarUrl = this.userForm.avatar;
-						// this.formatRegion()
-						// this.userForm.partnerId && this.getPartInfo()
+						this.avatarUrl = this.userForm.avatar;
+						this.userForm.partnerId && this.getPartInfo()
 					} else {
 						this.$message.error(res.data.message)
 					}
@@ -285,9 +285,11 @@
         }
         return isJPG && isLt2M;
       },
+      // 上传中
       handleProgress() {
       	this.uploading = true;
       },
+      // 上传失败
       handleError(){
       	this.uploading = false;
       	this.$message.error('上传失败，图片大小超过限制')
@@ -296,7 +298,6 @@
 			handleAvatarSuccess(res, file) {
 				this.uploading = false;
         this.avatarUrl = URL.createObjectURL(file.raw);
-        // this.userForm.avatar = URL.createObjectURL(file.raw);
         this.$message.success('上传成功')
       },
       // 身份证正面上传成功
@@ -321,7 +322,6 @@
       },
       uploadAvatar() {
       	this.avatarUrl = this.userForm.avatar;
-
       	this.avatarVisible = true
       },
       // 头像提交
@@ -332,6 +332,7 @@
       },
       // 账户信息编辑
       handleEdit() {
+      	this.formatRegion()
       	this.userFormVisible = true
       },
       // 账户信息提交
@@ -343,20 +344,21 @@
       				message: '请将个人信息填写完整'
       			})
       			return;
-      		} 
+      		}
+      		let areaName = Region.filter(region => region.id === this.originId)[0].name;
       		let data = {
       			name: this.userForm.name,
 						realname: this.userForm.realname,
 						sexual: this.userForm.sexual,
 						birthday: this.userForm.birthday,
 						qq: this.userForm.qq,
+						areaName: areaName,
 						idcardNum: this.userForm.idcardNum,
 						idcardPicFront: this.userForm.idcardPicFront,
 						idcardPicBack: this.userForm.idcardPicBack,
 						note: this.userForm.avatar,
       		}
       		updateMyInfo(data).then(res => {
-      			console.log(res)
       			if(res.data.code === '0001') {
       				this.$message.success(res.data.message)
       				this.getUserInfo()
@@ -373,7 +375,7 @@
       // 企业信息
       getPartInfo() {
       	getMyPartner().then(res => {
-      		console.log(res)
+      		// console.log(res)
       		if(res.data.code === '0001') {
       			this.partnerInfo = res.data.result.partnerInfo
       		} else {
@@ -385,31 +387,22 @@
       },
       // 选择省、市、区
       provinceChange (pid) {
-      	console.log(this.region.province)
       	this.region.city = '';
       	this.originId = pid;
       	this.regionList.city = Region.filter(region => region.pid === pid)
       },
       cityChange (cid) {
-      	// console.log(cid)
       	this.region.area = '';
       	this.originId = cid;
       	this.regionList.area = Region.filter(region => region.pid === cid)
       },
       areaChange(aid) {
-      	// console.log(aid)
       	this.originId = aid;
       }
 		},
-		computed: {
-			...mapGetters({
-	  		userForm: 'userInfo'
-			})
-		},
 		mounted() {
-			this.userForm.partnerId && this.getPartInfo()
+			this.getUserInfo()
 			this.regionList.province = Region.filter(region => region.level === 1)
-			this.formatRegion()
 		}
 	}
 </script>
