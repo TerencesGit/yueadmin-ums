@@ -22,10 +22,8 @@ export default {
 		// 用户登录
 		mock.onPost('/login').reply(config => {
 			let { username, password, isAdmin } = JSON.parse(config.data);
-			console.log(username, password, isAdmin)
 			let loginUser = _AdminList.filter(user => user.email === username && 
 				user.isAdmin === isAdmin)[0];
-			console.log(loginUser)
 			if(loginUser) {
 				if(loginUser.password === password) {
 					return new Promise((resolve, reject) => {
@@ -68,10 +66,14 @@ export default {
 				})
 			}
 			let _userInfo = _AdminList.filter(user => user.userId == userId)[0]
-			return new Promise((resolve, reject) => {
-				retObj.result = {
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
 					userInfo: _userInfo
 				}
+			}
+			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 					resolve([200, retObj])
 				}, 500)
@@ -87,7 +89,7 @@ export default {
 					}, 500)
 				})
 			}
-			let { name, realname, sexual, qq, birthday, idcardNum, 
+			let { name, realname, sexual, qq, birthday, areaName, idcardNum, 
 				idcardPicFront, idcardPicBack } = JSON.parse(config.data);
 			_AdminList.filter(user => {
 				if(user.userId == userId) {
@@ -96,6 +98,7 @@ export default {
 					user.sexual = sexual;
 					user.qq = qq;
 					user.birthday = birthday;
+					user.areaName = areaName;
 					user.idcardNum = idcardNum;
 					user.idcardPicFront = idcardPicFront;
 					user.idcardPicBack = idcardPicBack;

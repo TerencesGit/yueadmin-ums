@@ -17,7 +17,7 @@
 					<i class="el-icon-circle-check"></i>
 					<label>邮箱验证</label>
 					<span>验证后，可用于快速找回密码。</span>
-					<el-button size="small" type="primary">已验证</el-button>
+					<el-button size="small" type="primary" @click="handleVerified">已验证</el-button>
 				</li>
 				<li v-else class="account-item">
 					<i class="el-icon-warning"></i>
@@ -205,6 +205,9 @@
 					}
 				})
 			},
+			handleVerified() {
+				this.$message.success(`${this.userInfo.email}邮箱已验证通过`)
+			},
 			// 验证邮箱
 			verifyEmail() {
 				!this.sendEmail && 
@@ -234,7 +237,6 @@
 			// 获取短信验证码
 			getSmsCode() {
 				this.$refs.mobileForm.validateField('mobile', (errMessage) => {
-					console.log(errMessage)
 					if(!errMessage){
 						this.countDown()
 						this.$message('短信已发送，请注意查收')

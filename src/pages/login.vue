@@ -10,7 +10,7 @@
         v-bind:class="{'animated shake': invalid}">
         <h2 class="page-header">欢迎登录</h2>
         <el-form-item label="用户名" prop="username" :label-width="labelWith">
-          <el-input v-model.trim="loginForm.username" placeholder="请输入用户名"></el-input>
+          <el-input v-model.trim="loginForm.username" placeholder="请输入邮箱号/手机号"></el-input>
         </el-form-item>
         <el-form-item label="密 码" prop="password" :label-width="labelWith">
           <el-input type="password" v-model.trim="loginForm.password" placeholder="请输入密码"></el-input>
@@ -116,7 +116,6 @@ export default {
                 password: escape(btoa(this.loginForm.password)),
                 isAdmin: data.isAdmin
               }
-              console.log(res.data.result.userInfo.userId)
               localStorage.setItem('user', JSON.stringify(user))
               sessionStorage.setItem('userId', res.data.result.userInfo.userId)
               this.$message.success('登录成功')

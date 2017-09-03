@@ -1,6 +1,6 @@
 <template>
 	<section>
-			<div v-title :data-title="this.$route.name"></div>
+		<div v-title :data-title="this.$route.name"></div>
 		<el-row :gutter="20">
 			<el-col :span="7">
 				<el-card v-loading="loading">
@@ -36,7 +36,7 @@
 							</li>
 							<li class="list-group-item">
 								<label>性别</label>
-								<span>{{sexual}}</span>
+								<span>{{userForm.sexual ? '男' : '女'}}</span>
 							</li>
 							<li class="list-group-item">
 								<label>QQ</label>
@@ -48,15 +48,15 @@
 								<span v-if="userForm.birthday">{{userForm.birthday}}</span>
 								<span v-else>未设置</span>
 							</li>
-							<!-- <li class="list-group-item">
-								<label>籍贯</label>
-								<span v-if="userForm.areaName">{{userForm.areaName}}</span>
-								<span v-else>未设置</span>
-							</li> -->
 							<li class="list-group-item">
 								<label>部门</label>
 								<span v-if="userForm.orgName">{{userForm.orgName}}</span>
 								<span v-else>未知</span>
+							</li>
+							<li class="list-group-item">
+								<label>所在地</label>
+								<span v-if="userForm.areaName">{{userForm.areaName}}</span>
+								<span v-else>未设置</span>
 							</li>
 						</ul>
 					</div>
@@ -68,8 +68,8 @@
 						<span>企业信息</span>
 					</div>
 					<div class="partner-info">
-						<img :src="partnerInfo.logo" :title="partnerInfo.name">
 						<h3>{{partnerInfo.name}}</h3>
+						<img :src="partnerInfo.logo" :title="partnerInfo.name">
 						<p>{{partnerInfo.note}}</p>
 					</div>
 				</el-card>
@@ -78,11 +78,14 @@
 		<!-- 头像上传 -->
 		<el-dialog :visible.sync="avatarVisible" title="头像上传">
 			<el-upload
+				v-loading="uploading"
 			  class="uploader avatar-uploader"
 			  action="https://jsonplaceholder.typicode.com/posts/"
 			  accept="image/jpeg, image/png"
 			  :show-file-list="false"
+			  :on-progress="handleProgress"
 			  :on-success="handleAvatarSuccess"
+			  :on-error="handleError"
 			  :before-upload="beforeAvatarUpload">
 			  <img v-if="avatarUrl" :src="avatarUrl">
 			  <i v-else class="el-icon-plus uploader-icon"></i>
@@ -120,7 +123,7 @@
 					      @change="dateChange">
 					    </el-date-picker>
 						</el-form-item>
-						<el-form-item label="籍贯：">
+						<el-form-item label="所在地：">
 							<el-row :gutter="5">
 								<el-col :span="7">
 									<el-select v-model="region.province" placeholder="选择省" @change="provinceChange">
@@ -193,21 +196,11 @@
 </template>
 <script>
 	import Region from '@/assets/js/region'
+	import { mapGetters } from 'vuex'
 	import { getMyinfo, updateMyInfo, getMyPartner } from '@/api'
 	export default {
 		data() {
 			return {
-				userForm: {
-					name: '',
-					realname: '',
-					sexual: '',
-					birthday: '',
-					qq: '',
-					idcardNum: '',
-					idcardPicFront: '',
-					idcardPicBack: '',
-					note: '',
-				},
 				partnerInfo: {},
 				originName: '',
 				region: {
@@ -224,6 +217,7 @@
 				idcardFrontUrl: '',
 				idcardBackUrl: '',
 				loading: false,
+				uploading: false,
 				avatarVisible: false,
 				userFormVisible: false,
 				rules: {
@@ -265,10 +259,11 @@
 					console.log(res)
 					this.loading = false;
 					if(res.data.code === '0001') {
-						this.userForm = res.data.result.userInfo;
-						this.avatarUrl = this.userForm.avatar;
-						this.formatRegion()
-						this.userForm.partnerId && this.getPartInfo()
+						this.$store.dispatch('saveUserInfo', res.data.result.userInfo)
+						// this.userForm = res.data.result.userInfo;
+						// this.avatarUrl = this.userForm.avatar;
+						// this.formatRegion()
+						// this.userForm.partnerId && this.getPartInfo()
 					} else {
 						this.$message.error(res.data.message)
 					}
@@ -290,10 +285,18 @@
         }
         return isJPG && isLt2M;
       },
+      handleProgress() {
+      	this.uploading = true;
+      },
+      handleError(){
+      	this.uploading = false;
+      	this.$message.error('上传失败，图片大小超过限制')
+      },
 			// 头像上传成功
 			handleAvatarSuccess(res, file) {
+				this.uploading = false;
         this.avatarUrl = URL.createObjectURL(file.raw);
-        this.userForm.avatar = URL.createObjectURL(file.raw);
+        // this.userForm.avatar = URL.createObjectURL(file.raw);
         this.$message.success('上传成功')
       },
       // 身份证正面上传成功
@@ -317,6 +320,8 @@
       	}
       },
       uploadAvatar() {
+      	this.avatarUrl = this.userForm.avatar;
+
       	this.avatarVisible = true
       },
       // 头像提交
@@ -378,30 +383,33 @@
       		console.log(err)
       	})
       },
+      // 选择省、市、区
       provinceChange (pid) {
+      	console.log(this.region.province)
       	this.region.city = '';
       	this.originId = pid;
       	this.regionList.city = Region.filter(region => region.pid === pid)
       },
       cityChange (cid) {
-      	console.log(cid)
+      	// console.log(cid)
       	this.region.area = '';
       	this.originId = cid;
       	this.regionList.area = Region.filter(region => region.pid === cid)
       },
       areaChange(aid) {
-      	console.log(aid)
+      	// console.log(aid)
       	this.originId = aid;
       }
 		},
 		computed: {
-			sexual() {
-				return this.userForm.sexual === 1 ? '男' : this.userForm.sexual === 0 ? '女' : '未知'
-			}
+			...mapGetters({
+	  		userForm: 'userInfo'
+			})
 		},
 		mounted() {
-			this.getUserInfo()
+			this.userForm.partnerId && this.getPartInfo()
 			this.regionList.province = Region.filter(region => region.level === 1)
+			this.formatRegion()
 		}
 	}
 </script>
@@ -448,10 +456,12 @@
 	.partner-info {
 		text-align: center;
 		h3 {
-			margin: 15px 0;
+			margin: 20px 0;
+			font-size: 20px;
+			font-weight: bold;
 		}
 		img {
-			width: 280px
+			width: 60%
 		}
 		p {
 			margin: 20px 0;

@@ -1,8 +1,8 @@
 export const toggleSidebar = ({ commit }) => {
 	commit('TOGGLE_SIDEBAR')
 }
-export const setUserName = ({ commit }, name) => {
-	commit('SET_USERNAME', name)
+export const saveUserInfo = ({ commit }, userInfo) => {
+	commit('SAVE_USERINFO', userInfo)
 }
 export const setUserPermission = ({ commit }, permission) => {
 	commit('SET_PERMISSION', permission)
