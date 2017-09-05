@@ -17,7 +17,7 @@
 							新增
 						</el-button>
 						<el-button size="small" type="warning" @click="handleEdit">
-							<i class="fa fa-edit"></i>
+							<i class="fa fa-edit"> </i>
 							编辑
 						</el-button>
 						<el-button size="small" type="danger" @click="handleDelete">
@@ -52,15 +52,12 @@
 			      <el-table-column type="index" width="60"></el-table-column>
 			      <el-table-column prop="realname" label="姓名" width="120"></el-table-column>
 			      <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
-			      <!-- <el-table-column prop="mobile" label="手机号" width="120" :formatter="formatMobile"></el-table-column> -->
 			      <el-table-column prop="createTime" label="注册时间" width="120"></el-table-column>
 			      <el-table-column prop="orgName" label="部门" :formatter="formatOrg"></el-table-column>
-			      <el-table-column label="操作" width="200">
+			      <el-table-column prop="titleName" label="职位" :formatter="formatTitle"></el-table-column>
+			      <el-table-column label="操作" width="200" fixed="right">
 			      	<template scope="scope">
 			      		<el-button type="primary" size="small" @click="handleShow(scope.row)" class="m-r">查看</el-button>
-			      		<!-- <el-button v-if="scope.row.orgName" type="warning" size="small" @click="handleRemoveOrg(scope.row)">移除</el-button>
-			      		<el-button v-else type="success" size="small" @click="handleSetOrg(scope.row)">设置部门</el-button>
-			      		<el-button type="danger" size="small" @click="handleRemove(scope.row)">删除</el-button> -->
 			      		<el-dropdown 
 				      		split-button 
 				      		type="info" 
@@ -69,9 +66,14 @@
 								  更多操作
 								  <el-dropdown-menu slot="dropdown" class="staff-dropdown-menu">
 								    <el-dropdown-item>
-								    	<span @click="handleSetOrg(scope.row)">调整部门</span></el-dropdown-item>
+								    	<span @click="handleSetOrg(scope.row)">设置部门</span>
+								    </el-dropdown-item>
 								    <el-dropdown-item>
-								    	<span @click="handleSetStatus(scope.row)">启用</span>
+								    	<span @click="handleSetTitle(scope.row)">设置职位</span>
+								    </el-dropdown-item>
+								    <el-dropdown-item>
+								    	<span v-if="scope.row.status === 1" @click="handleSetStatus(scope.row)">禁用</span>
+								    	<span v-else @click="handleSetStatus(scope.row)">启用</span>
 								    </el-dropdown-item>
 								    <el-dropdown-item>
 								    	<span @click="handleRemove(scope.row)">删除</span>
@@ -176,13 +178,39 @@
 				<el-button type="primary" @click="setOrgSubmit">确定</el-button>
 			</div>
 		</el-dialog>
+		<!-- 职位列表 -->
+    <el-dialog title="职位列表" :visible.sync="titleListVisible">
+      <el-row>
+        <el-col :span="22" :offset="1">
+          <el-table 
+            border
+            max-height="350"
+            style="width: 100%"
+            v-loading="loading" 
+            :data="titleList">
+            <el-table-column width="80" label="选择" align="center">
+              <template scope="scope">
+                <el-radio class="radio no-label" v-model="titleId" :label="scope.row.titleId">
+                </el-radio>
+              </template>
+            </el-table-column>
+            <el-table-column prop="titleName" label="职位名称"></el-table-column>
+            <el-table-column prop="note" label="职位描述"></el-table-column>
+          </el-table>
+        </el-col>
+      </el-row>
+      <div slot="footer">
+        <el-button @click="titleListVisible = false">取消</el-button>
+        <el-button type="primary" @click="setTitleSubmit">确定</el-button>
+      </div>
+    </el-dialog>
 	</section>
 </template>
 <script>
 	import '@/assets/plugins/zTree/css/zTreeStyle.css'
 	import '@/assets/plugins/zTree/js/jquery.min.js'
 	import '@/assets/plugins/zTree/js/jquery.ztree.all.min.js'
-	import { readOrganizeTree, getUserList, saveOrganizeTree, deleteOrganize, setOrganizeStatus, setUserOrg, removeUser } from '@/api'
+	import { readOrganizeTree, getUserList, saveOrganizeTree, deleteOrganize, setOrganizeStatus, setUserOrg, removeUser, setUserStatus, getPartnerTitle, setUserTitle } from '@/api'
 	export default {
 		data() {
 			return {
@@ -221,6 +249,9 @@
 	      treeLoading: false,
 	      orgTreeVisible: false,
 	      dialogCheckedNode: null,
+	      titleListVisible: false,
+	      titleList: [],
+	      titleId: '',
 			}
 		},
 		methods: {
@@ -229,6 +260,9 @@
 			},
 			formatOrg(row) {
 				return row.orgName || '暂无'
+			},
+			formatTitle(row) {
+				return row.titleName || '暂无'
 			},
 			handleSizeChange(val) {
 				this.pageSize = val
@@ -493,28 +527,6 @@
       	this.staffInfo = Object.assign({}, row)
       	this.staffInfoVisible = true
       },
-      // 从部门移除员工
-      handleRemoveOrg(row) {
-      	this.$confirm(`确定将 ${row.realname} 从该部门移除？`, '提示', {type: 'warning'}).then(() => {
-      		let data = {
-	      		userId: row.userId
-	      	}
-      		setUserOrg(data).then(res => {
-      			console.log(res)
-      			if(res.data.code === '0001') {
-      				this.$message.success(res.data.message)
-      				this.getStaffList(this.checkedNode)
-      			} else {
-      				this.$message.error(res.data.message)
-      			}
-      		}).catch(err => {
-      			console.log(err)
-      		})
-      	}).catch(err => {
-      		console.log(err)
-      		this.$message('已取消操作')
-      	})
-      },
       // 设置员工部门
       handleSetOrg(row) {
       	this.getDialogOrgTree()
@@ -542,16 +554,80 @@
 				})
 				this.orgTreeVisible = false;
       },
+      // 获取职位列表
+      getTitleList() {
+				this.loading = true;
+				getPartnerTitle().then(res => {
+					this.loading = false;
+					if(res.data.code === '0001') {
+						this.titleList = res.data.result.titleList
+					} else {
+
+					}
+				}).catch(err => {
+					this.loading = false;
+					console.log(err)
+				})
+			},
+      // 设置员工职位
+      handleSetTitle(row) {
+      	this.getTitleList()
+      	this.staffInfo = Object.assign({}, row)
+      	this.titleId = row.titleId;
+      	this.titleListVisible = true;
+      },
+      // 设置员工职位提交
+      setTitleSubmit() {
+      	if(!this.titleId) {
+      		return this.$notify.warning({title: '提示', message: '请选择职位'})
+      	}
+      	let data = {
+      		userId: this.staffInfo.userId,
+      		titleId: this.titleId
+      	}
+      	setUserTitle(data).then(res => {
+      		if(res.data.code === '0001') {
+      			this.$message.success(res.data.message)
+      			this.getStaffList(this.checkedNode)
+      		} else {
+      			this.$message.error(res.data.message)
+      		}
+      		this.titleListVisible = false;
+      	}).catch(err => {
+      		console.log(err)
+      		this.$catchError(err)
+      	})
+      },
       //设置员工状态 
       handleSetStatus(row) {
-      	this.$notify.error({
-      		title: '提示',
-      		message: '暂无该功能！', 
-      	})
+      	let status = row.status === 1 ? 0 : 1;
+      	let statusText = row.status === 1 ? '禁用' : '启用';
+      	this.$confirm(`确定将 ${row.realname} 设为${statusText}状态？`, '提示', {type: 'warning'}).then(() => {
+	      	let data = {
+	      		userId: row.userId,
+	      		status: status
+	      	}
+	      	setUserStatus(data).then(res => {
+	      		if(res.data.code === '0001') {
+	      			this.$message.success(res.data.message)
+	      			this.getStaffList(this.checkedNode)
+	      		} else {
+	      			this.$message.error(res.data.message)
+	      		}
+	      	}).catch(err => {
+	      		console.log(err)
+	      	})
+	      }).catch(err => {
+	      	console.log(err)
+	      })
+      	// this.$notify.error({
+      	// 	title: '提示',
+      	// 	message: '暂无该功能！', 
+      	// })
       },
       // 删除员工
       handleRemove(row) {
-      	this.$confirm(`确定删除 ${row.realname}？`, '提示', {type: 'warning'}).then(() => {
+      	this.$confirm(`确定将 ${row.realname} 从该公司删除？`, '提示', {type: 'warning'}).then(() => {
       		let data = {
 	      		userId: row.userId
 	      	}

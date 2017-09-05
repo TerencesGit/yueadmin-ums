@@ -1,11 +1,13 @@
 import axios from 'axios'
 import Utils from '@/assets/js/utils'
 import MockAdapter from 'axios-mock-adapter'
-import { UserList, PartnerList, OrganizeList, FunctionTree } from './data/user'
+import { UserList, PartnerList, OrganizeList, FunctionTree, TitleList } 
+				from './data/user'
 let _UserList = UserList,
 		_PartnerList = PartnerList,
 		_Organizes = OrganizeList,
-		_FunctionTree = FunctionTree;
+		_FunctionTree = FunctionTree,
+		_TitleList = TitleList;
 const retObj = {
 	code: '0001',
 	message: '操作成功',
@@ -255,6 +257,19 @@ export default {
 		// 删除部门
 		mock.onPost('/partner/deleteOrganize').reply(config => {
 			let { orgId } = JSON.parse(config.data)
+			let _orgUser = _UserList.filter(user => user.orgId == orgId);
+			if(_orgUser.length !== 0) {
+				let retObj = {
+					code: '3001',
+					message: '该部门有员工，不可删除',
+					result: {}
+				}
+				return new Promise((resolve, reject) => {
+					setTimeout(() => {
+						resolve([200, retObj])
+					}, 500)
+				})
+			}
 			_Organizes = _Organizes.filter(org => org.orgId !== orgId)
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
@@ -354,6 +369,52 @@ export default {
 		mock.onPost('/adminInter/delFunction.do').reply(config => {
 			let { funcId } = JSON.parse(config.data)
 			_FunctionTree = _FunctionTree.filter(func => func.funcId !== funcId)
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 设置员工状态
+		mock.onPost('/partner/setUserStatus').reply(config => {
+			let { userId, status } = JSON.parse(config.data)
+			_UserList.filter(user => {
+				if(user.userId == userId) {
+					user.status = status
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取职位列表
+		mock.onGet('/partner/getPartnerTitle').reply(config => {
+			let userId = atob(Utils.getCookie('userId'));
+			let partnerId = _UserList.filter(user => user.userId == userId)[0].partnerId;
+			let titleList = _TitleList.filter(title => title.partnerId == partnerId)
+			retObj.result = {
+				titleList
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 设置员工职位
+		mock.onPost('/partner/setUserTitle').reply(config => {
+			let { userId, titleId } = JSON.parse(config.data)
+			let titleName = _TitleList.filter(title => title.titleId == titleId)[0].titleName
+			_UserList.filter(user => {
+				if(user.userId == userId) {
+					user.titleId = titleId,
+					user.titleName = titleName
+				}
+			})
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {

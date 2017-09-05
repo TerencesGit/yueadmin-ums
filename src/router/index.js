@@ -12,6 +12,7 @@ import WaittingVerify from '@/pages/account/waittingverify'
 
 import PartnerEdit from '@/pages/partner/partneredit'
 import PartnerOrgManage from '@/pages/partner/orgmanage'
+import PartnerTitleManage from '@/pages/partner/titlemanage'
 
 import SystemFuncManage from '@/pages/system/funcmanage'
 import SystemRoleManage from '@/pages/system/rolemanage'
@@ -83,7 +84,12 @@ const routes = [
         path: 'organizemanage',
         name: '组织部门管理',
         component: PartnerOrgManage,
-      }
+      },
+      {
+        path: 'titlemanage',
+        name: '职位管理',
+        component: PartnerTitleManage,
+      },
     ]
   },
   {
