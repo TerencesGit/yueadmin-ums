@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Utils from '@/assets/js/utils'
 import MockAdapter from 'axios-mock-adapter'
 import { UserList, PartnerList, OrganizeList, FunctionTree } from './data/user'
 let _UserList = UserList,
@@ -54,9 +55,19 @@ export default {
 				})
 			}
 		})
+		// 登出
+		mock.onGet('/logout').reply(config => {
+			Utils.delCookie('userId')
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
 		// 获取用户信息
 		mock.onGet('/accountInter/getMyinfo.do').reply(config => {
-			let userId = sessionStorage.getItem('userId');
+			let userId = atob(Utils.getCookie('userId'));
 			if(!userId) {
 				return new Promise((resolve, reject) => {
 					setTimeout(() => {
@@ -80,7 +91,7 @@ export default {
 		})
 		// 更新用户信息
 		mock.onPost('/accountInter/updateMyInfo.do').reply(config => {
-			let userId = sessionStorage.getItem('userId');
+			let userId = atob(Utils.getCookie('userId'));
 			if(!userId) {
 				return new Promise((resolve, reject) => {
 					setTimeout(() => {
@@ -148,7 +159,7 @@ export default {
 		})
 		// 获取企业信息
 		mock.onGet('/accountInter/getMyPartner.do').reply(config => {
-			let userId = sessionStorage.getItem('userId');
+			let userId = atob(Utils.getCookie('userId'));
 			if(!userId) {
 				return new Promise((resolve, reject) => {
 					setTimeout(() => {
@@ -267,15 +278,14 @@ export default {
 				}, 500)
 			})
 		})
-		// 重置员工部门
+		// 设置员工部门
 		mock.onPost('/partner/setUserOrg').reply(config => {
-			let { userId } = JSON.parse(config.data)
-			console.log(userId)
+			let { userId, orgId } = JSON.parse(config.data)
+			let _orgName = _Organizes.filter(org => org.orgId == orgId)[0].name;
 			_UserList.filter(user => {
-				console.log(user.userId)
 				if(user.userId == userId) {
-					user.orgId = '',
-					user.orgName = ''
+					user.orgId = orgId;
+					user.orgName = _orgName
 				}
 			})
 			retObj.result = {}

@@ -36,7 +36,7 @@
 							</li>
 							<li class="list-group-item">
 								<label>性别</label>
-								<span>{{userForm.sexual ? '男' : '女'}}</span>
+								<span>{{userForm.sexual === 1 ? '男' : userForm.sexual === 0 ? '女' : '未知'}}</span>
 							</li>
 							<li class="list-group-item">
 								<label>QQ</label>
@@ -200,7 +200,9 @@
 	export default {
 		data() {
 			return {
-				userForm: {},
+				userForm: {
+					avatar: '',
+				},
 				partnerInfo: {},
 				originName: '',
 				region: {
@@ -375,7 +377,7 @@
       // 企业信息
       getPartInfo() {
       	getMyPartner().then(res => {
-      		// console.log(res)
+      		console.log(res)
       		if(res.data.code === '0001') {
       			this.partnerInfo = res.data.result.partnerInfo
       		} else {
@@ -383,6 +385,7 @@
       		}
       	}).catch(err => {
       		console.log(err)
+      		this.$catchError(err)
       	})
       },
       // 选择省、市、区

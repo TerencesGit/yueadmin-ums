@@ -55,7 +55,7 @@
 <script>
 import { requestLogin } from '@/api'
 import Md5 from '@/assets/js/md5'
-import utils from '@/assets/js/utils'
+import Utils from '@/assets/js/utils'
 export default {
   data() {
     const validateCode = (rule, value, callback) => {
@@ -116,18 +116,19 @@ export default {
                 password: escape(btoa(this.loginForm.password)),
                 isAdmin: data.isAdmin
               }
+              let userId = res.data.result.userInfo.userId
               localStorage.setItem('user', JSON.stringify(user))
-              sessionStorage.setItem('userId', res.data.result.userInfo.userId)
+              Utils.setCookie('userId', btoa(userId))
               this.$message.success('登录成功')
               this.$router.push({ path: '/account/infocenter' })
               // if (this.loginForm.remember) {
               //   let name = btoa(escape(btoa(this.loginForm.username).split('').reverse().join()))
               //   let pass = btoa(escape(btoa(this.loginForm.password).split('').reverse().join()))
-              //   utils.setCookie('uname', name, '7d')
-              //   utils.setCookie('ukey', pass, '7d')
+              //   Utils.setCookie('uname', name, '7d')
+              //   Utils.setCookie('ukey', pass, '7d')
               // } else {
-              //   utils.delCookie('uname')
-              //   utils.delCookie('ukey')
+              //   Utils.delCookie('uname')
+              //   Utils.delCookie('ukey')
               // }
             } else {
               this.$message.error(res.data.message)
@@ -145,7 +146,7 @@ export default {
       })
     },
     drawCode () {
-      this.authCode = utils.canvasCode('canvasCode')
+      this.authCode = Utils.canvasCode('canvasCode')
     },
     keyDown(e) {
       e && e.keyCode === 13 && this.submitForm()
@@ -158,9 +159,9 @@ export default {
       this.loginForm.username = user.username
       this.loginForm.password = atob(unescape(user.password))
     }
-    // if (utils.getCookie('uname') && utils.getCookie('ukey')) {
-    //   this.loginForm.username = atob(unescape(atob(utils.getCookie('uname'))).split(',').reverse().join(''))
-    //   this.loginForm.password = atob(unescape(atob(utils.getCookie('ukey'))).split(',').reverse().join(''))
+    // if (Utils.getCookie('uname') && Utils.getCookie('ukey')) {
+    //   this.loginForm.username = atob(unescape(atob(Utils.getCookie('uname'))).split(',').reverse().join(''))
+    //   this.loginForm.password = atob(unescape(atob(Utils.getCookie('ukey'))).split(',').reverse().join(''))
     //   this.loginForm.remember = true
     // }
     let codeInput = document.querySelectorAll('.el-input__inner')[2]

@@ -6,19 +6,10 @@
 				组织部门管理
 			</div>
 			<el-row :gutter="15">
-				<el-col :span="5" class="tree" v-loading="loading">
-					<!-- <el-tree 
-						:data="organizeTree" 
-						:props="defaultProps"
-						empty-text="暂无部门"
-						highlight-current
-						default-expand-all
-						:expand-on-click-node="false"
-						@node-click="handleNodeClick">
-					</el-tree> -->
+				<el-col :span="5" class="org-tree" v-loading="loading">
 					<ul id="organizeTree" class="ztree"></ul>
 				</el-col>
-				<el-col :span="19" v-if="organizeTree.length === 0">
+				<el-col :span="19">
 					<!-- 工具栏 -->
 					<el-row class="button-group">
 						<el-button size="small" type="success" @click="handleAdd">
@@ -64,12 +55,29 @@
 			      <!-- <el-table-column prop="mobile" label="手机号" width="120" :formatter="formatMobile"></el-table-column> -->
 			      <el-table-column prop="createTime" label="注册时间" width="120"></el-table-column>
 			      <el-table-column prop="orgName" label="部门" :formatter="formatOrg"></el-table-column>
-			      <el-table-column label="操作" width="240">
+			      <el-table-column label="操作" width="200">
 			      	<template scope="scope">
-			      		<el-button type="primary" size="small" @click="handleShow(scope.row)">查看</el-button>
-			      		<el-button v-if="scope.row.orgName" type="warning" size="small" @click="handleRemoveOrg(scope.row)">移除</el-button>
+			      		<el-button type="primary" size="small" @click="handleShow(scope.row)" class="m-r">查看</el-button>
+			      		<!-- <el-button v-if="scope.row.orgName" type="warning" size="small" @click="handleRemoveOrg(scope.row)">移除</el-button>
 			      		<el-button v-else type="success" size="small" @click="handleSetOrg(scope.row)">设置部门</el-button>
-			      		<el-button type="danger" size="small" @click="handleRemove(scope.row)">删除</el-button>
+			      		<el-button type="danger" size="small" @click="handleRemove(scope.row)">删除</el-button> -->
+			      		<el-dropdown 
+				      		split-button 
+				      		type="info" 
+				      		size="small" 
+				      		trigger="click">
+								  更多操作
+								  <el-dropdown-menu slot="dropdown" class="staff-dropdown-menu">
+								    <el-dropdown-item>
+								    	<span @click="handleSetOrg(scope.row)">调整部门</span></el-dropdown-item>
+								    <el-dropdown-item>
+								    	<span @click="handleSetStatus(scope.row)">启用</span>
+								    </el-dropdown-item>
+								    <el-dropdown-item>
+								    	<span @click="handleRemove(scope.row)">删除</span>
+								    </el-dropdown-item>
+								  </el-dropdown-menu>
+								</el-dropdown>
 			      	</template>
 			      </el-table-column>
 			    </el-table>
@@ -156,6 +164,18 @@
 				<el-button type="primary" @click="staffInfoVisible = false">确定</el-button>
 			</div>
 		</el-dialog>
+		<!-- 部门设置 -->
+		<el-dialog 
+			size="tiny"
+			title="部门设置"
+			:visible.sync="orgTreeVisible" 
+			class="dialog-ztree">
+			<ul id="dialogOrgTree" class="ztree" v-loading="treeLoading"></ul>
+			<div slot="footer">
+				<el-button @click="orgTreeVisible = false">取消</el-button>
+				<el-button type="primary" @click="setOrgSubmit">确定</el-button>
+			</div>
+		</el-dialog>
 	</section>
 </template>
 <script>
@@ -166,7 +186,6 @@
 	export default {
 		data() {
 			return {
-				organizeTree: [],
         defaultProps: {
           label: 'name',
           children: 'children',
@@ -198,7 +217,10 @@
 	      	],
 	      },
 	      staffInfo: {},
-	      submitType: 0
+	      submitType: 0,
+	      treeLoading: false,
+	      orgTreeVisible: false,
+	      dialogCheckedNode: null,
 			}
 		},
 		methods: {
@@ -220,13 +242,16 @@
 				this.checkedNode = treeNode;
 				this.getStaffList(treeNode)
 			},
+			dialogNodeClick(event, treeId, treeNode) {
+				if(this.dialogCheckedNode === treeNode) return;
+				this.dialogCheckedNode = treeNode;
+			},
 			// 获取组织部门树
 			getOrganizeTree() {
 				this.loading = true
 				readOrganizeTree().then(res => {
 					console.log(res)
 					if(res.data.code === '0001') {
-						// this.organizeTree = res.data.result.organizeTree
 						const organizes = res.data.result.organizeTree;
 				    const setting = {
 				      view: {
@@ -272,11 +297,60 @@
 					console.log(err)
 				})
 			},
-			//获取被选中的单个节点
-			getSeletedNode() {
-				let treeObj = $.fn.zTree.getZTreeObj("organizeTree");
-			  this.checkedNode = treeObj.getSelectedNodes()[0];
+			getDialogOrgTree() {
+				this.treeLoading = true;
+				readOrganizeTree().then(res => {
+					if(res.data.code === '0001') {
+						let organizes = res.data.result.organizeTree;
+				    let setting = {
+				      view: {
+				        selectedMulti: false,
+				      },
+				      data: {
+				        simpleData: {
+				          enable: true
+				        }
+				      },
+				      callback: {
+				      	onClick: this.dialogNodeClick
+				      }
+				    }
+				    const zNode = [];
+				    organizes.forEach(org => {
+				      var iconSkin;
+				      if(!org.parentId){
+				        iconSkin = 'root'
+				      }else{
+				        iconSkin = 'folder'
+				      }
+				      let treeObj = {
+				        id: org.orgId,
+				        orgId: org.orgId,
+				        pId: org.parentId,
+				        name: org.name,
+				        note: org.note,
+				        status: org.status,
+				        open: true,
+				        iconSkin: iconSkin,
+				      };
+				      zNode.push(treeObj)
+				    })
+				    $.fn.zTree.init($('#dialogOrgTree'), setting, zNode);
+				    this.dialogCheckedNode = null;
+					} else {
+						this.$message(res.data.message)
+					}
+					this.treeLoading = false;
+				}).catch(err => {
+					this.treeLoading = false;
+					console.log(err)
+				})
 			},
+			//获取被选中的单个节点
+			// getSeletedNode() {
+			// 	let treeObj = $.fn.zTree.getZTreeObj("organizeTree");
+			//   this.checkedNode = treeObj.getSelectedNodes()[0];
+			// },
 			// 获取部门员工
 			getStaffList(org) {
 				this.tableLoading = true;
@@ -284,10 +358,9 @@
 					orgId: org.orgId,
 					name: org.name
 				}
-				// console.log(data)
 				getUserList(data).then(res => {
 					this.tableLoading = false
-					console.log(res)
+					// console.log(res)
 					if(res.data.code === '0001') {
 						this.staffList = res.data.result.staffList;
 						this.total = res.data.result.staffList.length;
@@ -412,6 +485,9 @@
       	}
       	this.registFormVisible = true
       },
+      handleClick() {
+      	console.log('show')
+      },
       // 员工信息
       handleShow(row) {
       	this.staffInfo = Object.assign({}, row)
@@ -441,6 +517,33 @@
       },
       // 设置员工部门
       handleSetOrg(row) {
+      	this.getDialogOrgTree()
+      	this.staffInfo = Object.assign({}, row)
+      	this.orgTreeVisible = true;
+      },
+      // 设置部门提交
+      setOrgSubmit() {
+      	if (!this.dialogCheckedNode) {
+      		return this.$notify.warning({title: '提示', message: '请选择部门'})
+      	}
+				let data = {
+					userId: this.staffInfo.userId,
+					orgId: this.dialogCheckedNode.orgId
+				}
+				setUserOrg(data).then(res => {
+					if(res.data.code === '0001') {
+						this.$message.success(res.data.message)
+						this.getStaffList(this.checkedNode)
+					} else {
+						this.$message.error(res.data.message)
+					}
+				}).catch(err => {
+					console.log(err)
+				})
+				this.orgTreeVisible = false;
+      },
+      //设置员工状态 
+      handleSetStatus(row) {
       	this.$notify.error({
       		title: '提示',
       		message: '暂无该功能！', 
@@ -480,23 +583,20 @@
 	}
 </script>
 <style scoped lang="scss">
-	.ztree {
-		width: 100%;
-		min-height: 400px;
-		max-height: 600px;
-		overflow-y: auto;
-		border: 1px solid #ddd;
-		
-		&::-webkit-scrollbar {
-      width: 4px;
-      border-radius: 5px;
-      background: #bbb
-    }
-    li {
-    	overflow: hidden;
-  		text-overflow: ellipsis;
-  		white-space: nowrap;
-    }
+	.org-tree {
+		.ztree {
+			width: 100%;
+			min-height: 400px;
+			max-height: 600px;
+			overflow-y: auto;
+			padding: 15px 10px;
+			border: 1px solid #ddd;
+			&::-webkit-scrollbar {
+	      width: 4px;
+	      border-radius: 5px;
+	      background: #bbb
+	    }
+		}
 	}
 	.el-card {
 		min-height: 500px
@@ -519,6 +619,7 @@
 	}
 	.avatar {
 		width: 150px;
+		height: 150px;
 		border-radius: 50%;
 		border: 1px solid #ddd;
 	}

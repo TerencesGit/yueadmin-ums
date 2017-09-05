@@ -16,6 +16,7 @@ import 'element-ui/lib/theme-default/index.css'
 import 'font-awesome/css/font-awesome.min.css'
 import 'nprogress/nprogress.css'
 import '@/assets/css/base.scss'
+import Utils from '@/assets/js/utils'
 NProgress.configure({ ease: 'ease', speed: 500, minimum: 0.5, showSpinner: false})
 Mock.bootstrap()
 Vue.use(Vuex)
@@ -55,10 +56,10 @@ Vue.prototype.$catchError = (err) => {
   }
 }
 const router = new Router({
-  routes  
+  routes
 })
 router.beforeEach((to, from, next) => {
-  let user = sessionStorage.getItem('userId')
+  let user = Utils.getCookie('userId')
   let logRequired = to.path.indexOf('account') !== -1 || 
                     to.path.indexOf('admin') !== -1;
   if(logRequired && !user) {
