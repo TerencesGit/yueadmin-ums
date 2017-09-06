@@ -27,8 +27,8 @@
 	      <el-pagination
 	        @size-change="handleSizeChange"
 	        @current-change="handleCurrentChange"
-	        :current-page="filter.pageNo"
-	        :page-size="filter.pageSize"
+	        :current-page="pageNo"
+	        :page-size="pageSize"
 	        :page-sizes="[10, 20, 30, 40]"
 	        layout="total, sizes, prev, pager, next, jumper"
 	        :total="total"
@@ -60,10 +60,8 @@
 	export default {
 		data () {
 			return {
-				filter: {
-					pageNo: 1,
-					pageSize: 10
-				},
+				pageNo: 1,
+				pageSize: 10,
 				total: 0,
 				loading: false,
 				titleList: [],
@@ -88,8 +86,12 @@
 				return this.$moment(new Date()).format('YYYY-MM-DD HH:mm')
 			},
 			getTitleList() {
+				let params = {
+					pageNo: this.pageNo,
+					pageSize: this.pageSize
+				}
 				this.loading = true;
-				getPartnerTitle().then(res => {
+				getPartnerTitle(params).then(res => {
 					this.loading = false;
 					if(res.data.code === '0001') {
 						this.titleList = res.data.result.titleList
@@ -180,9 +182,11 @@
 			},
 			handleSizeChange(val) {
 				this.pageSize = val
+				this.getTitleList()
 			},
 			handleCurrentChange(val) {
 				this.pageNo = val
+				this.getTitleList()
 			}
 		},
 		mounted() {

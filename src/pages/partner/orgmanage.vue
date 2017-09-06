@@ -50,9 +50,9 @@
 			      v-loading="staffLoading" 
 			      style="width: 100%">
 			      <el-table-column type="index" width="60"></el-table-column>
-			      <el-table-column prop="realname" label="姓名" width="120"></el-table-column>
+			      <el-table-column prop="realname" label="姓名" sortable width="120"></el-table-column>
 			      <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
-			      <el-table-column prop="createTime" label="注册时间" width="120"></el-table-column>
+			      <el-table-column prop="createTime" label="注册时间" sortable width="120" :formatter="formatTime"></el-table-column>
 			      <el-table-column prop="orgName" label="部门" :formatter="formatOrg"></el-table-column>
 			      <el-table-column prop="titleName" label="职位" :formatter="formatTitle"></el-table-column>
 			      <el-table-column label="操作" width="200" fixed="right">
@@ -228,7 +228,7 @@
 	import '@/assets/plugins/zTree/css/zTreeStyle.css'
 	import '@/assets/plugins/zTree/js/jquery.min.js'
 	import '@/assets/plugins/zTree/js/jquery.ztree.all.min.js'
-	import { readOrganizeTree, getUserList, saveOrganizeTree, deleteOrganize, setOrganizeStatus, setUserOrg, removeUser, setUserStatus, getPartnerTitle, setUserTitle } from '@/api'
+	import { readOrganizeTree, getUserList, saveOrganizeTree, deleteOrganize, setOrganizeStatus, setUserOrg, removeUser, setUserStatus, getPartnerTitle, setUserTitle, requestRegist } from '@/api'
 	export default {
 		data() {
 			const validateEmail = (rule, value, callback) => {
@@ -312,6 +312,9 @@
 			}
 		},
 		methods: {
+			formatTime(row) {
+				return this.$moment(row.createTime).format('YYYY-MM-DD')
+			},
 			formatMobile(row) {
 				return row.mobile ? row.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '暂无'
 			},
@@ -323,15 +326,17 @@
 			},
 			handleSizeChange(val) {
 				this.pageSize = val
+				this.getStaffList()
 			},
 			handleCurrentChange(val) {
 				this.pageNo = val
+				this.getStaffList()
 			},
 			// 节点点击事件
 			nodeClick(event, treeId, treeNode) {
 				if(this.checkedNode === treeNode) return;
 				this.checkedNode = treeNode;
-				this.getStaffList(treeNode)
+				this.getStaffList()
 			},
 			dialogNodeClick(event, treeId, treeNode) {
 				if(this.dialogCheckedNode === treeNode) return;
@@ -438,18 +443,19 @@
 				})
 			},
 			// 获取部门员工
-			getStaffList(org) {
+			getStaffList() {
 				this.staffLoading = true;
 				let data = {
-					orgId: org.orgId,
-					name: org.name
+					orgId: this.checkedNode.orgId,
+					pageNo: this.pageNo,
+					pageSize: this.pageSize,
 				}
 				getUserList(data).then(res => {
 					this.staffLoading = false
 					// console.log(res)
 					if(res.data.code === '0001') {
-						this.staffList = res.data.result.staffList;
-						this.total = res.data.result.staffList.length;
+						this.staffList = res.data.result.userList;
+						this.total = res.data.result.pageInfo.total;
 					} else {
 						this.$message.error(res.data.message)
 					}
@@ -569,6 +575,12 @@
       	if (!this.checkedNode) {
       		return this.$notify.warning({title: '提示', message: '请选择部门'})
       	}
+      	this.registForm = {
+      		realname: '',
+      		email: '',
+      		password: '',
+      		confirmPass: '',
+      	}
       	this.registFormTitle = `注册员工（${this.checkedNode.name}）`;
       	this.registFormVisible = true
       },
@@ -582,7 +594,17 @@
       			email: this.registForm.email,
       			password: this.registForm.password,
       		}
-      		console.log(data)
+      		requestRegist(data).then(res => {
+      			if(res.data.code === '0001') {
+      				this.$message.success(res.data.message)
+      				this.getStaffList()
+      			} else {
+      				this.$message.error(res.data.message)
+      			}
+      			this.registFormVisible = false
+      		}).catch(err => {
+      			console.log(err)
+      		})
       	})
       },
       // 员工信息
@@ -608,7 +630,7 @@
 				setUserOrg(data).then(res => {
 					if(res.data.code === '0001') {
 						this.$message.success(res.data.message)
-						this.getStaffList(this.checkedNode)
+						this.getStaffList()
 					} else {
 						this.$message.error(res.data.message)
 					}
@@ -620,7 +642,11 @@
       // 获取职位列表
       getTitleList() {
 				this.titleLoading = true;
-				getPartnerTitle().then(res => {
+				let params = {
+					pageNo: 1,
+					pageSize: 100
+				}
+				getPartnerTitle(params).then(res => {
 					this.titleLoading = false;
 					if(res.data.code === '0001') {
 						this.titleList = res.data.result.titleList
@@ -651,7 +677,7 @@
       	setUserTitle(data).then(res => {
       		if(res.data.code === '0001') {
       			this.$message.success(res.data.message)
-      			this.getStaffList(this.checkedNode)
+      			this.getStaffList()
       		} else {
       			this.$message.error(res.data.message)
       		}
@@ -673,7 +699,7 @@
 	      	setUserStatus(data).then(res => {
 	      		if(res.data.code === '0001') {
 	      			this.$message.success(res.data.message)
-	      			this.getStaffList(this.checkedNode)
+	      			this.getStaffList()
 	      		} else {
 	      			this.$message.error(res.data.message)
 	      		}
@@ -698,7 +724,7 @@
       			console.log(res)
       			if(res.data.code === '0001') {
       				this.$message.success(res.data.message)
-      				this.getStaffList(this.checkedNode)
+      				this.getStaffList()
       			} else {
       				this.$message.error(res.data.message)
       			}

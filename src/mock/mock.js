@@ -71,7 +71,16 @@ export default {
 		mock.onPost('/regist').reply(config => {
 			let { realname, email, password, orgId } = JSON.parse(config.data);
 			_UserList.push({
-				
+				createTime: new Date(),
+				realname,
+				email,
+				orgId
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
 			})
 		})
 		// 获取用户信息
@@ -201,33 +210,35 @@ export default {
 		})
 		// 用户列表
 		mock.onGet('/user/list').reply(config => {
-			let { orgId, name } = config.params;
+			let { orgId, pageNo, pageSize } = config.params;
 			let currOrg = OrganizeList.filter(org => org.orgId == orgId)[0];
+			let total = 0, userPage = null;
 			if(currOrg.parentId == 0) {
-				retObj.result = {
-					staffList: _UserList
-				}
-				return new Promise((resolve, reject) => {
-					setTimeout(() => {
-							resolve([200, retObj])
-					}, 500)
+				total = _UserList.length
+				userPage = _UserList.filter((user, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize)
+			} else {
+				let orgList = OrganizeList.filter(org => org.orgId == orgId || org.parentId == orgId)
+				let _userList = [];
+				orgList.forEach(org => {
+					let orgUser = _UserList.filter(user => user.orgId == org.orgId);
+					_userList = orgUser.length > 0 ? _userList.concat(orgUser) : _userList
 				})
+				total = _userList.length;
+				userPage = _userList.filter((user, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize)
 			}
-			let orgList = OrganizeList.filter(org => org.orgId == orgId || org.parentId == orgId)
-			let _staffList = [];
-			orgList.forEach(org => {
-				let _adminList = _UserList.filter(user => user.orgId == org.orgId);
-				// console.log(_adminList.length)
-				_staffList = _adminList.length >= 1 ? _staffList.concat(_adminList) : _staffList
-			})
-			// _UserList.forEach(user => {
-			// 	user.organize = name
-			// })
-			// _UserList.sort(() => {
-  	  // 		return 0.5 - Math.random()
-  	  // })
+  	  userPage.forEach(user => {
+  	  	user.orgName = _Organizes.filter(org => org.orgId == user.orgId)[0].name;
+  	  	_TitleList.filter(title => {
+  	  		if(title.titleId == user.titleId) {
+  	  			user.titleName = title.titleName
+  	  		}
+  	  	})
+  	  })
 			retObj.result = {
-				staffList: _staffList
+				userList: userPage,
+				pageInfo: {
+					total: total
+				}
 			}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
@@ -345,13 +356,16 @@ export default {
 		})
 		// 获取职位列表
 		mock.onGet('/partner/getPartnerTitle').reply(config => {
+			let { pageNo, pageSize } = config.params;
 			let userId = atob(Utils.getCookie('userId'));
 			let partnerId = _UserList.filter(user => user.userId == userId)[0].partnerId;
-			let titleList = _TitleList.filter(title => title.partnerId == partnerId)
+			let partnerTitle = _TitleList.filter(title => title.partnerId == partnerId)
+			let total = partnerTitle.length;
+			let titlePage = partnerTitle.filter((t,index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize)
 			retObj.result = {
-				titleList,
+				titleList: titlePage,
 				pageInfo: {
-					total: titleList.length
+					total
 				}
 			}
 			return new Promise((resolve, reject) => {
