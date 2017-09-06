@@ -47,7 +47,7 @@
 						border
 			      :data="staffList"
 			      highlight-current-row
-			      v-loading="tableLoading" 
+			      v-loading="staffLoading" 
 			      style="width: 100%">
 			      <el-table-column type="index" width="60"></el-table-column>
 			      <el-table-column prop="realname" label="姓名" width="120"></el-table-column>
@@ -88,7 +88,7 @@
 			    	<el-pagination
 				      @size-change="handleSizeChange"
 				      @current-change="handleCurrentChange"
-				      :current-page="currentPage"
+				      :current-page="pageNo"
 				      :page-sizes="[5, 10, 15, 20]"
 				      :page-size="pageSize"
 				      layout="total, sizes, prev, pager, next, jumper"
@@ -125,10 +125,28 @@
 			</div>
 		</el-dialog>
 		<!-- 注册员工 -->
-		<el-dialog :visible.sync="registFormVisible" title="注册员工">
+		<el-dialog :visible.sync="registFormVisible" :title="registFormTitle">
+			<el-row>
+    		<el-col :span="18" :offset="3">
+		    	<el-form :model="registForm" ref="registForm" :rules="rules" label-width="120px">
+		    		<el-form-item label="真实姓名" prop="realname">
+		    			<el-input v-model.trim="registForm.realname" placeholder="注册员工姓名"></el-input>
+		    		</el-form-item>
+		    		<el-form-item label="注册邮箱" prop="email">
+		    			<el-input v-model.trim="registForm.email" placeholder="注册员工邮箱"></el-input>
+		    		</el-form-item>
+		    		<el-form-item label="设置密码" prop="password">
+		    			<el-input type="password" v-model.trim="registForm.password" placeholder="密码长度不少于8位"></el-input>
+		    		</el-form-item>
+		    		<el-form-item label="确认密码" prop="confirmPass">
+		    			<el-input type="password" v-model.trim="registForm.confirmPass" placeholder="再次输入密码"></el-input>
+		    		</el-form-item>
+		    	</el-form>
+    		</el-col>
+    	</el-row>
 			<div slot="footer">
 				<el-button @click="registFormVisible = false">取消</el-button>
-				<el-button type="primary" @click="registFormVisible = false">确定</el-button>
+				<el-button type="primary" @click="registSubmit">确定</el-button>
 			</div>
 		</el-dialog>
 		<!-- 员工信息 -->
@@ -186,7 +204,7 @@
             border
             max-height="350"
             style="width: 100%"
-            v-loading="loading" 
+            v-loading="titleLoading" 
             :data="titleList">
             <el-table-column width="80" label="选择" align="center">
               <template scope="scope">
@@ -195,7 +213,7 @@
               </template>
             </el-table-column>
             <el-table-column prop="titleName" label="职位名称"></el-table-column>
-            <el-table-column prop="note" label="职位描述"></el-table-column>
+            <el-table-column prop="titleDesc" label="职位描述"></el-table-column>
           </el-table>
         </el-col>
       </el-row>
@@ -213,16 +231,39 @@
 	import { readOrganizeTree, getUserList, saveOrganizeTree, deleteOrganize, setOrganizeStatus, setUserOrg, removeUser, setUserStatus, getPartnerTitle, setUserTitle } from '@/api'
 	export default {
 		data() {
+			const validateEmail = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('请输入邮箱号'));
+        }
+        setTimeout(() => {
+          if (!value.match(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/)) {
+            callback(new Error('请输入正确邮箱号'));
+          } else {
+          	callback()
+          }
+        }, 0);
+      }
+			const validatePass = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('请再次输入密码'));
+        }
+        if (value !== this.registForm.password) {
+          callback(new Error('两次密码输入不一致'));
+        } else {
+        	callback()
+        }
+      }
 			return {
-        defaultProps: {
-          label: 'name',
-          children: 'children',
-        },
-        staffList: [],
+				loading: false,
+				staffList: [],
+	      staffLoading: false,
+	      pageNo: 1,
+	      pageSize: 10,
+	      total: 0,
 	      checkedNode: null,
 	      orgFormVisible: false,
 	      funcListVisible: false,
-	      registFormVisible: false,
+	      staffInfo: {},
 	      staffInfoVisible: false,
 	      orgFormTitle: '',
 	      organizeForm: {
@@ -231,11 +272,14 @@
 	      	note: '',
 	      	parentId: ''
 	      },
-	      loading: false,
-	      tableLoading: false,
-	      currentPage: 1,
-	      pageSize: 10,
-	      total: 0,
+	      registForm: {
+	      	realname: '',
+	      	email: '',
+	      	password: '',
+	      	confirmPass: ''
+	      },
+	      registFormTitle: '',
+	      registFormVisible: false,
 	      rules: {
 	      	name: [
 	      		{ required: true, message: '请输入部门名称', trigger: 'blur'}
@@ -243,15 +287,28 @@
 	      	note: [
 	      		{ required: true, message: '请输入部门简介', trigger: 'blur'}
 	      	],
+	      	realname: [
+	      		{ required: true, message: '请输入真实姓名', trigger: 'blur'}
+	      	],
+	      	email: [
+	      		{ required: true, validator: validateEmail, trigger: 'blur'}
+	      	],
+	      	password: [
+	      		{ required: true, message: '请输入密码', trigger: 'blur'},
+	      		{ min: 8, max: 20, message: '密码长度不少于8位', trigger: 'blur'},
+	      	],
+	      	confirmPass: [
+	      		{ required: true, validator: validatePass, trigger: 'blur'}
+	      	],
 	      },
-	      staffInfo: {},
 	      submitType: 0,
 	      treeLoading: false,
 	      orgTreeVisible: false,
 	      dialogCheckedNode: null,
-	      titleListVisible: false,
-	      titleList: [],
 	      titleId: '',
+	      titleList: [],
+	      titleLoading: false,
+	      titleListVisible: false,
 			}
 		},
 		methods: {
@@ -268,7 +325,7 @@
 				this.pageSize = val
 			},
 			handleCurrentChange(val) {
-				this.currentPage = val
+				this.pageNo = val
 			},
 			// 节点点击事件
 			nodeClick(event, treeId, treeNode) {
@@ -380,20 +437,15 @@
 					console.log(err)
 				})
 			},
-			//获取被选中的单个节点
-			// getSeletedNode() {
-			// 	let treeObj = $.fn.zTree.getZTreeObj("organizeTree");
-			//   this.checkedNode = treeObj.getSelectedNodes()[0];
-			// },
 			// 获取部门员工
 			getStaffList(org) {
-				this.tableLoading = true;
+				this.staffLoading = true;
 				let data = {
 					orgId: org.orgId,
 					name: org.name
 				}
 				getUserList(data).then(res => {
-					this.tableLoading = false
+					this.staffLoading = false
 					// console.log(res)
 					if(res.data.code === '0001') {
 						this.staffList = res.data.result.staffList;
@@ -402,7 +454,7 @@
 						this.$message.error(res.data.message)
 					}
 				}).catch(err => {
-					this.tableLoading = false
+					this.staffLoading = false
 					console.log(err)
 				})
 			},
@@ -517,10 +569,21 @@
       	if (!this.checkedNode) {
       		return this.$notify.warning({title: '提示', message: '请选择部门'})
       	}
+      	this.registFormTitle = `注册员工（${this.checkedNode.name}）`;
       	this.registFormVisible = true
       },
-      handleClick() {
-      	console.log('show')
+      // 注册员工提交
+      registSubmit() {
+      	this.$refs.registForm.validate(valid => {
+      		if(!valid) return;
+      		let data = {
+      			orgId: this.checkedNode.orgId,
+      			realname: this.registForm.realname,
+      			email: this.registForm.email,
+      			password: this.registForm.password,
+      		}
+      		console.log(data)
+      	})
       },
       // 员工信息
       handleShow(row) {
@@ -556,16 +619,16 @@
       },
       // 获取职位列表
       getTitleList() {
-				this.loading = true;
+				this.titleLoading = true;
 				getPartnerTitle().then(res => {
-					this.loading = false;
+					this.titleLoading = false;
 					if(res.data.code === '0001') {
 						this.titleList = res.data.result.titleList
 					} else {
-
+						this.$message.error(res.data.message)
 					}
 				}).catch(err => {
-					this.loading = false;
+					this.titleLoading = false;
 					console.log(err)
 				})
 			},
