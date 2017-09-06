@@ -1,6 +1,18 @@
 <template>
 	<section>
 		<div v-title :data-title="this.$route.name"></div>
+		<el-row class="toolbar">
+			<label>当前模块：</label>
+			<el-select v-model="moduleId" @change="moduleChange">
+				<el-option 
+					v-for="item in moduleList" 
+					:key="item.moduleId"
+					:label="item.name"
+					:value="item.moduleId">
+				</el-option>
+			</el-select>
+			<el-button type="primary" class="m-l" @click="handleCreateModule">新建模块</el-button>
+		</el-row>
 		<el-card class="card-primary">
 			<div slot="header">
 				组织部门管理
@@ -73,6 +85,9 @@
 				</el-col>
 			</el-row>
 		</el-card>
+		<el-dialog :visible.sync="moduleFormVisible" title="新建模块">
+			
+		</el-dialog>
 		<!-- 功能点表单 -->
 		<el-dialog :visible.sync="funcFormVisible" :title="funcFormTitle">
 			<el-row>
@@ -134,11 +149,14 @@
 	export default {
 		data() {
 			return {
+				moduleId: 20170906001,
+				moduleList: [
+					{moduleId: 20170906001, name: '用户模块', note: '用户模块101'},
+					{moduleId: 20170906002, name: '交易模块', note: '交易模块102'},
+					{moduleId: 20170906003, name: '支付模块', note: '支付模块103'},
+				],
+				moduleFormVisible: false,
 				functionTree: [],
-        defaultProps: {
-          label: 'name',
-          children: 'children',
-        },
         funcData: [],
 	      checkedNode: null,
 	      funcFormVisible: false,
@@ -181,6 +199,14 @@
 			handleCurrentChange(val) {
 				this.currentPage = val
 			},
+			// 新建模块
+			handleCreateModule() {
+				this.moduleFormVisible = true
+			},
+			moduleChange(val) {
+				this.moduleId = val
+				this.getFuncTree()
+			},
 			// 节点点击事件
 			nodeClick(event, treeId, treeNode) {
 				if(this.checkedNode === treeNode) return;
@@ -190,8 +216,11 @@
 			},
 			// 获取组织部门树
 			getFuncTree() {
-				this.loading = true
-				getFunctionTree().then(res => {
+				this.loading = true;
+				let data = {
+					moduleId: this.moduleId
+				}
+				getFunctionTree(data).then(res => {
 					console.log(res)
 					if(res.data.code === '0001') {
 						const funcTree = res.data.result.functionTree;

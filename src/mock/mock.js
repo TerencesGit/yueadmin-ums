@@ -439,8 +439,10 @@ export default {
 		})
 		// 获取功能树
 		mock.onGet('/adminInter/getFunctionTree.do').reply(config => {
+			let { moduleId } = config.params;
+			let moduleFuncTree = _FunctionTree.filter(func => func.moduleId == moduleId)
 			retObj.result = {
-				functionTree: _FunctionTree
+				functionTree: moduleFuncTree
 			}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {

@@ -119,8 +119,8 @@
   </transition>
 </template>
 <script>
-import utils from '../assets/js/utils'
-import { requestRegister } from '../api'
+import utils from '@/assets/js/utils'
+import { requestRegist } from '@/api'
 export default {
   data() {
     var validatePass = (rule, value, callback) => {
