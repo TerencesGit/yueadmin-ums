@@ -1,14 +1,16 @@
 import axios from 'axios'
 import Utils from '@/assets/js/utils'
 import MockAdapter from 'axios-mock-adapter'
-import { UserList, PartnerList, OrganizeList, FunctionTree, TitleList, RoleList } 
+import { UserList, PartnerList, OrganizeList, FunctionTree, TitleList, 
+	RoleList, RoleFunc } 
 				from './data/user'
 let _UserList = UserList,
 		_PartnerList = PartnerList,
 		_Organizes = OrganizeList,
 		_FunctionTree = FunctionTree,
 		_TitleList = TitleList,
-		_RoleList = RoleList;
+		_RoleList = RoleList,
+		_RoleFunc = RoleFunc;
 const retObj = {
 	code: '0001',
 	message: '操作成功',
@@ -526,6 +528,7 @@ export default {
 				}, 500)
 			})
 		})
+		// 新建角色
 		mock.onPost('/adminInter/createRole.do').reply(config => {
 			let { roleName, roleDesc } = JSON.parse(config.data)
 			_RoleList.push({
@@ -533,6 +536,72 @@ export default {
 				roleName,
 				roleDesc,
 				status: 1
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新角色
+		mock.onPost('/adminInter/updateRole.do').reply(config => {
+			let { roleId, roleName, roleDesc } = JSON.parse(config.data)
+			_RoleList.filter(role => {
+				if(role.roleId == roleId) {
+					role.roleName = roleName;
+					role.roleDesc = roleDesc;
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 删除角色
+		mock.onPost('/adminInter/delRole.do').reply(config => {
+			let { roleId } = JSON.parse(config.data)
+			_RoleList = _RoleList.filter(role => role.roleId != roleId)
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取角色关联的功能点
+		mock.onGet('/adminInter/getRoleFunctions.do').reply(config => {
+			let { roleId } = config.params
+			let funcIdList = _RoleFunc.filter(rolefunc => rolefunc.roleId == roleId).map(func => func.funcId)
+			let _funcList = [];
+			funcIdList.forEach(funcId => {
+				_funcList.push(
+					_FunctionTree.filter(func => func.funcId == funcId)[0]
+				)
+			})
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					roleFuncs: _funcList
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 配置角色功能
+		mock.onPost('/adminInter/updateRoleFunction.do').reply(config => {
+			let { roleId, funcIdList } = JSON.parse(config.data)
+			funcIdList.forEach(funcId => {
+				_RoleFunc.push({
+					roleId,
+					funcId,
+				})
 			})
 			retObj.result = {}
 			return new Promise((resolve, reject) => {

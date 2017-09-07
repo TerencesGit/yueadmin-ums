@@ -214,7 +214,7 @@
 				this.funcData = [];
 				this.funcData.push(this.checkedNode)
 			},
-			// 获取组织部门树
+			// 获取系统功能树
 			getFuncTree() {
 				this.loading = true;
 				let data = {

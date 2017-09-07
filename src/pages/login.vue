@@ -153,9 +153,8 @@ export default {
   },
   mounted () {
     this.drawCode()
-    localStorage.removeItem('user')
     let user = JSON.parse(localStorage.getItem('user'))
-    if(user) {
+    if(user && user.name && user.pwd) {
       this.loginForm.username = atob(unescape(user.name))
       this.loginForm.password = atob(unescape(user.pwd))
     }
