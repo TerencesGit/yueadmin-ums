@@ -112,13 +112,12 @@ export default {
             console.log(res)
             if (res.data.code === '0001') {
               let user = {
-                username: data.username,
-                password: escape(btoa(this.loginForm.password)),
-                isAdmin: data.isAdmin
+                name: escape(btoa(data.username)),
+                pwd: escape(btoa(this.loginForm.password)),
               }
               let userId = res.data.result.userInfo.userId
               localStorage.setItem('user', JSON.stringify(user))
-              Utils.setCookie('userId', btoa(userId))
+              Utils.setCookie('userId', userId)
               this.$message.success('登录成功')
               this.$router.push({ path: '/account/infocenter' })
               // if (this.loginForm.remember) {
@@ -154,10 +153,11 @@ export default {
   },
   mounted () {
     this.drawCode()
+    localStorage.removeItem('user')
     let user = JSON.parse(localStorage.getItem('user'))
     if(user) {
-      this.loginForm.username = user.username
-      this.loginForm.password = atob(unescape(user.password))
+      this.loginForm.username = atob(unescape(user.name))
+      this.loginForm.password = atob(unescape(user.pwd))
     }
     // if (Utils.getCookie('uname') && Utils.getCookie('ukey')) {
     //   this.loginForm.username = atob(unescape(atob(Utils.getCookie('uname'))).split(',').reverse().join(''))

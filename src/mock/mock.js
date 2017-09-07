@@ -1,13 +1,14 @@
 import axios from 'axios'
 import Utils from '@/assets/js/utils'
 import MockAdapter from 'axios-mock-adapter'
-import { UserList, PartnerList, OrganizeList, FunctionTree, TitleList } 
+import { UserList, PartnerList, OrganizeList, FunctionTree, TitleList, RoleList } 
 				from './data/user'
 let _UserList = UserList,
 		_PartnerList = PartnerList,
 		_Organizes = OrganizeList,
 		_FunctionTree = FunctionTree,
-		_TitleList = TitleList;
+		_TitleList = TitleList,
+		_RoleList = RoleList;
 const retObj = {
 	code: '0001',
 	message: '操作成功',
@@ -85,7 +86,7 @@ export default {
 		})
 		// 获取用户信息
 		mock.onGet('/accountInter/getMyinfo.do').reply(config => {
-			let userId = atob(Utils.getCookie('userId'));
+			let userId = Utils.getCookie('userId');
 			if(!userId) {
 				return new Promise((resolve, reject) => {
 					setTimeout(() => {
@@ -109,7 +110,7 @@ export default {
 		})
 		// 更新用户信息
 		mock.onPost('/accountInter/updateMyInfo.do').reply(config => {
-			let userId = atob(Utils.getCookie('userId'));
+			let userId = Utils.getCookie('userId');
 			if(!userId) {
 				return new Promise((resolve, reject) => {
 					setTimeout(() => {
@@ -141,8 +142,7 @@ export default {
 		})
 		// 更新密码
 		mock.onPost('/accountInter/updatePwd.do').reply(config => {
-			let userId = sessionStorage.getItem('userId');
-			console.log(config.data)
+			let userId = Utils.getCookie('userId');
 			let { oldPassword, newPassword } = JSON.parse(config.data);
 			let retObj = {
 				code: '0001',
@@ -177,7 +177,7 @@ export default {
 		})
 		// 获取企业信息
 		mock.onGet('/accountInter/getMyPartner.do').reply(config => {
-			let userId = atob(Utils.getCookie('userId'));
+			let userId = Utils.getCookie('userId');
 			if(!userId) {
 				return new Promise((resolve, reject) => {
 					setTimeout(() => {
@@ -357,7 +357,7 @@ export default {
 		// 获取职位列表
 		mock.onGet('/partner/getPartnerTitle').reply(config => {
 			let { pageNo, pageSize } = config.params;
-			let userId = atob(Utils.getCookie('userId'));
+			let userId = Utils.getCookie('userId');
 			let partnerId = _UserList.filter(user => user.userId == userId)[0].partnerId;
 			let partnerTitle = _TitleList.filter(title => title.partnerId == partnerId)
 			let total = partnerTitle.length;
@@ -393,7 +393,7 @@ export default {
 		})
 		// 创建职位
 		mock.onPost('/partner/createTitle').reply(config => {
-			let userId = atob(Utils.getCookie('userId'));
+			let userId = Utils.getCookie('userId');
 			let partnerId = _UserList.filter(user => user.userId == userId)[0].partnerId;
 			let { titleName, titleDesc } = JSON.parse(config.data)
 			_TitleList.push({
@@ -487,6 +487,53 @@ export default {
 		mock.onPost('/adminInter/delFunction.do').reply(config => {
 			let { funcId } = JSON.parse(config.data)
 			_FunctionTree = _FunctionTree.filter(func => func.funcId !== funcId)
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取角色分页列表
+		mock.onGet('/adminInter/getSysRoles.do').reply(config => {
+			let { pageNo, pageSize } = config.params;
+			let total = _RoleList.length;
+			let rolePage = _RoleList.filter((role, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize)
+			retObj.result = {
+				roleList: rolePage,
+				pageInfo: {
+					total: total
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 设置角色启用/禁用状态
+		mock.onPost('/adminInter/updateRoleStatus.do').reply(config => {
+			let { roleId, status } = JSON.parse(config.data);
+			_RoleList.filter(role => {
+				if(role.roleId == roleId) {
+					role.status = status
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		mock.onPost('/adminInter/createRole.do').reply(config => {
+			let { roleName, roleDesc } = JSON.parse(config.data)
+			_RoleList.push({
+				roleId: new Date().getTime(),
+				roleName,
+				roleDesc,
+				status: 1
+			})
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {

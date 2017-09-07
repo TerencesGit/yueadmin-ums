@@ -2,20 +2,7 @@
 	<section>
 			<div v-title :data-title="this.$route.name"></div>
 	    <el-row class="toolbar">
-	      <el-form :inline="true" :model="filter">
-	       <!--  <el-form-item label="">
-	          <el-input v-model="filter.code" placeholder="输入角色编号"></el-input>
-	        </el-form-item> -->
-	        <el-form-item label="">
-	          <el-input v-model="filter.name" placeholder="输入角色名称"></el-input>
-	        </el-form-item>
-	        <el-form-item label="">
-	          <el-button type="primary" @click="getRoleList">搜索</el-button>
-	        </el-form-item>
-	        <el-form-item label="">
-	          <el-button type="primary" @click="handleAdd">新增角色</el-button>
-	        </el-form-item>
-	      </el-form>
+	      <el-button type="primary" @click="handleAdd">新增角色</el-button>
 	    </el-row>
       <el-table 
 	      border 
@@ -26,12 +13,25 @@
 	      <el-table-column type="index" width="60"></el-table-column>
 	      <el-table-column prop="roleId" label="角色编号" sortable width="140"></el-table-column>
 	      <el-table-column prop="roleName" label="角色名称"></el-table-column>
-	      <el-table-column prop="status" label="状态" width="120" :formatter="formatStatus"></el-table-column>
-	      <el-table-column prop="createTime" label="创建时间" sortable width="180"></el-table-column>
+	      <el-table-column prop="roleDesc" label="角色描述"></el-table-column>
+	      <el-table-column prop="createTime" label="创建时间" sortable width="180" :formatter="formatTime"></el-table-column>
+	      <el-table-column prop="status" label="状态" width="120" :formatter="formatStatus">
+	      	<template scope="scope">
+	      		<el-switch
+						  v-model="scope.row.status"
+						  :on-value="1"
+						  :off-value="0"
+						  on-text="启用"
+						  off-text="禁用"
+						  @change="handleStatus(scope.row)">
+						</el-switch>
+	      	</template>
+	      </el-table-column>
 	      <el-table-column label="操作" width="240">
 	        <template scope="scope">
-	          <el-button plain type="warning" size="small" @click="handleEdit(scope.row.roleId)">编辑</el-button>
-	          <el-button size="small" @click="handleDetail(scope.row.roleId)">详情</el-button>
+	        	<el-button size="small" type="info" @click="handleDetail(scope.row)">权限</el-button>
+	          <el-button size="small" type="warning" @click="handleEdit(scope.row)">编辑</el-button>
+	          <el-button size="small" type="danger" @click="handleDetail(scope.row)">删除</el-button>
 	        </template>
 	      </el-table-column>
 	    </el-table>
@@ -68,14 +68,10 @@
 	</section>
 </template>
 <script>
-	import { getSysRoles } from '@/api'
+	import { getSysRoles, createRole, updateRoleStatus } from '@/api'
 	export default {
 		data () {
 			return {
-				filter: {
-					code: '',
-					name: '',
-				},
 				pageNo: 1,
 				pageSize: 10,
 				total: 0,
@@ -101,32 +97,83 @@
 			formatStatus(row) {
 				return row.status === 1 ? '启用' : '禁用'
 			},
+			formatTime() {
+				return this.$moment(new Date()).format('YYYY-MM-DD')
+			},
 			// 角色分页列表
 			getRoleList() {
 				let params = {
 					pageNo: this.pageNo,
 					pageSize: this.pageSize
 				}
+				this.loading = true;
 				getSysRoles(params).then(res => {
+					this.loading = false;
 					if(res.data.code === '0001') {
-						this.roleList = res.data.result.roles;
+						this.roleList = res.data.result.roleList;
+						this.total = res.data.result.pageInfo.total;
 					} else {
 						this.$message.error(res.data.message)
 					}
 				}).catch(err => {
+					this.loading = false;
 					console.log(err)
 				})
 			},
+			handleStatus(row) {
+				let data = {
+					roleId: row.roleId,
+					status: row.status
+				}
+				updateRoleStatus(data).then(res => {
+					if(res.data.code === '0001') {
+						this.$message.success(res.data.message)
+					} else {
+						row.status = row.status === 0 ? 1 : 0;
+						this.$message.error(res.data.message)
+					}
+				}).catch(err => {
+					console.log(err)
+					row.status = row.status === 0 ? 1 : 0;
+					this.$catchError(err)
+				})
+			},
 			handleAdd() {
+				this.roleForm = {
+					roleName: '',
+					roleDesc: ''
+				}
 				this.roleFormTitle = '新增角色'
 				this.roleFormVisible = true;
 			},
-			handleEdit() {
+			handleEdit(row) {
+				this.roleForm = {
+					roleId: row.roleId,
+					roleName: row.roleName,
+					roleDesc: row.roleDesc
+				}
 				this.roleFormTitle = '编辑角色'
 				this.roleFormVisible = true;
 			},
 			submitForm() {
+				this.$refs.roleForm.validate(valid => {
+					if(!valid) return;
+					let data = Object.assign({}, this.roleForm)
+					console.log(data)
+					if(data.roleId) {
 
+					} else {
+						createRole(data).then(res => {
+							if(res.data.code === '0001') {
+								this.$message.success(res.data.message)
+								this.getRoleList()
+							} else {
+								this.$message.error(res.data.message)
+							}
+						})
+					}
+					this.roleFormVisible = false;
+				})
 			},
 			handleDetail() {
 
@@ -137,6 +184,9 @@
 			handleCurrentChange() {
 
 			}
+		},
+		mounted() {
+			this.getRoleList()
 		}
 	}
 </script>

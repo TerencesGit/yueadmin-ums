@@ -59,9 +59,10 @@ const router = new Router({
   routes
 })
 router.beforeEach((to, from, next) => {
-  let user = Utils.getCookie('userId')
+  let user = Utils.getCookie('userId');
   let logRequired = to.path.indexOf('account') !== -1 || 
-                    to.path.indexOf('admin') !== -1;
+                    to.path.indexOf('admin') !== -1 ||
+                    to.path.indexOf('system') !== -1;
   if(logRequired && !user) {
     ElementUI.Message('尚未登录或当前会话已过期')
     return router.push('/login')
