@@ -57,10 +57,9 @@
 			      highlight-current-row
 			      v-loading="tableLoading" 
 			      style="width: 100%">
-			      <!-- <el-table-column type="index" width="60"></el-table-column> -->
-			      <el-table-column prop="funcId" label="功能编号" width="100"></el-table-column>
-			      <el-table-column prop="name" label="名称"></el-table-column>
-			      <el-table-column prop="desc" label="描述"></el-table-column>
+			      <el-table-column prop="funcId" label="功能点编号" width="120"></el-table-column>
+			      <el-table-column prop="name" label="功能点名称"></el-table-column>
+			      <el-table-column prop="desc" label="功能点描述"></el-table-column>
 			      <el-table-column prop="updateTime" label="更新时间" width="120" :formatter="formatTime"></el-table-column>
 			      <el-table-column prop="status" label="状态" :formatter="formatStatus" width="80"></el-table-column>
 			      <el-table-column label="操作" width="160">

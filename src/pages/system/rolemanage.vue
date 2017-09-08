@@ -265,9 +265,6 @@
 				          enable: true
 				        }
 				      },
-				      // callback: {
-				      // 	onClick: this.nodeClick
-				      // }
 				    }
 				    const zNode = [];
 				    this.funTreeList.forEach(func => {
@@ -307,14 +304,16 @@
 				getRoleFunctions(params).then(res => {
 					if(res.data.code === '0001') {
 						let treeObj = $.fn.zTree.getZTreeObj("functionTree");
-						let nodes = treeObj.transformToArray(treeObj.getNodes());
+						let nodes = treeObj.transformToArray(treeObj.getNodes()).filter(node => node.isParent === false);
 						nodes.forEach(node => {
 							treeObj.checkNode(node, false, true);
 						})
 						let roleFuncs = res.data.result.roleFuncs;
 						let checkedNodes = [];
 						roleFuncs.forEach(func => {
-							checkedNodes.push(nodes.filter(node => node.funcId == func.funcId)[0])
+							nodes.filter(node => {
+								node.funcId == func.funcId && checkedNodes.push(node)
+							})
 						})
 						checkedNodes.forEach(node => {
 							treeObj.checkNode(node, true, true);
@@ -329,15 +328,14 @@
 			},
 			// 权限配置
 			handleFunc(row) {
-				this.selectedRole = row;
+				this.selectedRole = row
+				this.funcTreeVisible = true
 				this.getFuncTree()
 				this.getRoleFuncs()
-				this.funcTreeVisible = true
 			},
 			// 权限提交
 			roleFuncSubmit() {
 				let checkedNodes = $.fn.zTree.getZTreeObj('functionTree').getCheckedNodes(true);
-				checkedNodes = checkedNodes.filter(node => node.check_Child_State === -1)
 				let funcIds = checkedNodes.map(node => node.funcId)
 				let data = {
 					roleId: this.selectedRole.roleId,

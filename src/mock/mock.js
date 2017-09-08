@@ -2,7 +2,7 @@ import axios from 'axios'
 import Utils from '@/assets/js/utils'
 import MockAdapter from 'axios-mock-adapter'
 import { UserList, PartnerList, OrganizeList, FunctionTree, TitleList, 
-	RoleList, RoleFunc } 
+	RoleList, RoleFunc, ContractTempList } 
 				from './data/user'
 let _UserList = UserList,
 		_PartnerList = PartnerList,
@@ -10,7 +10,8 @@ let _UserList = UserList,
 		_FunctionTree = FunctionTree,
 		_TitleList = TitleList,
 		_RoleList = RoleList,
-		_RoleFunc = RoleFunc;
+		_RoleFunc = RoleFunc,
+		_ContractTempList = ContractTempList;
 const retObj = {
 	code: '0001',
 	message: '操作成功',
@@ -96,7 +97,12 @@ export default {
 					}, 500)
 				})
 			}
-			let _userInfo = _UserList.filter(user => user.userId == userId)[0]
+			let _userInfo = _UserList.filter(user => user.userId == userId)[0];
+			_Organizes.filter(org => {
+				if(org.orgId == _userInfo.orgId) {
+					_userInfo.orgName = org.name
+				}
+			})
 			let retObj = {
 				code: '0001',
 				message: '操作成功',
@@ -604,6 +610,23 @@ export default {
 				})
 			})
 			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取合同模板列表
+		mock.onGet('/adminInter/getContractTemplates.do').reply(config => {
+			let { pageNo, pageSize } = config.params;
+			let total = _ContractTempList.length;
+			let templatePage = _ContractTempList.filter((temp, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize );
+			retObj.result = {
+				templateList: templatePage,
+				pageInfo: {
+					total: total
+				}
+			}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 					resolve([200, retObj])
