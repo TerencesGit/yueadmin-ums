@@ -17,6 +17,7 @@ import PartnerTitleManage from '@/pages/partner/titlemanage'
 import SystemFuncManage from '@/pages/system/funcmanage'
 import SystemRoleManage from '@/pages/system/rolemanage'
 import SystemTemplateManage from '@/pages/system/templatemanage'
+import SystemPartnerTypeManage from '@/pages/system/partnertypemanage'
 
 const routes = [
   {
@@ -112,6 +113,11 @@ const routes = [
         path: 'templatemanage',
         name: '合同模板管理',
         component: SystemTemplateManage,
+      },
+      {
+        path: 'partnertypemanage',
+        name: '商家类型管理',
+        component: SystemPartnerTypeManage,
       },
     ]
   },

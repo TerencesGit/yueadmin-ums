@@ -2,7 +2,7 @@ import axios from 'axios'
 import Utils from '@/assets/js/utils'
 import MockAdapter from 'axios-mock-adapter'
 import { UserList, PartnerList, OrganizeList, FunctionTree, TitleList, 
-	RoleList, RoleFunc, ContractTempList } 
+	RoleList, RoleFunc, ContractTempList, PartnerTypeList } 
 				from './data/user'
 let _UserList = UserList,
 		_PartnerList = PartnerList,
@@ -11,7 +11,8 @@ let _UserList = UserList,
 		_TitleList = TitleList,
 		_RoleList = RoleList,
 		_RoleFunc = RoleFunc,
-		_ContractTempList = ContractTempList;
+		_ContractTempList = ContractTempList,
+		_PartnerTypeList = PartnerTypeList;
 const retObj = {
 	code: '0001',
 	message: '操作成功',
@@ -670,6 +671,70 @@ export default {
 		mock.onPost('/adminInter/delTemplate.do').reply(config => {
 			let { templateId } = JSON.parse(config.data);
 			_ContractTempList = _ContractTempList.filter(temp => temp.templateId != templateId)
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取商家类型列表
+		mock.onGet('/adminInter/getPartnerTypes.do').reply(config => {
+			let { pageNo, pageSize } = config.params;
+			let total = _PartnerTypeList.length;
+			let partnerTypes = _PartnerTypeList.filter((temp, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize );
+			retObj.result = {
+				partnerTypes: partnerTypes,
+				pageInfo: {
+					total: total
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 设置商家类型启用/禁用状态
+		mock.onPost('/adminInter/updatePartnerTypeStatus.do').reply(config => {
+			let { typeId, status } = JSON.parse(config.data);
+			_PartnerTypeList.filter(type => {
+				if(type.typeId == typeId) {
+					type.status = status
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 新建商家类型
+		mock.onPost('/adminInter/createPartnerType.do').reply(config => {
+			let { typeName, note } = JSON.parse(config.data);
+			_PartnerTypeList.push({
+				typeId: new Date().getTime(),
+				typeName,
+				note,
+				status: 1
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新商家类型
+		mock.onPost('/adminInter/updatePartnerType.do').reply(config => {
+			let { typeId, typeName, note } = JSON.parse(config.data);
+			_PartnerTypeList.filter(type => {
+				if(type.typeId == typeId) {
+					type.typeName = typeName;
+					type.note = note
+				}
+			})
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
