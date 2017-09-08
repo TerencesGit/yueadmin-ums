@@ -633,5 +633,49 @@ export default {
 				}, 500)
 			})
 		})
+		// 新建合同模板
+		mock.onPost('/adminInter/createTemplate.do').reply(config => {
+			let { name, templateFile, note } = JSON.parse(config.data);
+			_ContractTempList.push({
+				templateId: new Date().getTime(),
+				name,
+				templateFile,
+				note
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新合同模板
+		mock.onPost('/adminInter/updateTemplate.do').reply(config => {
+			let { templateId, name, templateFile, note } = JSON.parse(config.data);
+			_ContractTempList.filter(temp => {
+				if(temp.templateId == templateId) {
+					temp.name = name,
+					temp.templateFile = templateFile,
+					temp.note = note
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 删除合同模板
+		mock.onPost('/adminInter/delTemplate.do').reply(config => {
+			let { templateId } = JSON.parse(config.data);
+			_ContractTempList = _ContractTempList.filter(temp => temp.templateId != templateId)
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
 	}
 }

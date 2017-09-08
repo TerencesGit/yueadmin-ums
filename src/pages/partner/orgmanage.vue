@@ -50,7 +50,7 @@
 			      v-loading="staffLoading" 
 			      style="width: 100%">
 			      <el-table-column type="index" width="60"></el-table-column>
-			      <el-table-column prop="realname" label="姓名" sortable width="120"></el-table-column>
+			      <el-table-column prop="realname" label="姓名" sortable width="120" :formatter="formatName"></el-table-column>
 			      <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
 			      <el-table-column prop="createTime" label="注册时间" sortable width="120" :formatter="formatTime"></el-table-column>
 			      <el-table-column prop="orgName" label="部门" :formatter="formatOrg"></el-table-column>
@@ -75,7 +75,7 @@
 								    	<span v-if="scope.row.status === 1" @click="handleSetStatus(scope.row)">禁用</span>
 								    	<span v-else @click="handleSetStatus(scope.row)">启用</span>
 								    </el-dropdown-item>
-								    <el-dropdown-item>
+								    <el-dropdown-item disabled>
 								    	<span @click="handleRemove(scope.row)">删除</span>
 								    </el-dropdown-item>
 								  </el-dropdown-menu>
@@ -152,9 +152,9 @@
 		<!-- 员工信息 -->
 		<el-dialog :visible.sync="staffInfoVisible" title="员工信息">
 			<el-row>
-				<el-col :span="18" :offset="3">
+				<el-col :span="16" :offset="4">
 					<el-form :model="staffInfo" label-width="180px">
-						<el-form-item label="">
+						<el-form-item label="" label-width="120px">
 							<img v-if="staffInfo.avatar" :src="staffInfo.avatar" alt="头像" class="avatar">
 							<img v-else src="../../assets/img/avatar.gif" alt="头像" class="avatar">
 						</el-form-item>
@@ -162,10 +162,10 @@
 							<span>{{staffInfo.realname}}</span>
 						</el-form-item>
 						<el-form-item label="邮箱：">
-							<span>{{staffInfo.email}}</span>
+							<span>{{staffInfo.email | email}}</span>
 						</el-form-item>
 						<el-form-item label="手机号：">
-							<span>{{staffInfo.mobile || '暂无'}}</span>
+							<span>{{staffInfo.mobile | mobile}}</span>
 						</el-form-item>
 						<el-form-item label="注册时间：">
 							<span>{{staffInfo.createTime}}</span>
@@ -229,6 +229,7 @@
 	import '@/assets/plugins/zTree/js/jquery.min.js'
 	import '@/assets/plugins/zTree/js/jquery.ztree.all.min.js'
 	import { readOrganizeTree, getUserList, saveOrganizeTree, deleteOrganize, setOrganizeStatus, setUserOrg, removeUser, setUserStatus, getPartnerTitle, setUserTitle, requestRegist } from '@/api'
+	import { mapGetters } from 'vuex'
 	export default {
 		data() {
 			const validateEmail = (rule, value, callback) => {
@@ -312,11 +313,11 @@
 			}
 		},
 		methods: {
+			formatName(row) {
+				return row.userId === this.userInfo.userId ? `${row.realname}(我)` : row.realname;
+			},
 			formatTime(row) {
 				return this.$moment(row.createTime).format('YYYY-MM-DD')
-			},
-			formatMobile(row) {
-				return row.mobile ? row.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '暂无'
 			},
 			formatOrg(row) {
 				return row.orgName || '暂无'
@@ -709,10 +710,6 @@
 	      }).catch(err => {
 	      	console.log(err)
 	      })
-      	// this.$notify.error({
-      	// 	title: '提示',
-      	// 	message: '暂无该功能！', 
-      	// })
       },
       // 删除员工
       handleRemove(row) {
@@ -740,7 +737,10 @@
 		computed: {
 			disabled() {
 				return this.checkedNode && this.checkedNode.status === 1 ? true : false
-			}
+			},
+			...mapGetters([
+	  		'userInfo'
+	  	]),
 		},
 		mounted () {
 			this.getOrganizeTree()

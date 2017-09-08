@@ -19,9 +19,9 @@
       <el-table-column prop="createTime" label="创建时间" sortable width="180" :formatter="formatTime"></el-table-column>
       <el-table-column label="操作" width="240">
         <template scope="scope">
-        	<el-button size="small" type="info" @click="handleEdit(scope.row)">查看</el-button>
+        	<el-button size="small" type="info" @click="handleDetail(scope.row)">查看</el-button>
           <el-button size="small" type="warning" @click="handleEdit(scope.row)">编辑</el-button>
-         <!--  <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button> -->
+          <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -50,8 +50,7 @@
 							  action="https://jsonplaceholder.typicode.com/posts/"
 							  :on-change="handleChange"
 							  :file-list="fileList">
-							  <el-button size="small" type="primary">点击上传</el-button>
-							  <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+							  <el-button size="small" type="primary" icon="upload">点击上传</el-button>
 							</el-upload>
 		    		</el-form-item>
 		    		<el-form-item label="模板描述" prop="note">
@@ -65,10 +64,39 @@
     		<el-button type="primary" @click="submitForm">确定</el-button>
     	</div>
     </el-dialog>
+    <!-- 模板详情 -->
+    <el-dialog :visible.sync="templateInfoVisible" title="模板信息">
+			<el-row>
+    		<el-col :span="14" :offset="5">
+		    	<el-form label-width="180px">
+		    		<el-form-item label="模板名称：">
+		    			<span>{{templateForm.name}}</span>
+		    		</el-form-item>
+		    		<el-form-item label="模板文件：">
+		    			<span>{{templateForm.templateFile}}</span>
+		    		</el-form-item>
+		    		<el-form-item label="模板描述：">
+		    			<span>{{templateForm.note}}</span>
+		    		</el-form-item>
+		    		<el-form-item label="更新人：">
+		    			<span>{{userInfo.name}}</span>
+		    		</el-form-item>
+		    		<el-form-item label="更新时间：">
+		    			<span>{{templateForm.createTime | formatDate}}</span>
+		    		</el-form-item>
+		    	</el-form>
+		    </el-col>
+		  </el-row>
+		  <div slot="footer">
+    		<el-button @click="templateInfoVisible = false">取消</el-button>
+    		<el-button type="primary" @click="templateInfoVisible = false">确定</el-button>
+    	</div>
+    </el-dialog>
 	</section>
 </template>
 <script>
-	import { getContractTemplates } from '@/api'
+	import { mapGetters } from 'vuex'
+	import { getContractTemplates, createTemplate, updateTemplate, delTemplate } from '@/api'
 	export default {
 		data() {
 			return {
@@ -90,19 +118,15 @@
 					],
 					note: [
 						{ required: true, message: '请输入备注', trigger: 'blur'}
-					]
+					],
+					templateFile: [
+						{ required: true, message: '请选择模板文件', trigger: 'blur'}
+					],
 				},
+				fileList: [],
 				templateFormTitle: '',
 				templateFormVisible: false,
-				fileList: [{
-          name: 'food.jpeg',
-          url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
-          status: 'finished'
-        }, {
-          name: 'food2.jpeg',
-          url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
-          // status: 'finished'
-        }]
+				templateInfoVisible: false,
 			}
 		},
 		methods: {
@@ -122,8 +146,9 @@
 					pageNo: this.pageNo,
 					pageSize: this.pageSize
 				}
+				this.loading = true;
 				getContractTemplates(params).then(res => {
-					console.log(res)
+					this.loading = false;
 					if(res.data.code === '0001') {
 						this.templateList = res.data.result.templateList;
 						this.total = res.data.result.pageInfo.total;
@@ -131,24 +156,104 @@
 						this.$message.error(res.data.message)
 					}
 				}).catch(err => {
+					this.loading = false;
 					console.log(err)
+					this.$carchError(err)
 				})
 			},
 			handleChange(file, fileList) {
-        this.fileList = fileList.slice(-3);
+				this.templateForm.templateFile = file.name;
+        this.fileList = fileList.slice(-1);
       },
 			handleAdd() {
+				this.templateForm = {
+					name: '',
+					note: '',
+					templateFile: '',
+				}
+				this.fileList = [];
+				this.templateFormTitle = '新建模板';
 				this.templateFormVisible = true
 			},
-			handleEdit() {
-
+			handleEdit(row) {
+				this.templateForm = {
+					templateId: row.templateId,
+					templateFile: row.templateFile,
+					name: row.name,
+					note: row.note,
+				}
+				this.fileList = [
+					{name: row.templateFile}
+				]
+				this.templateFormTitle = '编辑模板';
+				this.templateFormVisible = true
 			},
 			submitForm() {
-
+				this.$refs.templateForm.validate(valid => {
+					if(!valid) return;
+					let data = Object.assign({}, this.templateForm)
+					if(data.templateId) {
+						updateTemplate(data).then(res => {
+							if(res.data.code === '0001') {
+								this.$message.success(res.data.message)
+								this.getTemplateList()
+							} else {
+								this.$message.error(res.data.message)
+							}
+						}).catch(err => {
+							console.log(err)
+							this.$catchError(err)
+						})
+					} else {
+						createTemplate(data).then(res => {
+							if(res.data.code === '0001') {
+								this.$message.success(res.data.message)
+								this.getTemplateList()
+							} else {
+								this.$message.error(res.data.message)
+							}
+						}).catch(err => {
+							console.log(err)
+							this.$catchError(err)
+						})
+					}
+					this.templateFormVisible = false
+				})
 			},
-			handleDetail() {
-
+			handleDetail(row) {
+				this.templateForm = {
+					name: row.name,
+					templateFile: row.templateFile,
+					note: row.note
+				}
+				this.templateInfoVisible = true
+			},
+			handleDelete(row) {
+				this.$confirm(`确定删除${row.name}？`, '提示', {type: 'warning'}).then(() => {
+					let data = {
+						templateId: row.templateId
+					}
+					delTemplate(data).then(res => {
+						if(res.data.code === '0001') {
+							this.$message.success(res.data.message)
+							this.getTemplateList()
+						} else {
+							this.$message.error(res.data.message)
+						}
+					}).catch(err => {
+						console.log(err)
+						this.$catchError(err)
+					})
+				}).catch(err => {
+					console.log(err)
+					this.$message('已取消操作')
+				})
 			}
+		},
+		computed: {
+			...mapGetters([
+	  		'userInfo'
+	  	])
 		},
 		mounted() {
 			this.getTemplateList()

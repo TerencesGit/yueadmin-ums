@@ -25,11 +25,17 @@ Vue.use(ElementUI)
 Vue.prototype.$moment = moment
 Vue.prototype.$nprogress = NProgress
 Vue.config.productionTip = false
-Vue.filter('DateFormat', function(value){
+Vue.filter('formatDate', (value) => {
 	return moment(value).format('YYYY-MM-DD')
 })
-Vue.filter('TimeFormat', function(value){
+Vue.filter('formatTime', (value) => {
 	return moment(value).format('YYYY-MM-DD HH:mm:ss')
+})
+Vue.filter('mobile', (mobile) => {
+  return mobile ? mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '暂无'
+})
+Vue.filter('email', (email) => {
+  return email ? email.replace(/(.{2}).+(.{2}@.+)/, '$1****$2') : '暂无'
 })
 Vue.directive('title', {
   inserted (el, binding) {
