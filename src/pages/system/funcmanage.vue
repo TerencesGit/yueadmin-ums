@@ -84,8 +84,27 @@
 				</el-col>
 			</el-row>
 		</el-card>
-		<el-dialog :visible.sync="moduleFormVisible" title="新建模块">
-			
+		<!-- 模块表单 -->
+		<el-dialog :visible.sync="moduleFormVisible" :title="moduleFormTitle">
+			<el-row>
+				<el-col :span="18" :offset="3">
+					<el-form :model="moduleForm" :rules="moduleRules" ref="moduleForm" label-width="120px">
+						<el-form-item label="模块名称" prop="name">
+							<el-input v-model="moduleForm.name" placeholder="请输入模块名称"></el-input>
+						</el-form-item>
+						<el-form-item label="部署根路径" prop="contextRoot">
+							<el-input v-model="moduleForm.contextRoot" placeholder="部署根路径"></el-input>
+						</el-form-item>
+						<el-form-item label="模块描述" prop="note">
+							<el-input type="textarea" v-model="moduleForm.note" placeholder="请输入模块描述"></el-input>
+						</el-form-item>
+					</el-form>
+				</el-col>
+			</el-row>
+			<div slot="footer">
+				<el-button @click="moduleFormVisible = false">取消</el-button>
+				<el-button type="primary" @click="moduleFormSubmit">确定</el-button>
+			</div>
 		</el-dialog>
 		<!-- 功能点表单 -->
 		<el-dialog :visible.sync="funcFormVisible" :title="funcFormTitle">
@@ -144,16 +163,13 @@
 	import '@/assets/plugins/zTree/css/zTreeStyle.css'
 	import '@/assets/plugins/zTree/js/jquery.min.js'
 	import '@/assets/plugins/zTree/js/jquery.ztree.all.min.js'
-	import { getFunctionTree, createFunction, updateFunction, delFunction, setOrganizeStatus } from '@/api'
+	import { getModuleFunctionList, createFunction, updateFunction, delFunction, setOrganizeStatus, getModules, createModule, updateModule } from '@/api'
 	export default {
 		data() {
 			return {
 				moduleId: 20170906001,
-				moduleList: [
-					{moduleId: 20170906001, name: '用户模块', note: '用户模块101'},
-					{moduleId: 20170906002, name: '交易模块', note: '交易模块102'},
-					{moduleId: 20170906003, name: '支付模块', note: '支付模块103'},
-				],
+				moduleList: [],
+				moduleFormTitle: '',
 				moduleFormVisible: false,
 				functionTree: [],
         funcData: [],
@@ -182,7 +198,22 @@
 	      	],
 	      },
 	      funcDetail: {},
-	      submitType: 0
+	      moduleForm: {
+	      	name: '',
+	      	contextRoot: '',
+	      	note: '',
+	      },
+	      moduleRules: {
+	      	name: [
+	      		{ required: true, message: '请输入模块名称', trigger: 'blur'}
+	      	],
+	      	contextRoot: [
+	      		{ required: true, message: '请输入模块部署根路径', trigger: 'blur'}
+	      	],
+	      	note: [
+	      		{ required: true, message: '请输入模块描述', trigger: 'blur'}
+	      	],
+	      },
 			}
 		},
 		methods: {
@@ -198,9 +229,42 @@
 			handleCurrentChange(val) {
 				this.currentPage = val
 			},
+			// 获取功能模块列表
+			getModuleList() {
+				getModules().then(res => {
+					if(res.data.code === '0001') {
+						this.moduleList = res.data.result.modules
+  				} else {
+  					this.$message.error(res.data.message)
+  				}
+				}).catch(err => {
+					console.log(err)
+					this.$catchError(err)
+				})
+			},
 			// 新建模块
 			handleCreateModule() {
+				this.moduleFormTitle = '新建系统模块'
 				this.moduleFormVisible = true
+			},
+			// 模块提交
+			moduleFormSubmit() {
+				this.$refs.moduleForm.validate(valid => {
+					if(!valid) return;
+					let data = Object.assign({}, this.moduleForm)
+					createModule(data).then(res => {
+						if(res.data.code === '0001') {
+							this.$message.success(res.data.message)
+							this.getModuleList()
+	  				} else {
+	  					this.$message.error(res.data.message)
+	  				}
+					}).catch(err => {
+						console.log(err)
+						this.$catchError(err)
+					})
+					this.moduleFormVisible = false
+				})
 			},
 			moduleChange(val) {
 				this.moduleId = val
@@ -219,10 +283,9 @@
 				let data = {
 					moduleId: this.moduleId
 				}
-				getFunctionTree(data).then(res => {
-					console.log(res)
+				getModuleFunctionList(data).then(res => {
 					if(res.data.code === '0001') {
-						const funcTree = res.data.result.functionTree;
+						const funcTree = res.data.result.functions;
 				    const setting = {
 				      view: {
 				        selectedMulti: false,
@@ -277,13 +340,13 @@
       	if(!this.checkedNode) {
       		return this.$notify.warning({title: '提示', message: '请选择功能点'})
       	}
-      	this.submitType = 0
       	this.funcFormTitle = '新增功能点'
       	this.funcForm = {
       		funcId: '',
       		name: '',
       		funcDesc: '',
-      		parentId: this.checkedNode.funcId
+      		parentId: this.checkedNode.funcId,
+      		moduleId: this.moduleId
       	}
       	this.funcFormVisible = true
       },
@@ -297,7 +360,6 @@
       		name: this.checkedNode.name,
       		funcDesc: this.checkedNode.desc
       	}
-      	this.submitType = 1
       	this.funcFormTitle = '编辑功能点'
       	this.funcFormVisible = true
       },
@@ -306,20 +368,8 @@
       	this.$refs.funcForm.validate(valid => {
       		if(valid) {
       			let data = Object.assign({}, this.funcForm)
-      			console.log(data)
-      			if(this.submitType === 0) {
-      				createFunction(data).then(res => {
-	      				console.log(res)
-	      				if(res.data.code === '0001') {
-	      					this.$message.success(res.data.message)
-	      					this.getFuncTree()
-	      				} else {
-	      					this.$message.error(res.data.message)
-	      				}
-	      			}).catch(err => {
-	      				console.log(err)
-	      			})
-      			} else {
+      			// console.log(data)
+      			if(data.funcId) {
       				updateFunction(data).then(res => {
       					if(res.data.code === '0001') {
 	      					this.$message.success(res.data.message)
@@ -328,6 +378,18 @@
 	      					this.$message.error(res.data.message)
 	      				}
       				}).catch(err => {
+	      				console.log(err)
+	      			})
+      			} else {
+      				createFunction(data).then(res => {
+	      				// console.log(res)
+	      				if(res.data.code === '0001') {
+	      					this.$message.success(res.data.message)
+	      					this.getFuncTree()
+	      				} else {
+	      					this.$message.error(res.data.message)
+	      				}
+	      			}).catch(err => {
 	      				console.log(err)
 	      			})
       			}
@@ -405,6 +467,7 @@
 			}
 		},
 		mounted () {
+			this.getModuleList()
 			this.getFuncTree()
 		}
 	}
@@ -416,16 +479,10 @@
 		max-height: 600px;
 		overflow-y: auto;
 		border: 1px solid #ddd;
-		
 		&::-webkit-scrollbar {
       width: 4px;
       border-radius: 5px;
       background: #bbb
-    }
-    li {
-    	overflow: hidden;
-  		text-overflow: ellipsis;
-  		white-space: nowrap;
     }
 	}
 	.el-card {

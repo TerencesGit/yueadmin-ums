@@ -85,7 +85,7 @@
 	import '@/assets/plugins/zTree/css/zTreeStyle.css'
 	import '@/assets/plugins/zTree/js/jquery.min.js'
 	import '@/assets/plugins/zTree/js/jquery.ztree.all.min.js'
-	import { getSysRoles, createRole, updateRole, updateRoleStatus, delRole, getFunctionTree, getRoleFunctions, updateRoleFunction } from '@/api'
+	import { getSysRoles, createRole, updateRole, updateRoleStatus, delRole, getModuleFunctionList, getRoleFunctions, updateRoleFunction } from '@/api'
 	export default {
 		data () {
 			return {
@@ -249,7 +249,7 @@
 				let data = {
 					moduleId: 20170906001
 				}
-				getFunctionTree(data).then(res => {
+				getModuleFunctionList(data).then(res => {
 					this.treeLoading = false
 					if(res.data.code === '0001') {
 						this.funTreeList = res.data.result.functionTree;

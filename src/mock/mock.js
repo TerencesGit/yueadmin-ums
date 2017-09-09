@@ -1,13 +1,14 @@
 import axios from 'axios'
 import Utils from '@/assets/js/utils'
 import MockAdapter from 'axios-mock-adapter'
-import { UserList, PartnerList, OrganizeList, FunctionTree, TitleList, 
-	RoleList, RoleFuncs, ContractTempList, PartnerTypeList, TypeRoles } 
-				from './data/user'
+import { UserList, PartnerList, OrganizeList, ModuleList, FunctionList, 
+				TitleList, RoleList, RoleFuncs, ContractTempList, PartnerTypeList, 
+				TypeRoles } from './data/user'
 let _UserList = UserList,
 		_PartnerList = PartnerList,
 		_Organizes = OrganizeList,
-		_FunctionTree = FunctionTree,
+		_ModuleList = ModuleList,
+		_FunctionList = FunctionList,
 		_TitleList = TitleList,
 		_RoleList = RoleList,
 		_RoleFuncs = RoleFuncs,
@@ -401,7 +402,7 @@ export default {
 				}, 500)
 			})
 		})
-		// 创建职位
+		// 新建职位
 		mock.onPost('/partner/createTitle').reply(config => {
 			let userId = Utils.getCookie('userId');
 			let partnerId = _UserList.filter(user => user.userId == userId)[0].partnerId;
@@ -447,12 +448,14 @@ export default {
 				}, 500)
 			})
 		})
-		// 获取功能树
-		mock.onGet('/adminInter/getFunctionTree.do').reply(config => {
-			let { moduleId } = config.params;
-			let moduleFuncTree = _FunctionTree.filter(func => func.moduleId == moduleId)
-			retObj.result = {
-				functionTree: moduleFuncTree
+		// 获取功能模块列表
+		mock.onGet('/adminInter/getModules.do').reply(config => {
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					modules: _ModuleList
+				}
 			}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
@@ -460,15 +463,71 @@ export default {
 				}, 500)
 			})
 		})
-		// 创建功能点
+		// 新建功能模块
+		mock.onPost('/adminInter/createModule.do').reply(config => {
+			let { name, contextRoot, note } = JSON.parse(config.data);
+			let moduleId = new Date().getTime();
+			_ModuleList.push({
+				moduleId,
+				name,
+				contextRoot,
+				note,
+			})
+			_FunctionList.push({
+				funcId: new Date().getTime(),
+				moduleId,
+				parentId: 0,
+				name,
+				status: 1
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新功能模块
+		mock.onPost('/adminInter/updateModule.do').reply(config => {
+			let { moduleId, name, contextRoot, note } = JSON.parse(config.data);
+			_ModuleList.filter(module => {
+				if(module.moduleId === moduleId) {
+					module.name = name;
+					module.contextRoot = contextRoot;
+					module.note = note;
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 根据模块id获取模块功能点列表
+		mock.onGet('/adminInter/getModuleFunctionList.do').reply(config => {
+			let { moduleId } = config.params;
+			let functions = _FunctionList.filter(func => func.moduleId == moduleId)
+			// if(functions.length === 0) {}
+			retObj.result = {
+				functions
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 新建功能点
 		mock.onPost('/adminInter/createFunction.do').reply(config => {
-			let { parentId, name, funcDesc } = JSON.parse(config.data);
-			_FunctionTree.push({
+			let { parentId, name, funcDesc, moduleId } = JSON.parse(config.data);
+			_FunctionList.push({
 				funcId: new Date().getTime(),
 				name,
 				funcDesc,
 				status: 1,
 				parentId,
+				moduleId,
 			})
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
@@ -480,7 +539,7 @@ export default {
 		// 更新功能点
 		mock.onPost('/adminInter/updateFunction.do').reply(config => {
 			let { funcId, name, funcDesc } = JSON.parse(config.data);
-			_FunctionTree.filter(func => {
+			_FunctionList.filter(func => {
 				if(func.funcId === funcId) {
 					func.name = name;
 					func.funcDesc = funcDesc
@@ -496,7 +555,7 @@ export default {
 		// 删除功能点
 		mock.onPost('/adminInter/delFunction.do').reply(config => {
 			let { funcId } = JSON.parse(config.data)
-			_FunctionTree = _FunctionTree.filter(func => func.funcId !== funcId)
+			_FunctionList = _FunctionList.filter(func => func.funcId !== funcId)
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
@@ -586,7 +645,7 @@ export default {
 			let _funcList = [];
 			funcIdList.forEach(funcId => {
 				_funcList.push(
-					_FunctionTree.filter(func => func.funcId == funcId)[0]
+					_FunctionList.filter(func => func.funcId == funcId)[0]
 				)
 			})
 			let retObj = {

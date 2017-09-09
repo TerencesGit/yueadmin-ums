@@ -11,15 +11,41 @@
       v-loading="loading" 
       highlight-current-row
       style="width: 100%">
-      <el-table-column type="index" width="60"></el-table-column>
+      <el-table-column type="expand">
+	      <template scope="scope">
+	        <el-form label-position="left" inline class="table-expand">
+	          <el-form-item label="模板编号">
+	            <span>{{ scope.row.templateId }}</span>
+	          </el-form-item>
+	          <el-form-item label="模板文件">
+	          	<el-tag type="gray" v-for="(item, index) in scope.row.templateFile" :key="index">{{item}}</el-tag>
+	          </el-form-item>
+	          <el-form-item label="模板名称">
+	            <span >{{ scope.row.name }}</span>
+	          </el-form-item>
+	          <el-form-item label="更新人">
+	            <span >{{ userInfo.name }}</span>
+	          </el-form-item>
+	          <el-form-item label="模板描述">
+	            <span >{{ scope.row.note }}</span>
+	          </el-form-item>
+	          <el-form-item label="更新时间">
+	            <span >{{ scope.row.updateTime | formatDate }}</span>
+	          </el-form-item>
+	        </el-form>
+	      </template>
+      </el-table-column>
       <el-table-column prop="templateId" label="模板编号" sortable width="140"></el-table-column>
       <el-table-column prop="name" label="模板名称"></el-table-column>
-      <el-table-column prop="templateFile" label="模板文件"></el-table-column>
-      <el-table-column prop="note" label="模板描述"></el-table-column>
-      <el-table-column prop="createTime" label="创建时间" sortable width="180" :formatter="formatTime"></el-table-column>
-      <el-table-column label="操作" width="240">
+      <el-table-column prop="templateFile" label="模板文件" class-name="file-cell">
+      	<template scope="scope">
+      		<el-tag type="gray" v-for="(item, index) in scope.row.templateFile" :key="index">{{item}}</el-tag>
+      	</template>
+      </el-table-column>
+      <el-table-column prop="createTime" label="更新时间" sortable width="160" :formatter="formatTime"></el-table-column>
+      <el-table-column label="操作" width="180">
         <template scope="scope">
-        	<el-button size="small" type="info" @click="handleDetail(scope.row)">查看</el-button>
+        	<!-- <el-button size="small" type="info" @click="handleDetail(scope.row)">查看</el-button> -->
           <el-button size="small" type="warning" @click="handleEdit(scope.row)">编辑</el-button>
           <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
         </template>
@@ -49,6 +75,7 @@
 							  class="file-uploader"
 							  action="https://jsonplaceholder.typicode.com/posts/"
 							  :on-change="handleChange"
+							  :on-remove="handleRemove"
 							  :file-list="fileList">
 							  <el-button size="small" type="primary" icon="upload">点击上传</el-button>
 							</el-upload>
@@ -105,13 +132,7 @@
 				pageSize: 10,
 				total: 0,
 				templateList: [],
-				templateForm: {
-					templateId: '',
-					name: '',
-					templateFile: '',
-					tempalteFileType: '',
-					note: ''
-				},
+				templateForm: {},
 				rules: {
 					name: [
 						{ required: true, message: '请输入模板名称', trigger: 'blur'}
@@ -120,7 +141,7 @@
 						{ required: true, message: '请输入备注', trigger: 'blur'}
 					],
 					templateFile: [
-						{ required: true, message: '请选择模板文件', trigger: 'blur'}
+						{ required: true, type: 'array', message: '请选择模板文件', trigger: 'blur'}
 					],
 				},
 				fileList: [],
@@ -162,8 +183,12 @@
 				})
 			},
 			handleChange(file, fileList) {
-				this.templateForm.templateFile = file.name;
-        this.fileList = fileList.slice(-1);
+				this.templateForm.templateFile = fileList.map(file => file.name);
+        this.fileList = fileList;
+        // fileList.slice(-1);
+      },
+      handleRemove(file, fileList) {
+      	this.templateForm.templateFile = fileList.map(file => file.name)
       },
 			handleAdd() {
 				this.templateForm = {
@@ -182,9 +207,13 @@
 					name: row.name,
 					note: row.note,
 				}
-				this.fileList = [
-					{name: row.templateFile}
-				]
+				this.fileList = []
+				row.templateFile.forEach((file, index) => {
+					this.fileList.push({
+						uid: index,
+						name: file
+					})
+				})
 				this.templateFormTitle = '编辑模板';
 				this.templateFormVisible = true
 			},
@@ -192,6 +221,7 @@
 				this.$refs.templateForm.validate(valid => {
 					if(!valid) return;
 					let data = Object.assign({}, this.templateForm)
+					// console.log(data)
 					if(data.templateId) {
 						updateTemplate(data).then(res => {
 							if(res.data.code === '0001') {
