@@ -2,7 +2,7 @@ import axios from 'axios'
 import Utils from '@/assets/js/utils'
 import MockAdapter from 'axios-mock-adapter'
 import { UserList, PartnerList, OrganizeList, FunctionTree, TitleList, 
-	RoleList, RoleFunc, ContractTempList, PartnerTypeList } 
+	RoleList, RoleFuncs, ContractTempList, PartnerTypeList, TypeRoles } 
 				from './data/user'
 let _UserList = UserList,
 		_PartnerList = PartnerList,
@@ -10,9 +10,10 @@ let _UserList = UserList,
 		_FunctionTree = FunctionTree,
 		_TitleList = TitleList,
 		_RoleList = RoleList,
-		_RoleFunc = RoleFunc,
+		_RoleFuncs = RoleFuncs,
 		_ContractTempList = ContractTempList,
-		_PartnerTypeList = PartnerTypeList;
+		_PartnerTypeList = PartnerTypeList,
+		_TypeRoles = TypeRoles;
 const retObj = {
 	code: '0001',
 	message: '操作成功',
@@ -581,7 +582,7 @@ export default {
 		// 获取角色关联的功能点
 		mock.onGet('/adminInter/getRoleFunctions.do').reply(config => {
 			let { roleId } = config.params
-			let funcIdList = _RoleFunc.filter(rolefunc => rolefunc.roleId == roleId).map(func => func.funcId)
+			let funcIdList = _RoleFuncs.filter(rolefunc => rolefunc.roleId == roleId).map(func => func.funcId)
 			let _funcList = [];
 			funcIdList.forEach(funcId => {
 				_funcList.push(
@@ -605,7 +606,7 @@ export default {
 		mock.onPost('/adminInter/updateRoleFunction.do').reply(config => {
 			let { roleId, funcIdList } = JSON.parse(config.data)
 			funcIdList.forEach(funcId => {
-				_RoleFunc.push({
+				_RoleFuncs.push({
 					roleId,
 					funcId,
 				})
@@ -735,6 +736,55 @@ export default {
 					type.note = note
 				}
 			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取某商家类型关联的角色列表
+		mock.onGet('/adminInter/getRolesByPartType.do').reply(config => {
+			let { typeId } = config.params;
+			let roles = _TypeRoles.filter(typeRole => typeRole.typeId == typeId)
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					roles
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 设置商家类型关联的角色
+		mock.onPost('/adminInter/updatePartnerTypeRole.do').reply(config => {
+			let { typeId, roleIdList } = JSON.parse(config.data);
+			let typeRoles = _TypeRoles.filter(type => type.typeId == typeId);
+			if(typeRoles.length === 0) {
+				roleIdList.forEach(roleId => {
+					_TypeRoles.push({
+						typeRoleId: new Date().getTime(),
+						typeId,
+						roleId,
+					})
+				})
+			} else {
+				typeRoles.forEach(typeRole => {
+					roleIdList.filter(roleId => {
+						if(typeRole.roleId !== roleId) {
+							_TypeRoles.push({
+								typeRoleId: new Date().getTime(),
+								typeId,
+								roleId,
+							})
+						}
+					})
+				})
+			}
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {

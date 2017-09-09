@@ -94,7 +94,7 @@
 	</section>
 </template>
 <script>
-	import { getPartnerTypes, updatePartnerTypeStatus, createPartnerType, updatePartnerType, getSysRoles } from '@/api'
+	import { getPartnerTypes, updatePartnerTypeStatus, createPartnerType, updatePartnerType, getSysRoles, getRolesByPartType, updatePartnerTypeRole } from '@/api'
 	export default {
 		data() {
 			return {
@@ -116,6 +116,7 @@
 						{ required: true, message: '请输入备注', trigger: 'blur'}
 					],
 				},
+				selectedType: null,
 				typeFormTitle: '',
 				typeFormVisible: false,
 				roleList: [],
@@ -216,7 +217,6 @@
 					this.roleLoading = false;
 					if(res.data.code === '0001') {
 						this.roleList = res.data.result.roleList;
-						this.total = res.data.result.pageInfo.total;
 					} else {
 						this.$message.error(res.data.message)
 					}
@@ -225,16 +225,65 @@
 					console.log(err)
 				})
 			},
+			// 获取商家类型关联的角色列表
+			getTypeRoles() {
+				let params = {
+					typeId: this.selectedType.typeId
+				}
+				getRolesByPartType(params).then(res => {
+					if(res.data.code === '0001') {
+						let typeRoles = res.data.result.roles;
+						let selectedRows = [];
+						typeRoles.forEach(typeRole => {
+							this.roleList.filter(role => {
+								if(role.roleId === typeRole.roleId) {
+									selectedRows.push(role)
+								}
+							})
+						})
+						this.toggleSelection(selectedRows)
+					} else {
+						this.$message.error(res.data.message)
+					}
+				}).catch(err => {
+					console.log(err)
+					this.$catchError(err)
+				})
+			},
+			toggleSelection(rows) {
+				this.$refs.roleTable.clearSelection();
+        if (rows.length > 0) {
+          rows.forEach(row => {
+            this.$refs.roleTable.toggleRowSelection(row, true)
+          })
+        }
+      },
 			handleSelectionChange(val) {
-				console.log(val)
 				this.selectedRole = val
 			},
 			handleRoleSet(row) {
+				this.selectedType = row;
 				this.roleList.length === 0 && this.getRoleList()
+				this.getTypeRoles()
 				this.roleListVisible = true
 			},
 			typeRoleSubmit() {
-
+				let roleIds = this.selectedRole.map(role => role.roleId)
+				let data = {
+					typeId: this.selectedType.typeId,
+					roleIdList: roleIds
+				}
+				updatePartnerTypeRole(data).then(res => {
+					if(res.data.code === '0001') {
+						this.$message.success(res.data.message)
+					} else {
+						this.$message.error(res.data.message)
+					}
+				}).catch(err => {
+					console.log(err)
+					this.$catchError(err)
+				})
+				this.roleListVisible = false
 			},
 			handleStatus(row) {
 				let data = {
