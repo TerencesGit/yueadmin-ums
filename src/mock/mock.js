@@ -851,5 +851,21 @@ export default {
 				}, 500)
 			})
 		})
+		// 获得商家分页列表
+		mock.onGet('/domainInter/getPartnerList.do').reply(config => {
+			let { pageNo, pageSize } = config.params;
+			let total = _PartnerList.length;
+			retObj.result = {
+				partners: _PartnerList,
+				pageInfo: {
+					total
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
 	}
 }

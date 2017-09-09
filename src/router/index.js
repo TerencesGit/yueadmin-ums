@@ -14,6 +14,8 @@ import PartnerEdit from '@/pages/partner/partneredit'
 import PartnerOrgManage from '@/pages/partner/orgmanage'
 import PartnerTitleManage from '@/pages/partner/titlemanage'
 
+import AdminPartnerManage from '@/pages/admin/partnermanage'
+
 import SystemFuncManage from '@/pages/system/funcmanage'
 import SystemRoleManage from '@/pages/system/rolemanage'
 import SystemTemplateManage from '@/pages/system/templatemanage'
@@ -91,6 +93,18 @@ const routes = [
         path: 'titlemanage',
         name: '职位管理',
         component: PartnerTitleManage,
+      },
+    ]
+  },
+  {
+    path: '/admin',
+    name: '我的商家',
+    component: Layout,
+    children: [
+      {
+        path: 'partnermanage',
+        name: '商家管理',
+        component: AdminPartnerManage,
       },
     ]
   },
