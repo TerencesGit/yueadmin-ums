@@ -26,7 +26,7 @@
       <el-table-column prop="corporationName" label="注册人"></el-table-column>
       <el-table-column prop="contactAddress" label="地址"></el-table-column>
       <el-table-column prop="createTime" label="创建时间" sortable width="180" :formatter="formatTime"></el-table-column>
-     <!--  <el-table-column prop="status" label="状态" width="120" :formatter="formatStatus">
+      <el-table-column prop="status" label="状态" width="120">
       	<template scope="scope">
       		<el-switch
 					  v-model="scope.row.status"
@@ -37,11 +37,11 @@
 					  @change="handleStatus(scope.row)">
 					</el-switch>
       	</template>
-      </el-table-column> -->
+      </el-table-column>
       <el-table-column label="操作" width="240">
         <template scope="scope">
         	<el-button size="small" type="info" @click="handleDetail(scope.row)">详情</el-button>
-        	<el-button size="small" type="warning" @click="handlePartType(scope.row)">商家类型</el-button>
+        	<el-button size="small" type="primary" @click="handlePartType(scope.row)">商家类型</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -123,7 +123,7 @@
 	</section>
 </template>
 <script>
-	import { getPartners, getPartnerTypes } from '@/api'
+	import { getPartners, getPartnerTypes, updatePartType, updatePartnerStatus } from '@/api'
 	export default {
 		data() {
 			return {
@@ -178,6 +178,24 @@
 				this.partInfo = row;
 				this.partInfoVisible = true
 			},
+			handleStatus(row) {
+				let data = {
+					partnerId: row.partnerId,
+					status: row.status
+				}
+				updatePartnerStatus(data).then(res => {
+					if(res.data.code === '0001') {
+						this.$message.success(res.data.message)
+					} else {
+						row.status = row.status === 1 ? 0 : 1;
+						this.$message.error(res.data.message)
+					}
+				}).catch(err => {
+					console.log(err)
+					row.status = row.status === 1 ? 0 : 1;
+					this.$catchError(err)
+				})
+			},
 			getTypeList() {
 				let params = {
 					pageNo: 1,
@@ -197,12 +215,29 @@
 					this.$catchError(err)
 				})
 			},
-			handlePartType() {
+			handlePartType(row) {
+				this.partInfo = row;
+				this.typeId = row.typeId;
 				this.typeList.length === 0 && this.getTypeList()
 				this.typeListVisible = true
 			},
 			setTypeSubmit() {
-
+				let data = {
+					partnerId: this.partInfo.partnerId,
+					typeId: this.typeId
+				}
+				updatePartType(data).then(res => {
+					if(res.data.code === '0001') {
+						this.$message.success(res.data.message)
+						this.getPartnerList()
+					} else {
+						this.$message.error(res.data.message)
+					}
+				}).catch(err => {
+					console.log(err)
+					this.$catchError(err)
+				})
+				this.typeListVisible = false
 			}
 		},
 		mounted() {

@@ -19,30 +19,30 @@ export default {
   }
 }
 </script>
-<style scoped>
-  h3 {
-    margin: 15px 0;
-  }
+<style scoped lang="scss">
   .wrap {
     position: fixed;
     width: 100%;
     height: 100%;
     color: #676a6c;
     text-align: center;
-    background: #fff
-  }
-  .top {
-    height: 70%;
-    background: gray;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .top h1 {
-    font-size: 200px;
-    color: #fff;
-  }
-  .bottom {
-    padding-top: 30px;
+    background: #fff;
+    .top {
+      height: 70%;
+      background: gray;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .top h1 {
+      font-size: 200px;
+      color: #fff;
+    }
+    .bottom {
+      padding-top: 30px;
+      h3 {
+        margin: 15px 0;
+      }
+    }
   }
 </style>

@@ -2,18 +2,18 @@
   <transition name="slide-fade">
     <div class="container">
       <div v-title :data-title="this.$route.name"></div>
-      <el-form :model="loginForm" :rules="loginRules" ref="loginForm" class="login-form" :class="{'animated shake': invalid}">
+      <el-form :model="loginForm" :rules="loginRules" ref="loginForm" class="login-form" :class="{'animated shake': invalid}" :label-width="labelWidth">
         <h2 class="page-header">欢迎注册</h2>
-        <el-form-item label="邮 箱 号" prop="name" label-width="90px">
+        <el-form-item label="邮 箱 号" prop="name">
           <el-input v-model.string="loginForm.name" placeholder="请输入邮箱号"></el-input>
         </el-form-item>
-        <el-form-item label="密 码" prop="pass" label-width="90px">
+        <el-form-item label="密 码" prop="pass">
           <el-input type="password" v-model="loginForm.pass" auto-complete="off" placeholder="请输入密码"></el-input>
         </el-form-item>
-        <el-form-item label="确认密码" prop="checkPass" label-width="90px">
+        <el-form-item label="确认密码" prop="checkPass">
           <el-input type="password" v-model="loginForm.checkPass" auto-complete="off" placeholder="再次输入密码"></el-input>
         </el-form-item>
-        <el-form-item label="验证码" prop="authcode" label-width="90px">
+        <el-form-item label="验证码" prop="authcode">
           <el-input type="text" v-model="loginForm.authcode" placeholder="请输入验证码" style="float: left; width: 65%; margin-right: 15px;"></el-input>
           <canvas id="canvasCode" width="80px" height="35px" class="canvas-code" @click="drawCode"></canvas>
         </el-form-item>
@@ -23,7 +23,7 @@
             <a href="javascript:;" @click="dialogVisible = true">《用户注册协议》</a>
           </el-checkbox-group>
         </el-form-item>
-        <el-form-item class="m-b-5">
+        <el-form-item class="m-b-5" label-width="0">
           <el-button 
           type="primary" 
           :loading="logging"
@@ -32,7 +32,7 @@
             提 交
           </el-button>
         </el-form-item>
-        <el-form-item style="margin: 0; text-align: center;">
+        <el-form-item label-width="0" style="margin: 0; text-align: center;">
           <span style="margin: 0 10px">
             已有账号？
             <router-link to="/login">立即登录</router-link>
@@ -143,7 +143,7 @@ export default {
       }
     }
     var validateCode = (rule, value, callback) => {
-      if (value === '') {
+      if (!value) {
         callback(new Error('请输入验证码'))
       } else if (value.toUpperCase() !== this.authCode.toUpperCase()) {
         callback(new Error('验证码错误'))
@@ -160,6 +160,7 @@ export default {
       }
     }
     return {
+      labelWidth: '90px',
       dialogVisible: false,
       invalid: false,
       logging: false,

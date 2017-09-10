@@ -24,7 +24,7 @@ import SystemPartnerTypeManage from '@/pages/system/partnertypemanage'
 const routes = [
   {
     path: '/',
-    redirect: '/login'
+    redirect: '/account/infocenter'
   },
   {
     path: '/login',

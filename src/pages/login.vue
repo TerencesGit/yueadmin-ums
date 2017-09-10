@@ -6,20 +6,21 @@
         :model="loginForm" 
         :rules="loginRules" 
         ref="loginForm" 
-        class="login-form" 
+        class="login-form"
+        :label-width="labelWith" 
         v-bind:class="{'animated shake': invalid}">
         <h2 class="page-header">欢迎登录</h2>
-        <el-form-item label="用户名" prop="username" :label-width="labelWith">
+        <el-form-item label="用户名" prop="username">
           <el-input v-model.trim="loginForm.username" placeholder="请输入邮箱号/手机号"></el-input>
         </el-form-item>
-        <el-form-item label="密 码" prop="password" :label-width="labelWith">
+        <el-form-item label="密 码" prop="password">
           <el-input type="password" v-model.trim="loginForm.password" placeholder="请输入密码"></el-input>
         </el-form-item>
-        <el-form-item label="验证码" prop="authcode" :label-width="labelWith">
+        <el-form-item label="验证码" prop="authcode">
           <el-input type="text" v-model.trim="loginForm.authcode" placeholder="请输入验证码" style="float: left; width: 65%; margin-right: 15px;"></el-input>
           <canvas id="canvasCode" width="80px" height="35px" class="canvas-code" @click="drawCode"></canvas>
         </el-form-item>
-        <el-form-item label="登录角色" :label-width="labelWith">
+        <el-form-item label="登录角色">
           <el-select v-model="loginForm.isAdmin" class="el-select--block" placeholder="请选择角色">
             <el-option
               v-for="item in loginRoles"
@@ -29,12 +30,12 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="false" label="记住密码" :label-width="labelWith" class="m-b-5">
+        <el-form-item v-if="false" label="记住密码" class="m-b-5">
           <el-checkbox-group v-model="loginForm.remember">
             <el-checkbox name="type"></el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-        <el-form-item class="m-b-5">
+        <el-form-item label-width="0" class="m-b-5">
           <el-button 
             type="primary" 
             :loading="logging" 
@@ -43,7 +44,7 @@
             提 交
           </el-button>
         </el-form-item>
-        <el-form-item style="margin: 0; text-align: center;">
+        <el-form-item label-width="0" style="margin: 0; text-align: center;">
           <router-link to="/register">尚未注册？</router-link>
           <span style="margin: 0 10px">|</span>
           <router-link to="/forgetPass">忘记密码</router-link>
@@ -59,7 +60,7 @@ import Utils from '@/assets/js/utils'
 export default {
   data() {
     const validateCode = (rule, value, callback) => {
-      if (value === '') {
+      if (!value) {
         callback(new Error('请输入验证码'))
       } else if (value.toUpperCase() !== this.authCode.toUpperCase()) {
         callback(new Error('验证码错误'))

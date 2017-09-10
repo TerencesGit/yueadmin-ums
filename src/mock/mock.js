@@ -28,7 +28,7 @@ const retExpireObj = {
 export default {
 	bootstrap () {
 		let mock = new MockAdapter(axios)
-		// 用户登录
+		// 登录
 		mock.onPost('/login').reply(config => {
 			let { username, password, isAdmin } = JSON.parse(config.data);
 			let loginUser = _UserList.filter(user => user.email === username && 
@@ -861,6 +861,36 @@ export default {
 					total
 				}
 			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新商家的类型
+		mock.onPost('/domainInter/updatePartType.do').reply(config => {
+			let { partnerId, typeId } = JSON.parse(config.data);
+			_PartnerList.filter(part => {
+				if(part.partnerId == partnerId) {
+					part.typeId = typeId;
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新商家状态
+		mock.onPost('/domainInter/updatePartnerStatus.do').reply(config => {
+			let { partnerId, status } = JSON.parse(config.data);
+			_PartnerList.filter(part => {
+				if(part.partnerId == partnerId) {
+					part.status = status === 1 ? 0 : 1;
+				}
+			})
+			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 					resolve([200, retObj])
