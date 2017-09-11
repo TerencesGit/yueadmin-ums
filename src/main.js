@@ -72,7 +72,7 @@ router.beforeEach((to, from, next) => {
   if(logRequired && !user) {
     ElementUI.Message('尚未登录或当前会话已过期')
     return router.push('/login')
-  } 
+  }
   NProgress.start()
   next()
 })

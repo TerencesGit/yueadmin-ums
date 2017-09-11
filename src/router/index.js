@@ -15,6 +15,7 @@ import PartnerOrgManage from '@/pages/partner/orgmanage'
 import PartnerTitleManage from '@/pages/partner/titlemanage'
 
 import AdminPartnerManage from '@/pages/admin/partnermanage'
+import AdminContractManage from '@/pages/admin/contractmanage'
 
 import SystemFuncManage from '@/pages/system/funcmanage'
 import SystemRoleManage from '@/pages/system/rolemanage'
@@ -105,6 +106,11 @@ const routes = [
         path: 'partnermanage',
         name: '商家管理',
         component: AdminPartnerManage,
+      },
+      {
+        path: 'contractmanage',
+        name: '合同管理',
+        component: AdminContractManage,
       },
     ]
   },

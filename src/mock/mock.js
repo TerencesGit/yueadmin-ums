@@ -3,7 +3,7 @@ import Utils from '@/assets/js/utils'
 import MockAdapter from 'axios-mock-adapter'
 import { UserList, PartnerList, OrganizeList, ModuleList, FunctionList, 
 				TitleList, RoleList, RoleFuncs, ContractTempList, PartnerTypeList, 
-				TypeRoles } from './data/user'
+				TypeRoles, Contracts } from './data/user'
 let _UserList = UserList,
 		_PartnerList = PartnerList,
 		_Organizes = OrganizeList,
@@ -14,7 +14,8 @@ let _UserList = UserList,
 		_RoleFuncs = RoleFuncs,
 		_ContractTempList = ContractTempList,
 		_PartnerTypeList = PartnerTypeList,
-		_TypeRoles = TypeRoles;
+		_TypeRoles = TypeRoles,
+		_Contracts = Contracts;
 const retObj = {
 	code: '0001',
 	message: '操作成功',
@@ -855,10 +856,14 @@ export default {
 		mock.onGet('/domainInter/getPartnerList.do').reply(config => {
 			let { pageNo, pageSize } = config.params;
 			let total = _PartnerList.length;
-			retObj.result = {
-				partners: _PartnerList,
-				pageInfo: {
-					total
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					partners: _PartnerList,
+					pageInfo: {
+						total
+					}
 				}
 			}
 			return new Promise((resolve, reject) => {
@@ -890,6 +895,94 @@ export default {
 					part.status = status === 1 ? 0 : 1;
 				}
 			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取合同分页列表
+		mock.onGet('/domainInter/getContracts.do').reply(config => {
+			let { pageNo, pageSize } = config.params;
+			let total = _Contracts.length;
+			_Contracts.forEach(cont => {
+				_ContractTempList.filter(temp => {
+					if(temp.templateId == cont.templateId) {
+						cont.templateName = temp.name
+					}
+				})
+				_PartnerList.filter(part => {
+					if(part.partnerId == cont.partyB) {
+						cont.partyBName = part.name
+					}
+				})
+			})
+			retObj.result = {
+				contracts: _Contracts,
+				pageInfo: {
+					total
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 新建合同
+		mock.onPost('/domainInter/createContract.do').reply(config => {
+			let { contractCode, partyAName, partyB, templateId, signTime, effectiveDate,
+					expireDate, attachFiles, note } = JSON.parse(config.data);
+			_Contracts.push({
+				contractId: new Date().getTime(),
+				contractCode,
+				partyAName,
+				partyB,
+				templateId,
+				signTime,
+				effectiveDate,
+				expireDate, 
+				attachFiles,
+				note,
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新合同
+		mock.onPost('/domainInter/updateContract.do').reply(config => {
+			let { contractId, contractCode, partyAName, partyB, 
+					templateId, signTime, effectiveDate, expireDate, 
+					attachFiles, note } = JSON.parse(config.data);
+			_Contracts.some(contract => {
+				if(contract.contractId == contractId) {
+					contract.contractCode = contractCode;
+					contract.partyAName = partyAName;
+					contract.partyB = partyB;
+					contract.templateId = templateId;
+					contract.signTime = signTime;
+					contract.effectiveDate = effectiveDate;
+					contract.expireDate = expireDate;
+					contract.attachFiles = attachFiles;
+					contract.note = note;
+				}
+			})
+			// _Contracts.push({
+			// 	contractId: new Date().getTime(),
+			// 	contractCode,
+			// 	partyAName,
+			// 	partyB,
+			// 	templateId,
+			// 	signTime,
+			// 	effectiveDate,
+			// 	expireDate, 
+			// 	attachFiles,
+			// 	note,
+			// })
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
