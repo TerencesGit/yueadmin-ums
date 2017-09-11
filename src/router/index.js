@@ -15,6 +15,7 @@ import PartnerOrgManage from '@/pages/partner/orgmanage'
 import PartnerTitleManage from '@/pages/partner/titlemanage'
 
 import AdminPartnerManage from '@/pages/admin/partnermanage'
+import AdminPartnerVerify from '@/pages/admin/partnerverify'
 import AdminContractManage from '@/pages/admin/contractmanage'
 
 import SystemFuncManage from '@/pages/system/funcmanage'
@@ -102,6 +103,11 @@ const routes = [
     name: '我的商家',
     component: Layout,
     children: [
+      {
+        path: 'partnerverify',
+        name: '商家审核',
+        component: AdminPartnerVerify,
+      },
       {
         path: 'partnermanage',
         name: '商家管理',

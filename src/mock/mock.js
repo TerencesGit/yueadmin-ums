@@ -854,13 +854,22 @@ export default {
 		})
 		// 获得商家分页列表
 		mock.onGet('/domainInter/getPartnerList.do').reply(config => {
-			let { pageNo, pageSize } = config.params;
-			let total = _PartnerList.length;
+			let { pageNo, pageSize, status, isVerified } = config.params;
+			let _partnerList = _PartnerList;
+			if(isVerified >= 0) {
+				_partnerList = _PartnerList.filter(part => part.isVerified == isVerified)
+			}
+			if(status >= 0) {
+				_partnerList = _PartnerList.filter(part => part.status == status)
+			}
+			let total = _partnerList.length;
+			let partnerPage = _partnerList.filter((part, index) => 
+				index < pageNo * pageSize && index >= (pageNo - 1) * pageSize)
 			let retObj = {
 				code: '0001',
 				message: '操作成功',
 				result: {
-					partners: _PartnerList,
+					partners: partnerPage,
 					pageInfo: {
 						total
 					}
@@ -971,18 +980,6 @@ export default {
 					contract.note = note;
 				}
 			})
-			// _Contracts.push({
-			// 	contractId: new Date().getTime(),
-			// 	contractCode,
-			// 	partyAName,
-			// 	partyB,
-			// 	templateId,
-			// 	signTime,
-			// 	effectiveDate,
-			// 	expireDate, 
-			// 	attachFiles,
-			// 	note,
-			// })
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
