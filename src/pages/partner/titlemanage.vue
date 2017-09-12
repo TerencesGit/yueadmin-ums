@@ -13,8 +13,9 @@
 	      <el-table-column type="index" width="60"></el-table-column>
 	      <el-table-column prop="titleId" label="职位编号" sortable width="140"></el-table-column>
 	      <el-table-column prop="titleName" label="职位名称"></el-table-column>
-	      <el-table-column prop="createTime" label="更新时间" sortable width="180" :formatter="formatTime"></el-table-column>
 	      <el-table-column prop="titleDesc" label="职位描述"></el-table-column>
+	      <el-table-column prop="updateBy" label="更新人" :formatter="formatUpdateBy"></el-table-column>
+	      <el-table-column prop="updateTime" label="更新时间" sortable width="180" :formatter="formatTime"></el-table-column>
 	      <el-table-column label="操作" width="180">
 	        <template scope="scope">
 	          <!-- <el-button type="primary" size="small" @click="handleDetail(scope.row)">详情</el-button> -->
@@ -56,6 +57,7 @@
 	</section>
 </template>
 <script>
+	import { mapGetters } from 'vuex'
 	import { getPartnerTitle, createTitle, updateTitle, delTitle } from '@/api'
 	export default {
 		data () {
@@ -84,6 +86,9 @@
 		methods: {
 			formatTime(row) {
 				return this.$moment(new Date()).format('YYYY-MM-DD HH:mm')
+			},
+			formatUpdateBy(row) {
+				return this.userInfo.name;
 			},
 			getTitleList() {
 				let params = {
@@ -189,11 +194,13 @@
 				this.getTitleList()
 			}
 		},
+		computed: {
+			...mapGetters([
+	  		'userInfo'
+	  	])
+		},
 		mounted() {
 			this.getTitleList()
 		}
 	}
 </script>
-<style scoped lang="scss">
-	
-</style>

@@ -14,15 +14,12 @@
 			<el-button type="primary" class="m-l" @click="handleCreateModule">新建模块</el-button>
 		</el-row>
 		<el-card class="card-primary">
-			<div slot="header">
-				组织部门管理
-			</div>
+			<div slot="header">组织部门管理</div>
 			<el-row :gutter="15">
 				<el-col :span="5" class="tree" v-loading="loading">
 					<ul id="functionTree" class="ztree"></ul>
 				</el-col>
 				<el-col :span="19" v-if="functionTree.length === 0">
-					<!-- 工具栏 -->
 					<el-row class="button-group">
 						<el-button size="small" type="success" @click="handleAdd">
 							<i class="fa fa-plus-square"></i>
@@ -36,51 +33,26 @@
 							<i class="el-icon-delete"></i>
 							删除
 						</el-button>
-						<!-- <el-button size="small" type="primary" icon="setting" @click="handleFunc">
-							权限
-						</el-button> -->
-						<el-button size="small" type="info" :disabled="disabled" @click="handleStatus">
-							<i class="fa fa-unlock"></i>
-							启用 
-						</el-button>
-						<el-button plain size="small" type="danger" :disabled="!disabled" @click="handleStatus">
-							<i class="fa fa-ban"></i>
-							禁用 
-						</el-button>
 					</el-row>
-					<h3 class="page-header">
-						功能点详情
-					</h3>
+					<h3 class="page-header">当前功能点</h3>
 					<el-table
 						border
 			      :data="funcData"
 			      highlight-current-row
 			      v-loading="tableLoading" 
 			      style="width: 100%">
-			      <el-table-column prop="funcId" label="功能点编号" width="120"></el-table-column>
-			      <el-table-column prop="name" label="功能点名称"></el-table-column>
-			      <el-table-column prop="desc" label="功能点描述"></el-table-column>
+			      <el-table-column prop="funcId" label="编号" width="120"></el-table-column>
+			      <el-table-column prop="name" label="名称"></el-table-column>
+			      <el-table-column prop="md5" label="编码"></el-table-column>
+			      <el-table-column prop="funcurl" label="路由"></el-table-column>
 			      <el-table-column prop="updateTime" label="更新时间" width="120" :formatter="formatTime"></el-table-column>
 			      <el-table-column prop="status" label="状态" :formatter="formatStatus" width="80"></el-table-column>
-			      <el-table-column label="操作" width="160">
+			      <el-table-column label="详情" width="80">
 			      	<template scope="scope">
 			      		<el-button type="primary" size="small" @click="handleShow(scope.row)">查看</el-button>
-			      		<el-button type="danger" size="small" @click="handleDelete">删除</el-button>
 			      	</template>
 			      </el-table-column>
 			    </el-table>
-			    <!-- 分页 -->
-			    <!-- <el-row class="toolbar">
-			    	<el-pagination
-				      @size-change="handleSizeChange"
-				      @current-change="handleCurrentChange"
-				      :current-page="currentPage"
-				      :page-sizes="[5, 10, 15, 20]"
-				      :page-size="pageSize"
-				      layout="total, sizes, prev, pager, next, jumper"
-				      :total="total">
-				    </el-pagination>
-			    </el-row> -->
 				</el-col>
 			</el-row>
 		</el-card>
@@ -114,8 +86,35 @@
 						<el-form-item label="功能点名称" prop="name">
 							<el-input v-model="funcForm.name" placeholder="请输入功能点名称"></el-input>
 						</el-form-item>
+						<el-form-item label="功能点编码" prop="funcMd5">
+							<el-input v-model="funcForm.funcMd5" placeholder="请输入功能点编码"></el-input>
+						</el-form-item>
+						<el-form-item label="功能点路由" prop="funcUrl">
+							<el-input v-model="funcForm.funcUrl" placeholder="请输入功能点路由"></el-input>
+						</el-form-item>
+						<el-form-item label="同级序列号" prop="funcSeq">
+							<el-input v-model="funcForm.funcSeq" placeholder="请输入同级序列号"></el-input>
+						</el-form-item>
+						<el-form-item label="菜单显示名称" prop="viewname">
+							<el-input v-model="funcForm.viewname" placeholder="菜单显示名称"></el-input>
+						</el-form-item>
+						<el-form-item label="功能点图标" prop="funcIco">
+							<el-input v-model="funcForm.funcIco" placeholder="功能点图标"></el-input>
+						</el-form-item>
+						<el-form-item label="是否为菜单项">
+							<el-select v-model="funcForm.isMenu" style="width: 100%">
+								<el-option label="是" :value="1"></el-option>
+								<el-option label="否" :value="0"></el-option>
+							</el-select>
+						</el-form-item>
+						<el-form-item label="功能点状态">
+							<el-select v-model="funcForm.status" style="width: 100%">
+								<el-option label="启用" :value="1"></el-option>
+								<el-option label="禁用" :value="0"></el-option>
+							</el-select>
+						</el-form-item>
 						<el-form-item label="功能点描述" prop="funcDesc">
-							<el-input type="textarea" v-model="funcForm.funcDesc" placeholder="请输入功能点描述"></el-input>
+							<el-input type="textarea" :rows="2" v-model="funcForm.funcDesc" placeholder="请输入功能点描述"></el-input>
 						</el-form-item>
 					</el-form>
 				</el-col>
@@ -137,17 +136,35 @@
 			<el-row>
 				<el-col :span="18" :offset="3">
 					<el-form :model="funcDetail" label-width="160px">
-						<el-form-item label="功能名称：">
+						<el-form-item label="功能点名称：">
 							<span>{{funcDetail.name}}</span>
 						</el-form-item>
-						<el-form-item label="功能描述：">
+						<el-form-item label="功能点编码：">
+							<span>{{funcDetail.md5}}</span>
+						</el-form-item>
+						<el-form-item label="功能点路由：">
+							<span>{{funcDetail.funcurl}}</span>
+						</el-form-item>
+						<el-form-item label="同级序列号：">
+							<span>{{funcDetail.seq}}</span>
+						</el-form-item>
+						<el-form-item label="菜单显示名称：">
+							<span>{{funcDetail.viewname}}</span>
+						</el-form-item>
+						<el-form-item label="功能点图标：">
+							<span>{{funcDetail.ico}}</span>
+						</el-form-item>
+						<el-form-item label="是否为菜单项：">
+							<span>{{funcDetail.ismunu === 1 ? '是' : '否'}}</span>
+						</el-form-item>
+						<el-form-item label="功能点状态：">
+							<span>{{funcDetail.status === 1 ? '启用' : '禁用'}}</span>
+						</el-form-item>
+						<el-form-item label="功能点描述：">
 							<span>{{funcDetail.desc}}</span>
 						</el-form-item>
 						<el-form-item label="更新时间：">
 							<span>{{this.$moment(new Date()).format('YYYY-MM-DD')}}</span>
-						</el-form-item>
-						<el-form-item label="状态：">
-							<span>{{funcDetail.status ? '启用' : '禁用'}}</span>
 						</el-form-item>
 					</el-form>
 				</el-col>
@@ -193,8 +210,23 @@
 	      	name: [
 	      		{ required: true, message: '请输入功能点名称', trigger: 'blur'}
 	      	],
+	      	funcMd5: [
+	      		{ required: true, message: '请输入功能点编码', trigger: 'blur'}
+	      	],
+	      	funcUrl: [
+	      		{ required: true, message: '请输入功能点路由', trigger: 'blur'}
+	      	],
 	      	funcDesc: [
 	      		{ required: true, message: '请输入功能点描述', trigger: 'blur'}
+	      	],
+	      	funcSeq: [
+	      		{ required: true, message: '请输入同级序列号', trigger: 'blur'}
+	      	],
+	      	viewname: [
+	      		{ required: true, message: '请输入菜单显示名称', trigger: 'blur'}
+	      	],
+	      	funcIco: [
+	      		{ required: true, message: '请输入功能点图标', trigger: 'blur'}
 	      	],
 	      },
 	      funcDetail: {},
@@ -312,8 +344,14 @@
 				        funcId: func.funcId,
 				        pId: func.parentId,
 				        name: func.name,
+				        md5: func.funcMd5,
+				        funcurl: func.funcUrl,
+				        seq: func.funcSeq,
+				        viewname: func.viewname,
+				        ico: func.funcIco,
 				        desc: func.funcDesc,
 				        status: func.status,
+				        ismenu: func.isMenu,
 				        open: true,
 				        iconSkin: iconSkin,
 				      };
@@ -344,7 +382,14 @@
       	this.funcForm = {
       		funcId: '',
       		name: '',
+      		funcMd5: '',
+      		funcUrl: '',
+      		funcSeq: '',
+      		viewname: '',
+      		funcIco: '',
       		funcDesc: '',
+      		status: 1,
+      		isMenu: 1,
       		parentId: this.checkedNode.funcId,
       		moduleId: this.moduleId
       	}
@@ -358,7 +403,14 @@
       	this.funcForm = {
       		funcId: this.checkedNode.funcId,
       		name: this.checkedNode.name,
-      		funcDesc: this.checkedNode.desc
+      		funcMd5: this.checkedNode.md5,
+      		funcUrl: this.checkedNode.funcurl,
+      		funcSeq: this.checkedNode.seq,
+      		viewname: this.checkedNode.viewname,
+      		funcIco: this.checkedNode.ico,
+      		funcDesc: this.checkedNode.desc,
+      		status: this.checkedNode.status,
+      		isMenu: this.checkedNode.ismenu,
       	}
       	this.funcFormTitle = '编辑功能点'
       	this.funcFormVisible = true
@@ -368,7 +420,7 @@
       	this.$refs.funcForm.validate(valid => {
       		if(valid) {
       			let data = Object.assign({}, this.funcForm)
-      			// console.log(data)
+      			console.log(data)
       			if(data.funcId) {
       				updateFunction(data).then(res => {
       					if(res.data.code === '0001') {
@@ -404,7 +456,6 @@
       	if (!this.checkedNode) {
       		return this.$notify.warning({title: '提示', message: '请选择功能点'})
       	}
-      	// console.log(this.checkedNode)
       	if(this.checkedNode.children) {
       		return this.$notify.error({title: '提示', message: '该功能点有子节点，不可删除'})
       	}
@@ -426,33 +477,6 @@
       	}).catch(err => {
       		console.log(err)
       		this.$message('已取消操作')
-      	})
-      },
-      // 权限设置
-      // handleFunc() {
-      // 	if (!this.checkedNode) {
-      // 		return this.$notify.warning({title: '提示', message: '请选择功能点'})
-      // 	}
-      // 	this.funcListVisible = true
-      // },
-      // 状态设置
-      handleStatus() {
-      	if (!this.checkedNode) {
-      		return this.$notify.warning({title: '提示', message: '请选择功能点'})
-      	}
-      	let data = {
-      		orgId: this.checkedNode.orgId,
-      		status: this.checkedNode.status
-      	}
-      	setOrganizeStatus(data).then(res => {
-      		if(res.data.code === '0001') {
-      			this.$message.success(res.data.message)
-      			this.checkedNode.status = this.checkedNode.status === 1 ? 0 : 1;
-      		} else {
-      			this.$message.error(res.data.message)
-      		}
-      	}).catch(err => {
-      		console.log(err)
       	})
       },
       // 功能点信息

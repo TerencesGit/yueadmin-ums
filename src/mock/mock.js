@@ -521,12 +521,19 @@ export default {
 		})
 		// 新建功能点
 		mock.onPost('/adminInter/createFunction.do').reply(config => {
-			let { parentId, name, funcDesc, moduleId } = JSON.parse(config.data);
+			let { parentId, name, funcMd5, funcUrl, funcSeq, viewname, 
+				funcIco, funcDesc, isMenu, status, moduleId } = JSON.parse(config.data);
 			_FunctionList.push({
 				funcId: new Date().getTime(),
 				name,
-				funcDesc,
-				status: 1,
+      	funcMd5,
+    		funcUrl,
+    		funcSeq,
+    		viewname,
+    		funcIco,
+    		funcDesc,
+    		isMenu,
+				status,
 				parentId,
 				moduleId,
 			})
@@ -539,11 +546,19 @@ export default {
 		})
 		// 更新功能点
 		mock.onPost('/adminInter/updateFunction.do').reply(config => {
-			let { funcId, name, funcDesc } = JSON.parse(config.data);
+			let { funcId, name, funcMd5, funcUrl, funcSeq, viewname, 
+				funcIco, funcDesc, isMenu, status } = JSON.parse(config.data);
 			_FunctionList.filter(func => {
 				if(func.funcId === funcId) {
 					func.name = name;
-					func.funcDesc = funcDesc
+					func.funcMd5 = funcMd5;
+	    		func.funcUrl = funcUrl;
+	    		func.funcSeq = funcSeq;
+	    		func.viewname = viewname;
+	    		func.funcIco = funcIco;
+	    		func.funcDesc = funcDesc;
+	    		func.isMenu = isMenu;
+					func.status = status;
 				}
 			})
 			retObj.result = {}

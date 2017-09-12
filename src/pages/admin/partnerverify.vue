@@ -13,7 +13,7 @@
       :data="partnerList" 
       v-loading="loading" 
       highlight-current-row
-      style="width: 100%; margin-top: 30px">
+      style="width: 100%">
       <el-table-column type="index" width="60"></el-table-column>
       <el-table-column prop="partnerId" label="商家编号" sortable width="140"></el-table-column>
       <el-table-column prop="name" label="商家名称"></el-table-column>
