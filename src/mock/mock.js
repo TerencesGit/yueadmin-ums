@@ -987,5 +987,37 @@ export default {
 				}, 500)
 			})
 		})
+		// 商家审核通过
+		mock.onPost('/domainInter/examPartner.do').reply(config => {
+			let { partnerId, typeId } = JSON.parse(config.data);
+			_PartnerList.filter(part => {
+				if(part.partnerId == partnerId) {
+					part.typeId = typeId;
+					part.isVerified = 1
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 商家审核驳回
+		mock.onPost('/domainInter/rejectPartner.do').reply(config => {
+			let { partnerId, rejectInfo } = JSON.parse(config.data);
+			_PartnerList.filter(part => {
+				if(part.partnerId == partnerId) {
+					part.rejectInfo = rejectInfo;
+					part.isVerified = 2
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
 	}
 }

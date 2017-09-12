@@ -1,19 +1,13 @@
 <template>
 	<section>
 		<div v-title :data-title="this.$route.name"></div>
-		<!-- <el-row class="toolbar">
-			<el-form inline>
-				<el-form-item label="商家编号">
-					<el-input placeholder="商家编号"></el-input>
-				</el-form-item>
-				<el-form-item label="商家名称">
-					<el-input placeholder="商家名称"></el-input>
-				</el-form-item>
-				<el-form-item label="">
-					<el-button type="primary">搜索</el-button>
-				</el-form-item>
-			</el-form>
-    </el-row> -->
+		<el-row class="toolbar">
+			<el-radio-group v-model="isVerified" @change="isVerifiedChange">
+		    <el-radio-button :label="0">待审核</el-radio-button>
+		    <el-radio-button :label="1">已通过</el-radio-button>
+		    <el-radio-button :label="2">未通过</el-radio-button>
+		  </el-radio-group>
+    </el-row>
 		<el-table 
       border 
       :data="partnerList" 
@@ -26,13 +20,15 @@
       <el-table-column prop="corporationName" label="注册人"></el-table-column>
       <el-table-column prop="contactAddress" label="地址"></el-table-column>
       <el-table-column prop="createTime" label="创建时间" sortable width="140" :formatter="formatTime"></el-table-column>
-      <el-table-column prop="status" label="状态" width="100" :formatter="formatStatus">
+      <el-table-column prop="status" label="状态" width="120" :formatter="formatStatus">
       </el-table-column>
-      <el-table-column label="操作" width="240">
-        <template scope="scope">
-        	<el-button size="small" type="info" @click="handleDetail(scope.row)">详情</el-button>
-        	<el-button size="small" type="primary" @click="handlePass(scope.row)">通过</el-button>
-        	<el-button size="small" type="warning" @click="handleReject(scope.row)">驳回</el-button>
+      <el-table-column label="操作" width="200">
+        <template scope="scope" v-if="scope.row.isVerified === 0">
+        	<el-button size="small" type="primary" @click="handleDetail(scope.row)">详情</el-button>
+        	<el-button v-if="scope.row.isVerified === 0" size="small" type="success" @click="handlePass(scope.row)">通过</el-button>
+        	<el-button v-if="scope.row.isVerified === 0" size="small" type="warning" @click="handleReject(scope.row)">驳回</el-button>
+        	<!-- <el-button v-if="scope.row.isVerified === 1" size="small" type="info" @click="handleDetail(scope.row)">商家类型</el-button> -->
+        	<el-button v-if="scope.row.isVerified === 2" size="small" type="info" @click="handleReason(scope.row)">驳回原因</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -131,10 +127,18 @@
     		<el-button type="primary" @click="rejectFormSubmit">确定</el-button>
     	</div>
     </el-dialog>
+    <!-- 驳回原因 -->
+    <el-dialog :visible.sync="rejectInfoVisible" title="驳回原因">
+			<p>{{partInfo.rejectInfo}}</p>
+			<div slot="footer">
+        <el-button @click="rejectInfoVisible = false">取消</el-button>
+        <el-button type="primary" @click="rejectInfoVisible = false">确定</el-button>
+      </div>
+    </el-dialog>
 	</section>
 </template>
 <script>
-	import { getPartners, getPartnerTypes, updatePartType, updatePartnerStatus } from '@/api'
+	import { getPartners, getPartnerTypes, updatePartType, updatePartnerStatus, examPartner, rejectPartner } from '@/api'
 	export default {
 		data() {
 			return {
@@ -142,6 +146,7 @@
 				pageSize: 10,
 				total: 0,
 				loading: false,
+				isVerified: 0,
 				partnerList: [],
 				partInfo: {},
 				partInfoVisible: false,
@@ -153,11 +158,12 @@
 					rejectInfo: '',
 				},
 				rejectFormVisible: false,
+				rejectInfoVisible: false,
 			}
 		},
 		methods: {
 			formatStatus(row) {
-				return row.isVerified === 0 ? '未审核' : '审核通过'
+				return row.isVerified === 0 ? '待审核' : row.isVerified === 1 ? '审核通过' : '审核未通过'
 			},
 			formatTime() {
 				return this.$moment(new Date()).format('YYYY-MM-DD')
@@ -170,11 +176,15 @@
 				this.pageNo = val;
 				this.getPartnerList()
 			},
+			isVerifiedChange(val) {
+				this.isVerified = val;
+				this.getPartnerList()
+			},
 			getPartnerList() {
 				let params = {
 					pageNo: this.pageNo,
 					pageSize: this.pageSize,
-					isVerified: 0
+					isVerified: this.isVerified,
 				}
 				this.loading = true
 				getPartners(params).then(res => {
@@ -249,7 +259,7 @@
 					partnerId: this.partInfo.partnerId,
 					typeId: this.typeId
 				}
-				updatePartType(data).then(res => {
+				examPartner(data).then(res => {
 					if(res.data.code === '0001') {
 						this.$message.success(res.data.message)
 						this.getPartnerList()
@@ -273,9 +283,25 @@
 						partnerId: this.partInfo.partnerId,
 						rejectInfo: this.rejectForm.rejectInfo
 					}
-					console.log(data)
+					// console.log(data)
+					rejectPartner(data).then(res => {
+						if(res.data.code === '0001') {
+							this.$message.success(res.data.message)
+							this.getPartnerList()
+						} else {
+							this.$message.error(res.data.message)
+						}
+					}).catch(err => {
+						console.log(err)
+						this.$catchError(err)
+					})
+					this.rejectFormVisible = false
 				})
-			}
+			},
+			handleReason(row) {
+				this.partInfo = row
+				this.rejectInfoVisible = true;
+			},
 		},
 		mounted() {
 			this.getPartnerList()

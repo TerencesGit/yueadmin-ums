@@ -38,7 +38,7 @@
 					</el-switch>
       	</template>
       </el-table-column>
-      <el-table-column label="操作" width="240">
+      <el-table-column label="操作" width="180">
         <template scope="scope">
         	<el-button size="small" type="info" @click="handleDetail(scope.row)">详情</el-button>
         	<el-button size="small" type="primary" @click="handlePartType(scope.row)">商家类型</el-button>
