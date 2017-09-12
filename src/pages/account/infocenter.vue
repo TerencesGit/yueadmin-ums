@@ -16,9 +16,9 @@
 						</el-popover>
 						<div class="avatar" v-popover:avatarPop @click="uploadAvatar">
 							<img v-if="userForm.avatar" :src="userForm.avatar">
-							<img v-else src="../../assets/img/avatar.gif" alt="头像">
+							<img v-else src="../../assets/img/avatar.gif" alt="头像"/>
 						</div>
-						<h3>{{userForm.name}}</h3>
+						<h3>{{userForm.name}}<span>{{userForm.avatar}}</span></h3>
 						<ul class="list-group">
 							<li class="list-group-item active">
 								<a href="javascript:;" title="编辑" @click="handleEdit">		   账户信息
@@ -263,7 +263,6 @@
 					this.loading = false;
 					if(res.data.code === '0001') {
 						this.userForm = res.data.result.userInfo;
-						this.$store.dispatch('saveUserInfo', res.data.result.userInfo)
 						this.avatarUrl = this.userForm.avatar;
 						this.userForm.partnerId && this.getPartInfo()
 					} else {
@@ -347,19 +346,9 @@
       			})
       			return;
       		}
-      		let areaName = Region.filter(region => region.id === this.originId)[0].name;
-      		let data = {
-      			name: this.userForm.name,
-						realname: this.userForm.realname,
-						sexual: this.userForm.sexual,
-						birthday: this.userForm.birthday,
-						qq: this.userForm.qq,
-						areaName: areaName,
-						idcardNum: this.userForm.idcardNum,
-						idcardPicFront: this.userForm.idcardPicFront,
-						idcardPicBack: this.userForm.idcardPicBack,
-						note: this.userForm.avatar,
-      		}
+      		let areaName = this.originId ? Region.filter(region => region.id === this.originId)[0].name : '';
+      		let data = Object.assign({}, this.userForm)
+      		data.areaName = areaName; 
       		updateMyInfo(data).then(res => {
       			if(res.data.code === '0001') {
       				this.$message.success(res.data.message)

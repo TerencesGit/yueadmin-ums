@@ -4,20 +4,20 @@
       <div v-title :data-title="this.$route.name"></div>
       <el-form :model="loginForm" :rules="loginRules" ref="loginForm" class="login-form" :class="{'animated shake': invalid}" :label-width="labelWidth">
         <h2 class="page-header">欢迎注册</h2>
-        <el-form-item label="邮 箱 号" prop="name">
-          <el-input v-model.string="loginForm.name" placeholder="请输入邮箱号"></el-input>
+        <el-form-item label="邮 箱 号" prop="email">
+          <el-input v-model.string="loginForm.email" placeholder="请输入邮箱号"></el-input>
         </el-form-item>
-        <el-form-item label="密 码" prop="pass">
-          <el-input type="password" v-model="loginForm.pass" auto-complete="off" placeholder="请输入密码"></el-input>
+        <el-form-item label="密 码" prop="passwd">
+          <el-input type="password" v-model="loginForm.passwd" auto-complete="off" placeholder="请输入密码"></el-input>
         </el-form-item>
-        <el-form-item label="确认密码" prop="checkPass">
-          <el-input type="password" v-model="loginForm.checkPass" auto-complete="off" placeholder="再次输入密码"></el-input>
+        <el-form-item label="确认密码" prop="confirmPass">
+          <el-input type="password" v-model="loginForm.confirmPass" auto-complete="off" placeholder="再次输入密码"></el-input>
         </el-form-item>
         <el-form-item label="验证码" prop="authcode">
           <el-input type="text" v-model="loginForm.authcode" placeholder="请输入验证码" style="float: left; width: 65%; margin-right: 15px;"></el-input>
           <canvas id="canvasCode" width="80px" height="35px" class="canvas-code" @click="drawCode"></canvas>
         </el-form-item>
-        <el-form-item prop="agreement" class="m-b-5">
+        <el-form-item prop="agreement" label-width="0">
           <el-checkbox-group v-model="loginForm.agreement">
             <el-checkbox name="agreement" label="我已阅读并同意" v-model="checked"></el-checkbox>
             <a href="javascript:;" @click="dialogVisible = true">《用户注册协议》</a>
@@ -39,7 +39,7 @@
           </span>
         </el-form-item>
       </el-form>
-      <el-dialog title="注册协议" v-model="dialogVisible">
+      <el-dialog title="注册协议" :visible.sync="dialogVisible">
         <div class="content" style="height: 350px; overflow-y: auto">
           <h4>悦视觉用户注册协议</h4>
           <p> 本协议是您与悦视觉网站（简称"本站"，网址：www.yueshijue.com）所有者（以下简称为"悦视觉"）之间就悦视觉网站服务等相关事宜所订立的契约，请您仔细阅读本注册协议，您点击"同意并继续"按钮后，本协议即构成对双方有约束力的法律文件。</p>
@@ -119,44 +119,27 @@
   </transition>
 </template>
 <script>
-import utils from '@/assets/js/utils'
-import { requestRegist } from '@/api'
+import Md5 from '@/assets/js/md5'
+import Utils from '@/assets/js/utils'
+import { requestRegist, requestLogin } from '@/api'
 export default {
   data() {
-    var validatePass = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入密码'));
-      } else {
-        if (this.loginForm.checkPass !== '') {
-          this.$refs.loginForm.validateField('checkPass');
-        }
-        callback();
-      }
-    }
-    var validatePass2 = (rule, value, callback) => {
+    const validateConfirmPass = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请再次输入密码'));
-      } else if (value !== this.loginForm.pass) {
+      } else if (value !== this.loginForm.passwd) {
          callback(new Error('两次输入密码不一致'))
       } else {
         callback()
       }
     }
-    var validateCode = (rule, value, callback) => {
+    const validateCode = (rule, value, callback) => {
       if (!value) {
         callback(new Error('请输入验证码'))
       } else if (value.toUpperCase() !== this.authCode.toUpperCase()) {
         callback(new Error('验证码错误'))
       } else {
         callback()
-      }
-    }
-    var validateAgreement = (rule, value, callback) => {
-      console.log(value)
-      if (value) {
-        callback()
-      } else {
-        callback(new Error('请同意注册协议'));
       }
     }
     return {
@@ -167,23 +150,23 @@ export default {
       checked: true,
       authCode: '',
       loginForm: {
-        name: '',
-        pass: '',
-        checkPass: '',
+        email: '',
+        passwd: '',
+        confirmPass: '',
         authcode: '',
         agreement: [],
       },
       loginRules: {
-        name: [
+        email: [
           { required: true, message: '请输入邮箱号', trigger: 'blur' },
           { type: 'email', message: '请输入正确的邮箱号', trigger: 'blur' }
         ],
-        pass: [
-          { required: true, validator: validatePass, trigger: 'blur' },
+        passwd: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
           { min: 8, max: 20, message: '长度在 8 到 20 个字符', trigger: 'blur'}
         ],
-        checkPass: [
-          { required: true, validator: validatePass2, trigger: 'blur' }
+        confirmPass: [
+          { required: true, validator: validateConfirmPass, trigger: 'blur' }
         ],
         authcode: [
           { required: true, validator: validateCode, trigger: 'blur'}
@@ -195,35 +178,54 @@ export default {
     };
   },
   methods: {
+    drawCode () {
+      this.authCode = Utils.canvasCode('canvasCode')
+    },
     submitForm() {
       this.$refs.loginForm.validate((valid) => {
         if (valid && !this.logging) {
-          this.logging = true
-          requestRegister(this.loginForm).then(res => {
-            if (res.data.status === 1) {
-              this.$message({
-                type: 'success',
-                message: res.data.message
-              })
-              this.$router.push({ path: '/login' })
+          this.logging = true;
+          let data = {
+            email: this.loginForm.email,
+            passwd:  Md5.hex_md5(this.loginForm.passwd),
+            passwd2: Md5.hex_md5(this.loginForm.confirmPass),
+          }
+          console.log(data)
+          requestRegist(data).then(res => {
+            if (res.data.code === '0001') {
+              this.$message.success('注册成功')
+              this.loginSubmit()
+              // this.$router.push({ path: '/login' })
             } else {
-              this.$message({
-                type: 'error',
-                message: res.data.message
-              })
+              this.$message.error(res.data.message)
               this.drawCode()
             }
             this.logging = false
           })
         } else {
           this.invalid = true
-          console.log('error submit!!');
-          return false;
+          return;
         }
       })
     },
-    drawCode () {
-      this.authCode = utils.canvasCode('canvasCode')
+    loginSubmit() {
+      let data = {
+        username: this.loginForm.email,
+        password: Md5.hex_md5(this.loginForm.passwd),
+      }
+      requestLogin(data).then(res => {
+        if(res.data.code === '0001') {
+          let userId = res.data.result.userInfo.userId
+          Utils.setCookie('userId', userId)
+          this.$message.success('登录成功')
+          this.$router.push({ path: '/account/infocenter' })
+        } else {
+          this.$message.error(res.data.message)
+        }
+      }).catch(err => {
+        console.log(err)
+        this.$catchError(err)
+      })
     }
   },
   mounted () {
@@ -231,18 +233,7 @@ export default {
   }
 }
 </script>
-<style scoped>
-  h4 {
-    font-weight: bold;
-    margin-bottom: 15px;
-  }
-  h5 {
-    margin: 5px 0;
-  }
-  p {
-    margin: 10px 0;
-    line-height: 1.3
-  }
+<style scoped lang="scss">
   .container {
     overflow: hidden
   }
@@ -251,13 +242,26 @@ export default {
 		margin: 8% auto 0;
 		padding: 15px 30px;
 		border-radius: 5px;
-		background: #fff
+		background: #fff;
+     .canvas-code {
+      float: right;
+      cursor: pointer;
+      border-radius: 4px;
+      background-image: linear-gradient(-45deg, #111, #666, #222, #777);
+    }
 	}
-  .canvas-code {
-    float: right;
-    cursor: pointer;
-    border-radius: 4px;
-    background-image: linear-gradient(-45deg, #111, #666, #222, #777);
+  .content {
+    h4 {
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    h5 {
+      margin: 5px 0;
+    }
+    p {
+      margin: 10px 0;
+      line-height: 1.3
+    }
   }
   .slide-fade-enter-active {
     transition: all .5s;

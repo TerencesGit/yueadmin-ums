@@ -31,9 +31,8 @@ export default {
 		let mock = new MockAdapter(axios)
 		// 登录
 		mock.onPost('/login').reply(config => {
-			let { username, password, isAdmin } = JSON.parse(config.data);
-			let loginUser = _UserList.filter(user => user.email === username && 
-				user.isAdmin === isAdmin)[0];
+			let { username, password } = JSON.parse(config.data);
+			let loginUser = _UserList.filter(user => user.email === username)[0];
 			if(loginUser) {
 				if(loginUser.password === password) {
 					return new Promise((resolve, reject) => {
@@ -76,6 +75,29 @@ export default {
 			})
 		})
 		// 注册
+		mock.onPost('/baseInter/register.do').reply(config => {
+			let { email, passwd, passwd2 } = JSON.parse(config.data);
+			// console.log(email, passwd, passwd2
+			let userId = new Date().getTime();
+			_UserList.push({
+				userId,
+				email,
+				password: passwd,
+				sexual: 1,
+				partnerId: '',
+				mobVerified: 0,
+		    emailVerified: 0,
+		    status: 1,
+				createTime: new Date(),
+			}) 
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 代注册
 		mock.onPost('/regist').reply(config => {
 			let { realname, email, password, orgId } = JSON.parse(config.data);
 			_UserList.push({
@@ -198,6 +220,18 @@ export default {
 				})
 			}
 			let _userInfo = _UserList.filter(user => user.userId == userId)[0];
+			if(!(_userInfo && _userInfo.partnerId)) {
+				return new Promise((resolve, reject) => {
+					let retObj = {
+						code: '3001',
+						message: '尚未注册企业',
+						result: {}
+					}
+					setTimeout(() => {
+						resolve([200, retObj])
+					}, 500)
+				})
+			}
 			let _partnerId = _userInfo.partnerId;
 			let _partnerInfo = _PartnerList.filter(p => p.partnerId == _partnerId)[0]
 			retObj.result = {
