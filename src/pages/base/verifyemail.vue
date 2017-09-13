@@ -1,7 +1,10 @@
 <template>
 	<section>
-		<h4 class="message">重置密码邮件已发送到您的
-		<router-link to="/">{{email}}</router-link>邮箱，请注意查收</h4>
+		<h4 class="message">
+			重置密码邮件已发送到您的
+			<router-link to="/resetpasswd">{{email}}</router-link>
+			邮箱，请注意查收
+		</h4>
 	</section>
 </template>
 <script>
@@ -10,9 +13,6 @@
 			return {
 				email: ''
 			}
-		},
-		methods: {
-
 		},
 		mounted() {
 			this.$route.query && this.$route.query.email && (this.email = this.$route.query.email) || this.$router.back()

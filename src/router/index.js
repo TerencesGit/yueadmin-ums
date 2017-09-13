@@ -8,6 +8,8 @@ import Welcome from '@/pages/welcome'
 import BaseFindPasswd from '@/pages/base/findpasswd'
 import BaseSendEmail from '@/pages/base/sendemail'
 import BaseVerifyEmail from '@/pages/base/verifyemail'
+import BaseResetPasswd from '@/pages/base/resetpasswd'
+import BaseResetSuccess from '@/pages/base/resetsuccess'
 
 import AccountCenter from '@/pages/account/infocenter'
 import AccountSettings from '@/pages/account/settings'
@@ -47,8 +49,9 @@ const routes = [
     component: BaseFindPasswd,
     children: [
       { path: '/', name: '找回密码', component: BaseSendEmail },
-      { path: '/verifyemail', name: '发送邮件成功', component: BaseVerifyEmail },
-
+      { path: '/verifyemail', name: '发送邮件', component: BaseVerifyEmail },
+      { path: '/resetpasswd', name: '重置密码', component: BaseResetPasswd },
+      { path: '/resetsuccess', name: '重置密码成功', component: BaseResetSuccess },
     ]
   },
   {

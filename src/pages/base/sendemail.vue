@@ -31,7 +31,7 @@
 	      			if(res.data.result.finded) {
 	      				callback()
 	      			} else {
-	      				callback(new Error('该邮箱尚未绑定'))
+	      				callback(new Error('该邮箱号尚未绑定'))
 	      			}
 	      		} else {
 	      			this.$message.error(res.data.message)
@@ -41,7 +41,7 @@
 			}
 			const validateCode = (rule, value, callback) => {
 	      if (!value) {
-	        callback(new Error('输入绑定邮箱号'))
+	        callback(new Error('输入验证码'))
 	      } else if (value.toUpperCase() !== this.authCode.toUpperCase()) {
 	        callback(new Error('验证码错误'))
 	      } else {
@@ -104,5 +104,8 @@
 	.el-form {
 		width: 40%;
 		margin: 50px auto;
+		.canvas-code {
+			background: #1D8CE0
+		}
 	}
 </style>
