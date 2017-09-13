@@ -24,7 +24,7 @@
 							<i class="el-icon-delete"></i>
 							删除
 						</el-button>
-						<el-button size="small" type="primary" icon="setting" @click="handleFunc">
+						<el-button size="small" type="primary" icon="setting" @click="handleOrgRoles">
 							权限
 						</el-button>
 						<el-button size="small" type="info" :disabled="disabled" @click="handleStatus">
@@ -114,14 +114,27 @@
 			</el-row>
 			<div slot="footer">
 				<el-button @click="orgFormVisible = false">取消</el-button>
-				<el-button type="primary" @click="submitForm">确定</el-button>
+				<el-button type="primary" @click="orgSubmit">确定</el-button>
 			</div>
 		</el-dialog>
 		<!-- 权限设置 -->
-		<el-dialog :visible.sync="funcListVisible" title="权限设置">
+		<el-dialog :visible.sync="orgRolesVisible" title="权限设置">
+			<el-table 
+	      border 
+	      :data="roleList"
+	      ref="roleTable" 
+	      v-loading="roleLoading" 
+	      highlight-current-row
+	      max-height="350"
+	      style="width: 100%"
+	      @selection-change="handleSelectionChange">
+	      <el-table-column type="selection" width="50"></el-table-column>
+	      <el-table-column prop="roleName" label="角色名称"></el-table-column>
+	      <el-table-column prop="roleDesc" label="角色描述"></el-table-column>
+			</el-table>
 			<div slot="footer">
-				<el-button @click="funcListVisible = false">取消</el-button>
-				<el-button type="primary" @click="funcListVisible = false">确定</el-button>
+				<el-button @click="orgRolesVisible = false">取消</el-button>
+				<el-button type="primary" @click="orgRolesSubmit">确定</el-button>
 			</div>
 		</el-dialog>
 		<!-- 注册员工 -->
@@ -193,7 +206,7 @@
 			<ul id="dialogOrgTree" class="ztree" v-loading="treeLoading"></ul>
 			<div slot="footer">
 				<el-button @click="orgTreeVisible = false">取消</el-button>
-				<el-button type="primary" @click="setOrgSubmit">确定</el-button>
+				<el-button type="primary" @click="staffOrgSubmit">确定</el-button>
 			</div>
 		</el-dialog>
 		<!-- 职位列表 -->
@@ -219,7 +232,7 @@
       </el-row>
       <div slot="footer">
         <el-button @click="titleListVisible = false">取消</el-button>
-        <el-button type="primary" @click="setTitleSubmit">确定</el-button>
+        <el-button type="primary" @click="staffTitleSubmit">确定</el-button>
       </div>
     </el-dialog>
 	</section>
@@ -228,22 +241,10 @@
 	import '@/assets/plugins/zTree/css/zTreeStyle.css'
 	import '@/assets/plugins/zTree/js/jquery.min.js'
 	import '@/assets/plugins/zTree/js/jquery.ztree.all.min.js'
-	import { readOrganizeTree, getUserList, saveOrganizeTree, deleteOrganize, setOrganizeStatus, setUserOrg, removeUser, setUserStatus, getPartnerTitle, setUserTitle, requestRegist } from '@/api'
+	import { getMyPartnerOrgs, getMyPartnerRoles, getRolesByOrg, updateOrgRole, getOrganizeStaff, createOrganize, updateOrganize, delOrganize, updateOrgStatus, updateStaffOrg,updateStaffStatus, getPartnerTitle, updateStaffTitle, registerByAgency,removeUser } from '@/api'
 	import { mapGetters } from 'vuex'
 	export default {
 		data() {
-			const validateEmail = (rule, value, callback) => {
-        if (!value) {
-          return callback(new Error('请输入邮箱号'));
-        }
-        setTimeout(() => {
-          if (!value.match(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/)) {
-            callback(new Error('请输入正确邮箱号'));
-          } else {
-          	callback()
-          }
-        }, 0);
-      }
 			const validatePass = (rule, value, callback) => {
         if (!value) {
           return callback(new Error('请再次输入密码'));
@@ -263,7 +264,7 @@
 	      total: 0,
 	      checkedNode: null,
 	      orgFormVisible: false,
-	      funcListVisible: false,
+	      orgRolesVisible: false,
 	      staffInfo: {},
 	      staffInfoVisible: false,
 	      orgFormTitle: '',
@@ -292,7 +293,8 @@
 	      		{ required: true, message: '请输入真实姓名', trigger: 'blur'}
 	      	],
 	      	email: [
-	      		{ required: true, validator: validateEmail, trigger: 'blur'}
+	      		{ required: true, message: '请输入注册邮箱', trigger: 'blur'},
+	      		{ type: 'email', message: '邮箱格式不正确', trigger: 'blur'},
 	      	],
 	      	password: [
 	      		{ required: true, message: '请输入密码', trigger: 'blur'},
@@ -302,10 +304,12 @@
 	      		{ required: true, validator: validatePass, trigger: 'blur'}
 	      	],
 	      },
-	      submitType: 0,
 	      treeLoading: false,
 	      orgTreeVisible: false,
 	      dialogCheckedNode: null,
+	      roleList: [],
+	      selectedRole: [],
+	      roleLoading: false,
 	      titleId: '',
 	      titleList: [],
 	      titleLoading: false,
@@ -346,9 +350,8 @@
 			// 获取组织部门树
 			getOrganizeTree() {
 				this.loading = true
-				readOrganizeTree().then(res => {
-					console.log(res)
-					if(res.data.code === '0001') {
+				getMyPartnerOrgs().then(res => {
+ 					if(res.data.code === '0001') {
 						const organizes = res.data.result.organizeTree;
 				    const setting = {
 				      view: {
@@ -396,7 +399,7 @@
 			},
 			getDialogOrgTree() {
 				this.treeLoading = true;
-				readOrganizeTree().then(res => {
+				getMyPartnerOrgs().then(res => {
 					if(res.data.code === '0001') {
 						let organizes = res.data.result.organizeTree;
 				    let setting = {
@@ -451,9 +454,8 @@
 					pageNo: this.pageNo,
 					pageSize: this.pageSize,
 				}
-				getUserList(data).then(res => {
+				getOrganizeStaff(data).then(res => {
 					this.staffLoading = false
-					// console.log(res)
 					if(res.data.code === '0001') {
 						this.staffList = res.data.result.userList;
 						this.total = res.data.result.pageInfo.total;
@@ -470,7 +472,6 @@
       	if(!this.checkedNode) {
       		return this.$notify.warning({title: '提示', message: '请选择部门'})
       	}
-      	this.submitType = 0
       	this.orgFormTitle = '新增部门'
       	this.organizeForm = {
       		orgId: '',
@@ -490,26 +491,39 @@
       		name: this.checkedNode.name,
       		note: this.checkedNode.note
       	}
-      	this.submitType = 1
       	this.orgFormTitle = '编辑部门'
       	this.orgFormVisible = true
       },
-      // 提交表单
-      submitForm() {
+      // 部门表单提交
+      orgSubmit() {
       	this.$refs.organizeForm.validate(valid => {
       		if(valid) {
       			let data = Object.assign({}, this.organizeForm)
-      			saveOrganizeTree(data).then(res => {
-      				console.log(res)
-      				if(res.data.code === '0001') {
-      					this.$message.success(res.data.message)
-      					this.getOrganizeTree()
-      				} else {
-      					this.$message.error(res.data.message)
-      				}
-      			}).catch(err => {
-      				console.log(err)
-      			})
+      			if(data.orgId) {
+      				updateOrganize(data).then(res => {
+	      				console.log(res)
+	      				if(res.data.code === '0001') {
+	      					this.$message.success(res.data.message)
+	      					this.getOrganizeTree()
+	      				} else {
+	      					this.$message.error(res.data.message)
+	      				}
+	      			}).catch(err => {
+	      				console.log(err)
+	      			})
+      			} else {
+      				createOrganize(data).then(res => {
+	      				console.log(res)
+	      				if(res.data.code === '0001') {
+	      					this.$message.success(res.data.message)
+	      					this.getOrganizeTree()
+	      				} else {
+	      					this.$message.error(res.data.message)
+	      				}
+	      			}).catch(err => {
+	      				console.log(err)
+	      			})
+      			}
       			this.orgFormVisible = false
       		} else {
       			console.log('err submit')
@@ -529,7 +543,7 @@
       		let data = {
 	      		orgId: this.checkedNode.orgId
 	      	}
-	      	deleteOrganize(data).then(res => {
+	      	delOrganize(data).then(res => {
 	      		if(res.data.code === '0001') {
 	  					this.$message.success(res.data.message)
 	  					this.getOrganizeTree()
@@ -544,13 +558,84 @@
       		this.$message('已取消操作')
       	})
       },
+      // 获取商家角色列表
+      getPartnerRoles() {
+      	this.roleLoading = true;
+      	getMyPartnerRoles().then(res => {
+      		this.roleLoading = false;
+    			if(res.data.code === '0001') {
+    				this.roleList = res.data.result.roleList;
+  				} else {
+  					this.$message.error(res.data.message)
+  				}
+      	}).catch(err => {
+      		console.log(err)
+      		this.roleLoading = false;
+      	})
+      },
+      // 获取部门关联的角色列表
+      getOrgRoles() {
+      	let params = {
+      		orgId: this.checkedNode.orgId
+      	}
+      	getRolesByOrg(params).then(res => {
+      		if(res.data.code === '0001') {
+    				let orgRoles = res.data.result.orgRoles;
+						let selectedRows = [];
+						orgRoles.forEach(orgRole => {
+							this.roleList.filter(role => {
+								if(role.roleId === orgRole.roleId) {
+									selectedRows.push(role)
+								}
+							})
+						})
+						this.toggleSelection(selectedRows)
+  				} else {
+  					this.$message.error(res.data.message)
+  				}
+      	}).catch(err => {
+      		console.log(err)
+      		this.roleLoading = false;
+      	})
+      },
       // 权限设置
-      handleFunc() {
+      handleOrgRoles() {
       	if (!this.checkedNode) {
       		return this.$notify.warning({title: '提示', message: '请选择部门'})
       	}
-      	this.funcListVisible = true
+      	this.roleList.length === 0 && this.getPartnerRoles()
+      	this.getOrgRoles()
+      	this.orgRolesVisible = true
       },
+      toggleSelection(rows) {
+				this.$refs.roleTable.clearSelection();
+        if (rows.length > 0) {
+          rows.forEach(row => {
+            this.$refs.roleTable.toggleRowSelection(row, true)
+          })
+        }
+      },
+      handleSelectionChange(val) {
+				this.selectedRole = val
+			},
+			// 部门角色配置
+			orgRolesSubmit() {
+				let roleIds = this.selectedRole.map(role => role.roleId)
+				let data = {
+					orgId: this.checkedNode.orgId,
+					roleIdList: roleIds
+				}
+				updateOrgRole(data).then(res => {
+					if(res.data.code === '0001') {
+    				this.$message.success(res.data.message)
+  				} else {
+  					this.$message.error(res.data.message)
+  				}
+      	}).catch(err => {
+      		console.log(err)
+      	})
+      	this.orgRolesVisible = false
+			},
       // 状态设置
       handleStatus() {
       	if (!this.checkedNode) {
@@ -560,7 +645,7 @@
       		orgId: this.checkedNode.orgId,
       		status: this.checkedNode.status
       	}
-      	setOrganizeStatus(data).then(res => {
+      	updateOrgStatus(data).then(res => {
       		if(res.data.code === '0001') {
       			this.$message.success(res.data.message)
       			this.checkedNode.status = this.checkedNode.status === 1 ? 0 : 1;
@@ -595,7 +680,7 @@
       			email: this.registForm.email,
       			password: this.registForm.password,
       		}
-      		requestRegist(data).then(res => {
+      		registerByAgency(data).then(res => {
       			if(res.data.code === '0001') {
       				this.$message.success(res.data.message)
       				this.getStaffList()
@@ -620,7 +705,7 @@
       	this.orgTreeVisible = true;
       },
       // 设置部门提交
-      setOrgSubmit() {
+      staffOrgSubmit() {
       	if (!this.dialogCheckedNode) {
       		return this.$notify.warning({title: '提示', message: '请选择部门'})
       	}
@@ -628,7 +713,7 @@
 					userId: this.staffInfo.userId,
 					orgId: this.dialogCheckedNode.orgId
 				}
-				setUserOrg(data).then(res => {
+				updateStaffOrg(data).then(res => {
 					if(res.data.code === '0001') {
 						this.$message.success(res.data.message)
 						this.getStaffList()
@@ -667,7 +752,7 @@
       	this.titleListVisible = true;
       },
       // 设置员工职位提交
-      setTitleSubmit() {
+      staffTitleSubmit() {
       	if(!this.titleId) {
       		return this.$notify.warning({title: '提示', message: '请选择职位'})
       	}
@@ -675,7 +760,7 @@
       		userId: this.staffInfo.userId,
       		titleId: this.titleId
       	}
-      	setUserTitle(data).then(res => {
+      	updateStaffTitle(data).then(res => {
       		if(res.data.code === '0001') {
       			this.$message.success(res.data.message)
       			this.getStaffList()
@@ -697,7 +782,7 @@
 	      		userId: row.userId,
 	      		status: status
 	      	}
-	      	setUserStatus(data).then(res => {
+	      	updateStaffStatus(data).then(res => {
 	      		if(res.data.code === '0001') {
 	      			this.$message.success(res.data.message)
 	      			this.getStaffList()

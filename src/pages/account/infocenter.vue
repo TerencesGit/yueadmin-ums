@@ -196,7 +196,7 @@
 </template>
 <script>
 	import Region from '@/assets/js/region'
-	import { getMyinfo, updateMyInfo, getMyPartner } from '@/api'
+	import { getMyInfo, updateMyInfo, getMyPartner } from '@/api'
 	export default {
 		data() {
 			return {
@@ -258,7 +258,7 @@
 			// 获取用户信息
 			getUserInfo() {
 				this.loading = true;
-				getMyinfo().then(res => {
+				getMyInfo().then(res => {
 					// console.log(res)
 					this.loading = false;
 					if(res.data.code === '0001') {
@@ -366,7 +366,6 @@
       // 企业信息
       getPartInfo() {
       	getMyPartner().then(res => {
-      		console.log(res)
       		if(res.data.code === '0001') {
       			this.partnerInfo = res.data.result.partnerInfo
       		} else {

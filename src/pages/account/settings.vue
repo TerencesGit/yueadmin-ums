@@ -96,7 +96,7 @@
 	</section>
 </template>
 <script>
-	import { getMyinfo, updatePwd, } from '@/api'
+	import { getMyInfo, updatePwd, } from '@/api'
 	import Md5 from '@/assets/js/md5'
 	export default {
 		data () {
@@ -161,11 +161,10 @@
 			}
 		},
 		methods: {
-			// 用户信息
+			// 获取用户信息
 			getUserInfo() {
 				this.loading = true;
-				getMyinfo().then(res => {
-					console.log(res)
+				getMyInfo().then(res => {
 					this.loading = false;
 					if(res.data.code === '0001') {
 						this.userInfo = res.data.result.userInfo;
@@ -173,7 +172,7 @@
 						this.$message.error(res.data.message)
 					}
 				}).catch(err => {
-					// console.log(err)
+					console.log(err)
 					this.loading = false;
 					this.$catchError(err)
 				})

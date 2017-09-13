@@ -115,7 +115,7 @@
 	</section>
 </template>
 <script>
-	import { getMyPartner } from '@/api'
+	import { getMyPartnerInfo, updateMyPartnerInfo } from '@/api'
 	export default {
 		data() {
 			const validateMobile = (rule, value, callback) => {
@@ -174,6 +174,9 @@
 					corporationName: [
 						{ required: true, message: '请输入企业法定代表人', trigger: 'blur'},
 					],
+					email: [
+						{ type: 'email', message: '邮箱格式不正确', trigger: 'blur'},
+					]
 				},
 				logoUrl: '',
 				licenseUrl: ''
@@ -181,8 +184,8 @@
 		},
 		methods: {
 			getPartnerInfo() {
-				getMyPartner().then(res => {
-					console.log(res)
+				getMyPartnerInfo().then(res => {
+					// console.log(res)
 					if(res.data.code === '0001') {
 						this.partnerForm = res.data.result.partnerInfo
 						this.logoUrl = res.data.result.partnerInfo.logo
@@ -222,7 +225,16 @@
 					if(valid) {
 						let data = Object.assign({}, this.partnerForm)
 						console.log(data)
-
+						updateMyPartnerInfo(data).then(res => {
+							if(res.data.code === '0001') {
+								this.$message.success(res.data.message)
+							} else {
+								this.$message.error(res.data.message)
+							}
+						}).catch(err => {
+							console.log(err)
+							this.$catchError(err)
+						})
 					} else {
 						this.$notify({
 							type: 'warning',

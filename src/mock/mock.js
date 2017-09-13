@@ -2,7 +2,7 @@ import axios from 'axios'
 import Utils from '@/assets/js/utils'
 import MockAdapter from 'axios-mock-adapter'
 import { UserList, PartnerList, OrganizeList, ModuleList, FunctionList, 
-				TitleList, RoleList, RoleFuncs, ContractTempList, PartnerTypeList, 
+				TitleList, RoleList, OrgRoles, RoleFuncs, ContractTempList, PartnerTypeList, 
 				TypeRoles, Contracts } from './data/user'
 let _UserList = UserList,
 		_PartnerList = PartnerList,
@@ -11,6 +11,7 @@ let _UserList = UserList,
 		_FunctionList = FunctionList,
 		_TitleList = TitleList,
 		_RoleList = RoleList,
+		_OrgRoles = OrgRoles,
 		_RoleFuncs = RoleFuncs,
 		_ContractTempList = ContractTempList,
 		_PartnerTypeList = PartnerTypeList,
@@ -134,24 +135,46 @@ export default {
 				}, 500)
 			})
 		})
-		// 代注册
-		mock.onPost('/regist').reply(config => {
-			let { realname, email, password, orgId } = JSON.parse(config.data);
-			_UserList.push({
-				createTime: new Date(),
-				realname,
-				email,
-				orgId
-			})
-			retObj.result = {}
+		// 用户列表
+		mock.onGet('/user/list').reply(config => {
+			let { orgId, pageNo, pageSize } = config.params;
+			let currOrg = OrganizeList.filter(org => org.orgId == orgId)[0];
+			let total = 0, userPage = null;
+			if(currOrg.parentId == 0) {
+				total = _UserList.length
+				userPage = _UserList.filter((user, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize)
+			} else {
+				let orgList = OrganizeList.filter(org => org.orgId == orgId || org.parentId == orgId)
+				let _userList = [];
+				orgList.forEach(org => {
+					let orgUser = _UserList.filter(user => user.orgId == org.orgId);
+					_userList = orgUser.length > 0 ? _userList.concat(orgUser) : _userList
+				})
+				total = _userList.length;
+				userPage = _userList.filter((user, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize)
+			}
+  	  userPage.forEach(user => {
+  	  	user.orgName = _Organizes.filter(org => org.orgId == user.orgId)[0].name;
+  	  	_TitleList.filter(title => {
+  	  		if(title.titleId == user.titleId) {
+  	  			user.titleName = title.titleName
+  	  		}
+  	  	})
+  	  })
+			retObj.result = {
+				userList: userPage,
+				pageInfo: {
+					total: total
+				}
+			}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
-					resolve([200, retObj])
+						resolve([200, retObj])
 				}, 500)
 			})
 		})
 		// 获取用户信息
-		mock.onGet('/accountInter/getMyinfo.do').reply(config => {
+		mock.onGet('/accountInter/getMyInfo.do').reply(config => {
 			let userId = Utils.getCookie('userId');
 			if(!userId) {
 				return new Promise((resolve, reject) => {
@@ -246,7 +269,7 @@ export default {
 				}, 500)
 			})
 		})
-		// 获取企业信息
+		// 获取商家信息
 		mock.onGet('/accountInter/getMyPartner.do').reply(config => {
 			let userId = Utils.getCookie('userId');
 			if(!userId) {
@@ -280,8 +303,53 @@ export default {
 				})
 			})
 		})
-		// 组织部门树
-		mock.onGet('/partner/readOrganizeTree').reply(config => {
+		// 获取当前用户所属商户信息
+		mock.onGet('/partnerInter/getMyPartnerInfo.do').reply(config => {
+			let userId = Utils.getCookie('userId');
+			if(!userId) {
+				return new Promise((resolve, reject) => {
+					setTimeout(() => {
+						resolve([200, retExpireObj])
+					}, 500)
+				})
+			}
+			let _userInfo = _UserList.filter(user => user.userId == userId)[0];
+			if(!(_userInfo && _userInfo.partnerId)) {
+				return new Promise((resolve, reject) => {
+					let retObj = {
+						code: '3001',
+						message: '尚未注册企业',
+						result: {}
+					}
+					setTimeout(() => {
+						resolve([200, retObj])
+					}, 500)
+				})
+			}
+			let _partnerId = _userInfo.partnerId;
+			let _partnerInfo = _PartnerList.filter(p => p.partnerId == _partnerId)[0]
+			retObj.result = {
+				partnerInfo: _partnerInfo
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				})
+			})
+		})
+		// 更新当前用户所属商户信息
+		mock.onPost('/partnerInter/updateMyPartnerInfo.do').reply(config => {
+			let { partnerId, name, shortName } = JSON.parse(config.data);
+			console.log(partnerId, name, shortName)
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+						resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取商家组织部门树
+		mock.onGet('/partnerInter/getMyPartnerOrgs.do').reply(config => {
 			retObj.result = {
 				organizeTree: _Organizes
 			}
@@ -291,8 +359,72 @@ export default {
 				}, 500)
 			})
 		})
-		// 用户列表
-		mock.onGet('/user/list').reply(config => {
+		// 获取商家角色列表
+		mock.onGet('/partnerInter/getMyPartnerRoles.do').reply(config => {
+			let total = _RoleList.length;
+			retObj.result = {
+				roleList: _RoleList,
+				pageInfo: {
+					total: total
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取部门关联角色列表
+		mock.onGet('/partnerInter/getRolesByOrg.do').reply(config => {
+			let { orgId } = config.params;
+			let orgRoles = _OrgRoles.filter(orgRole => orgRole.orgId === orgId);
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					orgRoles
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 配置部门关联角色列表
+		mock.onPost('/partnerInter/updateOrgRole.do').reply(config => {
+			let { orgId, roleIdList } = JSON.parse(config.data);
+			let orgRoles = _OrgRoles.filter(orgRole => orgRole.orgId == orgId);
+			if(orgRoles.length === 0) {
+				roleIdList.forEach(roleId => {
+					_OrgRoles.push({
+						orgRoleId: new Date().getTime(),
+						orgId,
+						roleId,
+					})
+				})
+			} else {
+				orgRoles.forEach(orgRole => {
+					roleIdList.filter(roleId => {
+						if(orgRole.roleId !== roleId) {
+							_OrgRoles.push({
+								orgRoleId: new Date().getTime(),
+								orgId,
+								roleId,
+							})
+						}
+					})
+				})
+			}
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取组织节点下的员工
+		mock.onGet('/partnerInter/getOrganizeStaff.do').reply(config => {
 			let { orgId, pageNo, pageSize } = config.params;
 			let currOrg = OrganizeList.filter(org => org.orgId == orgId)[0];
 			let total = 0, userPage = null;
@@ -329,25 +461,15 @@ export default {
 				}, 500)
 			})
 		})
-		// 新增/编辑组织树
-		mock.onPost('/partner/saveOrganizeTree').reply(config => {
-			let { orgId, name, note, parentId } = JSON.parse(config.data)
-			// console.log(orgId, name, note, parentId)
-			if(orgId) {
-				_Organizes.some(org => {
-					if(org.orgId === orgId) {
-						org.name = name;
-						org.note = note
-					}
-				})
-			} else {
-				_Organizes.push({
-					orgId: new Date().getTime(),
-					name,
-					note,
-					parentId
-				})
-			}
+		// 新增组织节点
+		mock.onPost('/partnerInter/createOrganize.do').reply(config => {
+			let { name, note, parentId } = JSON.parse(config.data)
+			_Organizes.push({
+				orgId: new Date().getTime(),
+				name,
+				note,
+				parentId
+			})
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
@@ -355,8 +477,24 @@ export default {
 				}, 500)
 			})
 		})
-		// 删除部门
-		mock.onPost('/partner/deleteOrganize').reply(config => {
+		// 编辑组织节点
+		mock.onPost('/partnerInter/updateOrganize.do').reply(config => {
+			let { orgId, name, note, parentId } = JSON.parse(config.data)
+			_Organizes.some(org => {
+				if(org.orgId === orgId) {
+					org.name = name;
+					org.note = note
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 删除组织节点
+		mock.onPost('/partnerInter/delOrganize.do').reply(config => {
 			let { orgId } = JSON.parse(config.data)
 			let _orgUser = _UserList.filter(user => user.orgId == orgId);
 			if(_orgUser.length !== 0) {
@@ -379,8 +517,8 @@ export default {
 				}, 500)
 			})
 		})
-		// 设置部门状态
-		mock.onPost('/partner/setOrganizeStatus').reply(config => {
+		// 设置组织节点状态
+		mock.onPost('/partnerInter/updateOrgStatus.do').reply(config => {
 			let { orgId, status } = JSON.parse(config.data)
 			_Organizes.filter(org => {
 				if(org.orgId === orgId) {
@@ -394,8 +532,24 @@ export default {
 				}, 500)
 			})
 		})
+		// 员工代注册
+		mock.onPost('/partnerInter/registerByAgency.do').reply(config => {
+			let { realname, email, password, orgId } = JSON.parse(config.data);
+			_UserList.push({
+				createTime: new Date(),
+				realname,
+				email,
+				orgId
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
 		// 设置员工部门
-		mock.onPost('/partner/setUserOrg').reply(config => {
+		mock.onPost('/partnerInter/updateStaffOrg.do').reply(config => {
 			let { userId, orgId } = JSON.parse(config.data)
 			let _orgName = _Organizes.filter(org => org.orgId == orgId)[0].name;
 			_UserList.filter(user => {
@@ -412,7 +566,7 @@ export default {
 			})
 		})
 		// 删除用户
-		mock.onPost('/partner/removeUser').reply(config => {
+		mock.onPost('/partnerInter/removeUser.do').reply(config => {
 			let { userId } = JSON.parse(config.data)
 			_UserList = _UserList.filter(user => user.userId !== userId)
 			retObj.result = {}
@@ -423,7 +577,7 @@ export default {
 			})
 		})
 		// 设置员工状态
-		mock.onPost('/partner/setUserStatus').reply(config => {
+		mock.onPost('/partnerInter/updateStaffStatus.do').reply(config => {
 			let { userId, status } = JSON.parse(config.data)
 			_UserList.filter(user => {
 				if(user.userId == userId) {
@@ -438,7 +592,7 @@ export default {
 			})
 		})
 		// 获取职位列表
-		mock.onGet('/partner/getPartnerTitle').reply(config => {
+		mock.onGet('/partnerInter/getMyPartnerTitleList.do').reply(config => {
 			let { pageNo, pageSize } = config.params;
 			let userId = Utils.getCookie('userId');
 			let partnerId = _UserList.filter(user => user.userId == userId)[0].partnerId;
@@ -458,7 +612,7 @@ export default {
 			})
 		})
 		// 设置员工职位
-		mock.onPost('/partner/setUserTitle').reply(config => {
+		mock.onPost('/partnerInter/updateStaffTitle.do').reply(config => {
 			let { userId, titleId } = JSON.parse(config.data)
 			let titleName = _TitleList.filter(title => title.titleId == titleId)[0].titleName
 			_UserList.filter(user => {
@@ -475,7 +629,7 @@ export default {
 			})
 		})
 		// 新建职位
-		mock.onPost('/partner/createTitle').reply(config => {
+		mock.onPost('/partnerInter/createTitle.do').reply(config => {
 			let userId = Utils.getCookie('userId');
 			let partnerId = _UserList.filter(user => user.userId == userId)[0].partnerId;
 			let { titleName, titleDesc } = JSON.parse(config.data)
@@ -493,7 +647,7 @@ export default {
 			})
 		})
 		// 编辑职位
-		mock.onPost('/partner/updateTitle').reply(config => {
+		mock.onPost('/partnerInter/updateTitle.do').reply(config => {
 			let { titleId, titleName, titleDesc } = JSON.parse(config.data)
 			_TitleList.filter(title => {
 				if(title.titleId == titleId) {
@@ -509,7 +663,7 @@ export default {
 			})
 		})
 		// 删除职位
-		mock.onPost('/partner/delTitle').reply(config => {
+		mock.onPost('/partnerInter/delTitle.do').reply(config => {
 			let { titleId } = JSON.parse(config.data)
 			let _title = _TitleList.filter(title => title.titleId == titleId)[0];
 			_TitleList.splice(_TitleList.indexOf(_title), 1)

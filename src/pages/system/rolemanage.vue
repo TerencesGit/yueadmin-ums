@@ -252,7 +252,7 @@
 				getModuleFunctionList(data).then(res => {
 					this.treeLoading = false
 					if(res.data.code === '0001') {
-						this.funTreeList = res.data.result.functionTree;
+						this.funTreeList = res.data.result.functions;
 				    const setting = {
 				      view: {
 				        selectedMulti: false,
