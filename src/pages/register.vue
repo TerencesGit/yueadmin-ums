@@ -205,7 +205,7 @@ export default {
         } else {
           this.invalid = true
           return;
-        }
+        } 
       })
     },
     loginSubmit() {

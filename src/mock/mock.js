@@ -97,6 +97,31 @@ export default {
 				}, 500)
 			})
 		})
+		// 查询邮箱或手机号是否已被使用
+		mock.onGet('/baseInter/accountFind.do').reply(config => {
+			let { account } = config.params;
+			// console.log(account)
+			let _user = _UserList.filter(user => user.email === account);
+			let finded = _user.length > 0 ? true : false;
+			retObj.result = {
+				finded
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		mock.onPost('/baseInter/sendForgotPwdEmail.do').reply(config => {
+			let { email } = JSON.parse(config.data)
+			console.log(email)
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
 		// 代注册
 		mock.onPost('/regist').reply(config => {
 			let { realname, email, password, orgId } = JSON.parse(config.data);

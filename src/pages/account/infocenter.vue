@@ -18,7 +18,7 @@
 							<img v-if="userForm.avatar" :src="userForm.avatar">
 							<img v-else src="../../assets/img/avatar.gif" alt="头像"/>
 						</div>
-						<h3>{{userForm.name}}<span>{{userForm.avatar}}</span></h3>
+						<h3>{{userForm.name}}</h3>
 						<ul class="list-group">
 							<li class="list-group-item active">
 								<a href="javascript:;" title="编辑" @click="handleEdit">		   账户信息

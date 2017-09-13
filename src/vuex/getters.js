@@ -4,12 +4,9 @@ export const sidebarStatus = state => {
 export const userInfo = state => {
 	return state.userInfo
 }
+export const stepActive = state => {
+	return state.stepActive
+}
 export const userPermission = state => {
 	return state.userPermission
-}
-export const partnerInfo = state => {
-	return state.partnerInfo
-}
-export const wareList = state => {
-	return state.wareList
 }

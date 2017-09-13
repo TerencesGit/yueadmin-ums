@@ -47,7 +47,7 @@
         <el-form-item label-width="0" style="margin: 0; text-align: center;">
           <router-link to="/register">尚未注册？</router-link>
           <span style="margin: 0 10px">|</span>
-          <router-link to="/forgetPass">忘记密码</router-link>
+          <router-link to="/findpasswd">忘记密码</router-link>
         </el-form-item>
       </el-form>    
     </div>

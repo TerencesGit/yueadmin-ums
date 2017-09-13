@@ -7,9 +7,8 @@ Vue.use(Vuex)
 const state = {
 	sidebarStatus: false,
 	userInfo: {},
+	stepActive: 0,
 	userPermission: [],
-	partnerInfo: {},
-	wareList: []
 }
 
 const mutations = {
@@ -19,15 +18,12 @@ const mutations = {
 	SAVE_USERINFO (state, userInfo) {
 		state.userInfo = userInfo
 	},
+	CHANGE_STEPACTIVE(state, step) {
+		state.stepActive = step
+	},
 	SET_PERMISSION (state, permission) {
 		state.userPermission = permission
 	},
-	SET_PARTNER_INFO (state, partner) {
-		state.partnerInfo = partner
-	},
-	SET_WARELIST (state, warelist) {
-		state.wareList = warelist
-	}
 }
 export default new Vuex.Store({
 	state,

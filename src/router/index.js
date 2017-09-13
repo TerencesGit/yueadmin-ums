@@ -5,6 +5,10 @@ import NotFound from '@/pages/NotFound'
 import NoPermission from '@/pages/NoPermission'
 import Welcome from '@/pages/welcome'
 
+import BaseFindPasswd from '@/pages/base/findpasswd'
+import BaseSendEmail from '@/pages/base/sendemail'
+import BaseVerifyEmail from '@/pages/base/verifyemail'
+
 import AccountCenter from '@/pages/account/infocenter'
 import AccountSettings from '@/pages/account/settings'
 import RegistedPartner from '@/pages/account/registedpartner'
@@ -37,6 +41,15 @@ const routes = [
     path: '/register',
     name: '欢迎注册',
     component: Register
+  },
+  {
+    path: '/findpasswd',
+    component: BaseFindPasswd,
+    children: [
+      { path: '/', name: '找回密码', component: BaseSendEmail },
+      { path: '/verifyemail', name: '发送邮件成功', component: BaseVerifyEmail },
+
+    ]
   },
   {
     path: '/',
