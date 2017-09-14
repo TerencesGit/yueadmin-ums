@@ -39,6 +39,7 @@ const routes = [
     path: '/login',
     name: '欢迎登录',
     component: Login
+    // component: CASLogin
   },
   {
     path: '/register',

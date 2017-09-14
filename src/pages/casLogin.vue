@@ -1,5 +1,5 @@
 <template>
-	<form id="casForm" action="http://www.yueshijue.com/ssoAjax/casProxy.do" style="display: none">
+	<form id="casForm" action="http://www.yueshijue.com/ums/ssoAjax/casProxy.do" style="display: none">
     <input type="text" name="rawUrl" :value="rawUrl">
   </form>
 </template>

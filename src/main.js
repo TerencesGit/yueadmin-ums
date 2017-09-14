@@ -65,7 +65,7 @@ const router = new Router({
   routes
 })
 router.beforeEach((to, from, next) => {
-  Vue.prototype.$fromPath = to.path;
+  Vue.prototype.$fromPath = from.path;
   let user = Utils.getCookie('userId');
   let logRequired = to.path.indexOf('account') !== -1 || 
                     to.path.indexOf('admin') !== -1 ||

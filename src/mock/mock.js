@@ -1,5 +1,6 @@
 import axios from 'axios'
 import Utils from '@/assets/js/utils'
+import Region from '@/assets/js/region'
 import MockAdapter from 'axios-mock-adapter'
 import { UserList, PartnerList, OrganizeList, ModuleList, FunctionList, 
 				TitleList, RoleList, OrgRoles, RoleFuncs, ContractTempList, PartnerTypeList, 
@@ -184,6 +185,7 @@ export default {
 				})
 			}
 			let _userInfo = _UserList.filter(user => user.userId == userId)[0];
+			_userInfo.areaName = Region.filter(region => region.id === _userInfo.areaId)[0].name;
 			_Organizes.filter(org => {
 				if(org.orgId == _userInfo.orgId) {
 					_userInfo.orgName = org.name
@@ -212,7 +214,7 @@ export default {
 					}, 500)
 				})
 			}
-			let { name, realname, sexual, qq, birthday, areaName, idcardNum, 
+			let { name, realname, sexual, qq, birthday, areaId, idcardNum, 
 				idcardPicFront, idcardPicBack } = JSON.parse(config.data);
 			_UserList.filter(user => {
 				if(user.userId == userId) {
@@ -221,7 +223,7 @@ export default {
 					user.sexual = sexual;
 					user.qq = qq;
 					user.birthday = birthday;
-					user.areaName = areaName;
+					user.areaId = areaId;
 					user.idcardNum = idcardNum;
 					user.idcardPicFront = idcardPicFront;
 					user.idcardPicBack = idcardPicBack;
@@ -448,7 +450,8 @@ export default {
 				userPage = _userList.filter((user, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize)
 			}
   	  userPage.forEach(user => {
-  	  	user.orgName = _Organizes.filter(org => org.orgId == user.orgId)[0].name;
+  	  	user.orgName = _Organizes.filter(org => org.orgId === user.orgId)[0].name;
+  	  	user.areaName = user.areaId ? Region.filter(region => region.id === user.areaId)[0].name : '未设置';
   	  	_TitleList.filter(title => {
   	  		if(title.titleId == user.titleId) {
   	  			user.titleName = title.titleName

@@ -80,8 +80,8 @@
 			<el-upload
 				v-loading="uploading"
 			  class="uploader avatar-uploader"
-			  action="https://jsonplaceholder.typicode.com/posts/"
 			  accept="image/jpeg, image/png"
+			  :action="uploadAction"
 			  :show-file-list="false"
 			  :on-progress="handleProgress"
 			  :on-success="handleAvatarSuccess"
@@ -201,10 +201,20 @@
 		data() {
 			return {
 				userForm: {
+					name: '',
+					realname: '',
+					qq: '',
 					avatar: '',
+					sexual: '',
+					areaName: '',
+					birthday: '',
+					idcardNum: '',
+					idcardPicFront: '',
+					idcardPicBack: '',
 				},
 				partnerInfo: {},
-				originName: '',
+				areaId: '',
+				areaName: '',
 				region: {
 					province: '',
 					city: '',
@@ -215,6 +225,8 @@
 					city: [],
 					area: [],
 				},
+				// uploadAction: '/baseInter/uploadFile.do',
+				uploadAction: 'https://jsonplaceholder.typicode.com/posts/',
 				avatarUrl: '',
 				idcardFrontUrl: '',
 				idcardBackUrl: '',
@@ -238,16 +250,16 @@
 		methods: {
 			// 地区格式化
 			formatRegion() {
-				let origin = Region.filter(region => region.id === this.userForm.origin)[0];
+				let origin = Region.filter(region => region.id === this.userForm.areaId)[0];
 				if(!origin) return;
 				if(origin.level === 1) {
-					this.originName = this.region.province = origin.name
+					this.areaName = this.region.province = origin.name
 				} else if (origin.level === 2) {
-					this.originName = this.region.city = origin.name;
+					this.areaName = this.region.city = origin.name;
 					this.region.province = Region.filter(region => region.id === origin.pid)[0].name;
 					this.regionList.city = Region.filter(region => region.pid === origin.pid);
 				} else if (origin.level === 3) {
-					this.originName = this.region.area = origin.name;
+					this.areaName = this.region.area = origin.name;
 					let city = Region.filter(region => region.id === origin.pid)[0];
 					this.region.city = city.name;
 					this.region.province = Region.filter(region => region.id === city.pid)[0].name;
@@ -259,11 +271,12 @@
 			getUserInfo() {
 				this.loading = true;
 				getMyInfo().then(res => {
-					// console.log(res)
+					console.log(res)
 					this.loading = false;
 					if(res.data.code === '0001') {
 						this.userForm = res.data.result.userInfo;
 						this.avatarUrl = this.userForm.avatar;
+						this.areaId = this.userForm.areaId;
 						this.userForm.partnerId && this.getPartInfo()
 					} else {
 						this.$message.error(res.data.message)
@@ -346,9 +359,20 @@
       			})
       			return;
       		}
-      		let areaName = this.originId ? Region.filter(region => region.id === this.originId)[0].name : '';
-      		let data = Object.assign({}, this.userForm)
-      		data.areaName = areaName; 
+      		let data = {
+      			userId: this.userForm.userId,
+      			name: this.userForm.name,
+						realname: this.userForm.realname,
+						qq: this.userForm.qq,
+						// avatar: this.userForm.avatar,
+						sexual: this.userForm.sexual,
+						areaId: this.areaId,
+						birthday: this.userForm.birthday,
+						idcardNum: this.userForm.idcardNum,
+						idcardPicFront: this.userForm.idcardPicFront,
+						idcardPicBack: this.userForm.idcardPicBack,
+      		}
+      		console.log(data)
       		updateMyInfo(data).then(res => {
       			if(res.data.code === '0001') {
       				this.$message.success(res.data.message)
@@ -379,16 +403,16 @@
       // 选择省、市、区
       provinceChange (pid) {
       	this.region.city = '';
-      	this.originId = pid;
+      	this.areaId = pid;
       	this.regionList.city = Region.filter(region => region.pid === pid)
       },
       cityChange (cid) {
       	this.region.area = '';
-      	this.originId = cid;
+      	this.areaId = cid;
       	this.regionList.area = Region.filter(region => region.pid === cid)
       },
       areaChange(aid) {
-      	this.originId = aid;
+      	this.areaId = aid;
       }
 		},
 		mounted() {

@@ -49,7 +49,7 @@
 			      highlight-current-row
 			      v-loading="staffLoading" 
 			      style="width: 100%">
-			      <el-table-column type="index" width="60"></el-table-column>
+			      <el-table-column type="index" width="50"></el-table-column>
 			      <el-table-column prop="realname" label="姓名" sortable width="120" :formatter="formatName"></el-table-column>
 			      <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
 			      <el-table-column prop="createTime" label="注册时间" sortable width="120" :formatter="formatTime"></el-table-column>
