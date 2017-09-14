@@ -377,7 +377,13 @@ export default {
 		// 获取部门关联角色列表
 		mock.onGet('/partnerInter/getRolesByOrg.do').reply(config => {
 			let { orgId } = config.params;
-			let orgRoles = _OrgRoles.filter(orgRole => orgRole.orgId === orgId);
+			let currOrg = _Organizes.filter(org => org.orgId === orgId)[0];
+			let orgRoles = [];
+			if(currOrg.parentId === 0) {
+				orgRoles = _RoleList
+			} else {
+				orgRoles = _OrgRoles.filter(orgRole => orgRole.orgId === orgId);
+			}
 			let retObj = {
 				code: '0001',
 				message: '操作成功',

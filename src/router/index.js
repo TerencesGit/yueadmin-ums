@@ -1,5 +1,6 @@
 import Layout from '@/components/Layout'
 import Login from '@/pages/login'
+import CASLogin from '@/pages/casLogin'
 import Register from '@/pages/register'
 import NotFound from '@/pages/NotFound'
 import NoPermission from '@/pages/NoPermission'

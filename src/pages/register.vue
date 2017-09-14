@@ -121,9 +121,29 @@
 <script>
 import Md5 from '@/assets/js/md5'
 import Utils from '@/assets/js/utils'
-import { requestRegist, requestLogin } from '@/api'
+import { requestRegist, requestLogin, accountFind } from '@/api'
 export default {
   data() {
+    const validateEmail = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请输入邮箱号'))
+      } else {
+        let params = {
+          account: value
+        }
+        accountFind(params).then(res => {
+          if(res.data.code === '0001') {
+            if(!res.data.result.finded) {
+              callback()
+            } else {
+              callback(new Error('该邮箱号已注册'))
+            }
+          } else {
+            this.$message.error(res.data.message)
+          }
+        })
+      }
+    }
     const validateConfirmPass = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请再次输入密码'));
@@ -159,7 +179,8 @@ export default {
       loginRules: {
         email: [
           { required: true, message: '请输入邮箱号', trigger: 'blur' },
-          { type: 'email', message: '请输入正确的邮箱号', trigger: 'blur' }
+          { type: 'email', message: '邮箱号格式有误', trigger: 'blur' },
+          { validator: validateEmail, trigger: 'blur' },
         ],
         passwd: [
           { required: true, message: '请输入密码', trigger: 'blur' },

@@ -20,7 +20,7 @@
           <el-input type="text" v-model.trim="loginForm.authcode" placeholder="请输入验证码" style="float: left; width: 65%; margin-right: 15px;"></el-input>
           <canvas id="canvasCode" width="80px" height="35px" class="canvas-code" @click="drawCode"></canvas>
         </el-form-item>
-        <el-form-item label="登录角色">
+        <!-- <el-form-item label="登录角色">
           <el-select v-model="loginForm.isAdmin" class="el-select--block" placeholder="请选择角色">
             <el-option
               v-for="item in loginRoles"
@@ -29,8 +29,8 @@
               :key="item.value">
             </el-option>
           </el-select>
-        </el-form-item>
-        <el-form-item v-if="false" label="记住密码" class="m-b-5">
+        </el-form-item> -->
+        <el-form-item label="记住密码" class="m-b-5">
           <el-checkbox-group v-model="loginForm.remember">
             <el-checkbox name="type"></el-checkbox>
           </el-checkbox-group>

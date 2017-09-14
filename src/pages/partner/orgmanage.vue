@@ -24,7 +24,7 @@
 							<i class="el-icon-delete"></i>
 							删除
 						</el-button>
-						<el-button size="small" type="primary" icon="setting" @click="handleOrgRoles">
+						<el-button size="small" type="primary" icon="setting" :disabled="roleDisabled" @click="handleOrgRoles">
 							权限
 						</el-button>
 						<el-button size="small" type="info" :disabled="disabled" @click="handleStatus">
@@ -75,9 +75,9 @@
 								    	<span v-if="scope.row.status === 1" @click="handleSetStatus(scope.row)">禁用</span>
 								    	<span v-else @click="handleSetStatus(scope.row)">启用</span>
 								    </el-dropdown-item>
-								    <el-dropdown-item disabled>
+								   <!--  <el-dropdown-item disabled>
 								    	<span @click="handleRemove(scope.row)">删除</span>
-								    </el-dropdown-item>
+								    </el-dropdown-item> -->
 								  </el-dropdown-menu>
 								</el-dropdown>
 			      	</template>
@@ -821,7 +821,10 @@
 		},
 		computed: {
 			disabled() {
-				return this.checkedNode && this.checkedNode.status === 1 ? true : false
+				return this.checkedNode && this.checkedNode.status === 1 ? true : false;
+			},
+			roleDisabled() {
+				return this.checkedNode && this.checkedNode.pId ? false : true;
 			},
 			...mapGetters([
 	  		'userInfo'
