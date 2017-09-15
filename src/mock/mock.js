@@ -157,7 +157,7 @@ export default {
   	  userPage.forEach(user => {
   	  	user.orgName = _Organizes.filter(org => org.orgId == user.orgId)[0].name;
   	  	_TitleList.filter(title => {
-  	  		if(title.titleId == user.titleId) {
+  	  		if(title.id == user.titleId) {
   	  			user.titleName = title.titleName
   	  		}
   	  	})
@@ -185,7 +185,7 @@ export default {
 				})
 			}
 			let _userInfo = _UserList.filter(user => user.userId == userId)[0];
-			_userInfo.areaName = Region.filter(region => region.id === _userInfo.areaId)[0].name;
+			_userInfo.areaName = _userInfo.areaId ? Region.filter(region => region.id === _userInfo.areaId)[0].name : '未设置';
 			_Organizes.filter(org => {
 				if(org.orgId == _userInfo.orgId) {
 					_userInfo.orgName = org.name
@@ -198,6 +198,29 @@ export default {
 					userInfo: _userInfo
 				}
 			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新用户头像
+		mock.onPost('/accountInter/updateAvatar.do').reply(config => {
+			let userId = Utils.getCookie('userId');
+			if(!userId) {
+				return new Promise((resolve, reject) => {
+					setTimeout(() => {
+						resolve([200, retExpireObj])
+					}, 500)
+				})
+			}
+			let { avatar } = JSON.parse(config.data);
+			_UserList.filter(user => {
+				if(user.userId == userId) {
+					user.avatar = avatar
+				}
+			})
+			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 					resolve([200, retObj])
@@ -453,7 +476,7 @@ export default {
   	  	user.orgName = _Organizes.filter(org => org.orgId === user.orgId)[0].name;
   	  	user.areaName = user.areaId ? Region.filter(region => region.id === user.areaId)[0].name : '未设置';
   	  	_TitleList.filter(title => {
-  	  		if(title.titleId == user.titleId) {
+  	  		if(title.id == user.titleId) {
   	  			user.titleName = title.titleName
   	  		}
   	  	})
@@ -623,7 +646,7 @@ export default {
 		// 设置员工职位
 		mock.onPost('/partnerInter/updateStaffTitle.do').reply(config => {
 			let { userId, titleId } = JSON.parse(config.data)
-			let titleName = _TitleList.filter(title => title.titleId == titleId)[0].titleName
+			let titleName = _TitleList.filter(title => title.id === titleId)[0].titleName
 			_UserList.filter(user => {
 				if(user.userId == userId) {
 					user.titleId = titleId,
@@ -643,7 +666,7 @@ export default {
 			let partnerId = _UserList.filter(user => user.userId == userId)[0].partnerId;
 			let { titleName, titleDesc } = JSON.parse(config.data)
 			_TitleList.push({
-				titleId: new Date().getTime(),
+				id: new Date().getTime(),
 				titleName,
 				titleDesc,
 				partnerId,
@@ -657,9 +680,9 @@ export default {
 		})
 		// 编辑职位
 		mock.onPost('/partnerInter/updateTitle.do').reply(config => {
-			let { titleId, titleName, titleDesc } = JSON.parse(config.data)
+			let { id, titleName, titleDesc } = JSON.parse(config.data)
 			_TitleList.filter(title => {
-				if(title.titleId == titleId) {
+				if(title.id === id) {
 					title.titleName = titleName;
 					title.titleDesc = titleDesc
 				}
@@ -673,8 +696,8 @@ export default {
 		})
 		// 删除职位
 		mock.onPost('/partnerInter/delTitle.do').reply(config => {
-			let { titleId } = JSON.parse(config.data)
-			let _title = _TitleList.filter(title => title.titleId == titleId)[0];
+			let { id } = JSON.parse(config.data)
+			let _title = _TitleList.filter(title => title.id === id)[0];
 			_TitleList.splice(_TitleList.indexOf(_title), 1)
 			retObj.result = {}
 			return new Promise((resolve, reject) => {

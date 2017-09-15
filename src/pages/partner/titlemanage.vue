@@ -11,9 +11,9 @@
 	      highlight-current-row
 	      style="width: 100%">
 	      <el-table-column type="index" width="60"></el-table-column>
-	      <el-table-column prop="titleId" label="职位编号" sortable width="140"></el-table-column>
+	      <el-table-column prop="id" label="职位编号" sortable width="140"></el-table-column>
 	      <el-table-column prop="titleName" label="职位名称"></el-table-column>
-	      <el-table-column prop="titleDesc" label="职位描述"></el-table-column>
+	      <el-table-column prop="description" label="职位描述"></el-table-column>
 	      <el-table-column prop="updateBy" label="更新人" :formatter="formatUpdateBy"></el-table-column>
 	      <el-table-column prop="updateTime" label="更新时间" sortable width="180" :formatter="formatTime"></el-table-column>
 	      <el-table-column label="操作" width="180">
@@ -43,8 +43,8 @@
 			    		<el-form-item label="职位名称" prop="titleName">
 			    			<el-input v-model="titleForm.titleName" placeholder="职位名称"></el-input>
 			    		</el-form-item>
-			    		<el-form-item label="职位描述" prop="titleDesc">
-			    			<el-input type="textarea" v-model="titleForm.titleDesc" placeholder="职位描述"></el-input>
+			    		<el-form-item label="职位描述" prop="description">
+			    			<el-input type="textarea" v-model="titleForm.description" placeholder="职位描述"></el-input>
 			    		</el-form-item>
 			    	</el-form>
 	    		</el-col>
@@ -69,7 +69,7 @@
 				titleList: [],
 				titleForm: {
 					titleName: '',
-					titleDesc: '',
+					description: '',
 				},
 				titleFormTitle: '',
 				titleFormVisible: false,
@@ -77,7 +77,7 @@
 					titleName: [
 						{ required: true, message: '请输入职位名称', trigger: 'blur'}
 					],
-					titleDesc: [
+					description: [
 						{ required: true, message: '请输入职位描述', trigger: 'blur'}
 					]
 				}
@@ -118,9 +118,9 @@
 			// 职位新增
 			handleAdd() {
 				this.titleForm = {
-					titleId: '',
+					id: '',
 					titleName: '',
-					titleDesc: '',
+					description: '',
 				}
 				this.titleFormTitle = '新增职位'
 				this.titleFormVisible = true;
@@ -128,9 +128,9 @@
 			// 职位编辑
 			handleEdit(row) {
 				this.titleForm = {
-					titleId: row.titleId,
+					id: row.id,
 					titleName: row.titleName,
-					titleDesc: row.titleDesc
+					description: row.description
 				}
 				this.titleFormTitle = '职位编辑'
 				this.titleFormVisible = true;
@@ -140,7 +140,7 @@
 				this.$refs.titleForm.validate(valid => {
 					if(valid) {
 						let data = Object.assign({}, this.titleForm)
-						if(data.titleId) {
+						if(data.id) {
 							updateTitle(data).then(res => {
 								if(res.data.code === '0001') {
 									this.$message.success(res.data.message)
@@ -169,7 +169,7 @@
 			handleDelete(row) {
 				this.$confirm(`确定删除 ${row.titleName} 职位？`, '提示', {type: 'warning'}).then(() => {
 					let data = {
-						titleId: row.titleId
+						id: row.id
 					}
 					delTitle(data).then(res => {
 						if(res.data.code === '0001') {

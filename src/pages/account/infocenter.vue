@@ -15,10 +15,10 @@
 						  popper-class="text-center">
 						</el-popover>
 						<div class="avatar" v-popover:avatarPop @click="uploadAvatar">
-							<img v-if="userForm.avatar" :src="userForm.avatar">
+							<img v-if="userInfo.avatar" :src="userInfo.avatar">
 							<img v-else src="../../assets/img/avatar.gif" alt="头像"/>
 						</div>
-						<h3>{{userForm.name}}</h3>
+						<h3>{{userInfo.name}}</h3>
 						<ul class="list-group">
 							<li class="list-group-item active">
 								<a href="javascript:;" title="编辑" @click="handleEdit">		   账户信息
@@ -27,35 +27,35 @@
 							</li>
 							<li class="list-group-item">
 								<label>邮箱</label>
-								<span>{{userForm.email}}</span>
+								<span>{{userInfo.email}}</span>
 							</li>
 							<li class="list-group-item">
 								<label>姓名</label>
-								<span v-if="userForm.realname">{{userForm.realname}}</span>
+								<span v-if="userInfo.realname">{{userInfo.realname}}</span>
 								<span v-else>未设置</span>
 							</li>
 							<li class="list-group-item">
 								<label>性别</label>
-								<span>{{userForm.sexual === 1 ? '男' : userForm.sexual === 0 ? '女' : '未知'}}</span>
+								<span>{{userInfo.sexual === 1 ? '男' : userInfo.sexual === 0 ? '女' : '未知'}}</span>
 							</li>
 							<li class="list-group-item">
 								<label>QQ</label>
-								<span v-if="userForm.qq">{{userForm.qq}}</span>
+								<span v-if="userInfo.qq">{{userInfo.qq}}</span>
 								<span v-else>未设置</span>
 							</li>
 							<li class="list-group-item">
 								<label>生日</label>
-								<span v-if="userForm.birthday">{{userForm.birthday}}</span>
+								<span v-if="userInfo.birthday">{{userInfo.birthday}}</span>
 								<span v-else>未设置</span>
 							</li>
 							<li class="list-group-item">
 								<label>部门</label>
-								<span v-if="userForm.orgName">{{userForm.orgName}}</span>
+								<span v-if="userInfo.orgName">{{userInfo.orgName}}</span>
 								<span v-else>未知</span>
 							</li>
 							<li class="list-group-item">
 								<label>所在地</label>
-								<span v-if="userForm.areaName">{{userForm.areaName}}</span>
+								<span v-if="userInfo.areaName">{{userInfo.areaName}}</span>
 								<span v-else>未设置</span>
 							</li>
 						</ul>
@@ -82,6 +82,8 @@
 			  class="uploader avatar-uploader"
 			  accept="image/jpeg, image/png"
 			  :action="uploadAction"
+			  name='uploadFile'
+			  :data="{category: 'avatar'}"
 			  :show-file-list="false"
 			  :on-progress="handleProgress"
 			  :on-success="handleAvatarSuccess"
@@ -196,22 +198,12 @@
 </template>
 <script>
 	import Region from '@/assets/js/region'
-	import { getMyInfo, updateMyInfo, getMyPartner } from '@/api'
+	import { getMyInfo, updateMyInfo, getMyPartner, updateAvatar } from '@/api'
 	export default {
 		data() {
 			return {
-				userForm: {
-					name: '',
-					realname: '',
-					qq: '',
-					avatar: '',
-					sexual: '',
-					areaName: '',
-					birthday: '',
-					idcardNum: '',
-					idcardPicFront: '',
-					idcardPicBack: '',
-				},
+				userInfo: {},
+				userForm: {},
 				partnerInfo: {},
 				areaId: '',
 				areaName: '',
@@ -227,6 +219,7 @@
 				},
 				// uploadAction: '/baseInter/uploadFile.do',
 				uploadAction: 'https://jsonplaceholder.typicode.com/posts/',
+				avatarId: '',
 				avatarUrl: '',
 				idcardFrontUrl: '',
 				idcardBackUrl: '',
@@ -248,9 +241,9 @@
 			}
 		},
 		methods: {
-			// 地区格式化
-			formatRegion() {
-				let origin = Region.filter(region => region.id === this.userForm.areaId)[0];
+			// 所在地回显
+			formatRegion(areaId) {
+				let origin = Region.filter(region => region.id === areaId)[0];
 				if(!origin) return;
 				if(origin.level === 1) {
 					this.areaName = this.region.province = origin.name
@@ -274,10 +267,12 @@
 					console.log(res)
 					this.loading = false;
 					if(res.data.code === '0001') {
-						this.userForm = res.data.result.userInfo;
-						this.avatarUrl = this.userForm.avatar;
-						this.areaId = this.userForm.areaId;
-						this.userForm.partnerId && this.getPartInfo()
+						let userJson = JSON.stringify(res.data.result.userInfo);
+						this.userInfo = JSON.parse(userJson);
+						this.userForm = JSON.parse(userJson);
+						this.avatarUrl = this.userInfo.avatar;
+						this.userInfo.areaId && (this.areaId = this.userInfo.areaId) && this.formatRegion(this.userInfo.areaId)
+						this.userInfo.partnerId && this.getPartInfo()
 					} else {
 						this.$message.error(res.data.message)
 					}
@@ -304,15 +299,24 @@
       	this.uploading = true;
       },
       // 上传失败
-      handleError(){
+      handleError(err) {
+      	console.log(err)
       	this.uploading = false;
       	this.$message.error('上传失败，图片大小超过限制')
       },
 			// 头像上传成功
 			handleAvatarSuccess(res, file) {
+				console.log(res)
 				this.uploading = false;
-        this.avatarUrl = URL.createObjectURL(file.raw);
-        this.$message.success('上传成功')
+				this.$message.success('上传成功')
+				this.avatarUrl = URL.createObjectURL(file.raw);
+				// if(res.code === '0001') {
+				// 	this.$message.success('上传成功')
+				// 	this.avatarUrl = URL.createObjectURL(file.raw);
+				// 	this.avatarId = res.result.fileInfo.fileUuid;
+				// } else {
+				// 	this.$message.error(res.message)
+				// }
       },
       // 身份证正面上传成功
 			handleIdCardFrontSuccess(res, file) {
@@ -340,13 +344,25 @@
       },
       // 头像提交
       uploadSubmit() {
-      	this.avatarVisible = false
-      	this.userForm.avatar = this.avatarUrl
+      	let data = {
+      		avatar: this.avatarId
+      	}
+      	this.userInfo.avatar = this.avatarUrl
       	this.$message.success('更新成功')
+      	// updateAvatar(data).then(res => {
+      	// 	if(res.data.code === '0001') {
+      	// 		this.userInfo.avatar = this.avatarUrl
+      	// 		this.$message.success('更新成功')
+      	// 	} else {
+      	// 		this.$message.error(res.data.message)
+      	// 	}
+      	// }).catch(err => {
+      	// 	console.log(err)
+      	// })
+      	this.avatarVisible = false
       },
       // 账户信息编辑
       handleEdit() {
-      	this.formatRegion()
       	this.userFormVisible = true
       },
       // 账户信息提交

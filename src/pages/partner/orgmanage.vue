@@ -49,9 +49,9 @@
 			      highlight-current-row
 			      v-loading="staffLoading" 
 			      style="width: 100%">
-			      <el-table-column type="index" width="50"></el-table-column>
+			      <el-table-column type="index" width="55"></el-table-column>
 			      <el-table-column prop="realname" label="姓名" sortable width="120" :formatter="formatName"></el-table-column>
-			      <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
+			      <el-table-column prop="email" label="邮箱" width="180" :formatter="formatEmail"></el-table-column>
 			      <el-table-column prop="createTime" label="注册时间" sortable width="120" :formatter="formatTime"></el-table-column>
 			      <el-table-column prop="orgName" label="部门" :formatter="formatOrg"></el-table-column>
 			      <el-table-column prop="titleName" label="职位" :formatter="formatTitle"></el-table-column>
@@ -165,7 +165,7 @@
 		<!-- 员工信息 -->
 		<el-dialog :visible.sync="staffInfoVisible" title="员工信息">
 			<el-row>
-				<el-col :span="16" :offset="4">
+				<el-col :span="14" :offset="5">
 					<el-form :model="staffInfo" label-width="180px">
 						<el-form-item label="" label-width="120px">
 							<img v-if="staffInfo.avatar" :src="staffInfo.avatar" alt="头像" class="avatar">
@@ -183,8 +183,11 @@
 						<el-form-item label="注册时间：">
 							<span>{{staffInfo.createTime}}</span>
 						</el-form-item>
-						<el-form-item label="所属部门：">
+						<el-form-item label="部门：">
 							<span>{{staffInfo.orgName || '暂无'}}</span>
+						</el-form-item>
+						<el-form-item label="职位：">
+							<span>{{staffInfo.titleName}}</span>
 						</el-form-item>
 						<el-form-item label="所在地：">
 							<span>{{staffInfo.areaName}}</span>
@@ -221,7 +224,7 @@
             :data="titleList">
             <el-table-column width="80" label="选择" align="center">
               <template scope="scope">
-                <el-radio class="radio no-label" v-model="titleId" :label="scope.row.titleId">
+                <el-radio class="radio no-label" v-model="titleId" :label="scope.row.id">
                 </el-radio>
               </template>
             </el-table-column>
@@ -319,6 +322,9 @@
 		methods: {
 			formatName(row) {
 				return row.userId === this.userInfo.userId ? `${row.realname}(我)` : row.realname;
+			},
+			formatEmail(row) {
+				return row.email && row.email.replace(/(.{3}).+(.{2}@.+)/, '$1****$2')
 			},
 			formatTime(row) {
 				return this.$moment(row.createTime).format('YYYY-MM-DD')
@@ -678,7 +684,8 @@
       			orgId: this.checkedNode.orgId,
       			realname: this.registForm.realname,
       			email: this.registForm.email,
-      			password: this.registForm.password,
+      			passwd: this.registForm.password,
+      			passwd2: this.registForm.confirmPass,
       		}
       		registerByAgency(data).then(res => {
       			if(res.data.code === '0001') {
