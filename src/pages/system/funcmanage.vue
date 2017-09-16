@@ -11,7 +11,8 @@
 					:value="item.moduleId">
 				</el-option>
 			</el-select>
-			<el-button type="primary" class="m-l" @click="handleCreateModule">新建模块</el-button>
+			<el-button type="success" class="m-l" @click="handleCreateModule">新建模块</el-button>
+			<el-button type="warning" class="m-l" @click="handleUpdateModule">编辑当前模块</el-button>
 		</el-row>
 		<el-card class="card-primary">
 			<div slot="header">组织部门管理</div>
@@ -67,6 +68,16 @@
 						<el-form-item label="部署根路径" prop="contextRoot">
 							<el-input v-model="moduleForm.contextRoot" placeholder="部署根路径"></el-input>
 						</el-form-item>
+						<!-- <el-form-item label="模块标识">
+							<el-select v-model="moduleForm.clientId" style="width: 100%">
+								<el-option 
+									v-for="item in clientList" 
+									:key="item.clientId"
+									:label="item.clientName"
+								  :value="item.clientId">
+								</el-option>
+							</el-select>
+						</el-form-item> -->
 						<el-form-item label="模块描述" prop="note">
 							<el-input type="textarea" v-model="moduleForm.note" placeholder="请输入模块描述"></el-input>
 						</el-form-item>
@@ -180,7 +191,8 @@
 	import '@/assets/plugins/zTree/css/zTreeStyle.css'
 	import '@/assets/plugins/zTree/js/jquery.min.js'
 	import '@/assets/plugins/zTree/js/jquery.ztree.all.min.js'
-	import { getModuleFunctionList, createFunction, updateFunction, delFunction, setOrganizeStatus, getModules, createModule, updateModule } from '@/api'
+	import { getModuleFunctionList, createFunction, updateFunction, 								 delFunction, setOrganizeStatus, getModules, createModule, 
+				   updateModule } from '@/api'
 	export default {
 		data() {
 			return {
@@ -188,6 +200,7 @@
 				moduleList: [],
 				moduleFormTitle: '',
 				moduleFormVisible: false,
+				clientList: [],
 				functionTree: [],
         funcData: [],
 	      checkedNode: null,
@@ -274,9 +287,40 @@
 					this.$catchError(err)
 				})
 			},
+			// 获取模块标识列表
+			// getClientList() {
+			// 	getMailClientList().then(res => {
+			// 		console.log(res)
+			// 		if(res.data.code === '0001') {
+			// 				this.clientList = res.data.result.clientList
+	  // 				} else {
+	  // 					this.$message.error(res.data.message)
+	  // 				}
+			// 		}).catch(err => {
+			// 			console.log(err)
+			// 			this.$catchError(err)
+			// 		})
+			// },
 			// 新建模块
 			handleCreateModule() {
+				this.moduleForm = {
+	      	name: '',
+	      	contextRoot: '',
+	      	note: '',
+	      },
 				this.moduleFormTitle = '新建系统模块'
+				this.moduleFormVisible = true
+			},
+			// 编辑模块
+			handleUpdateModule() {
+				let currModule = this.moduleList.filter(module => module.moduleId === this.moduleId)[0];
+				this.moduleForm = {
+					moduleId: currModule.moduleId,
+					name: currModule.name,
+	      	contextRoot: currModule.contextRoot,
+	      	note: currModule.note,
+				}
+				this.moduleFormTitle = '编辑系统模块'
 				this.moduleFormVisible = true
 			},
 			// 模块提交
@@ -284,17 +328,32 @@
 				this.$refs.moduleForm.validate(valid => {
 					if(!valid) return;
 					let data = Object.assign({}, this.moduleForm)
-					createModule(data).then(res => {
-						if(res.data.code === '0001') {
-							this.$message.success(res.data.message)
-							this.getModuleList()
-	  				} else {
-	  					this.$message.error(res.data.message)
-	  				}
-					}).catch(err => {
-						console.log(err)
-						this.$catchError(err)
-					})
+					console.log(data)
+					if(data.moduleId) {
+						updateModule(data).then(res => {
+							if(res.data.code === '0001') {
+								this.$message.success(res.data.message)
+								this.getModuleList()
+		  				} else {
+		  					this.$message.error(res.data.message)
+		  				}
+						}).catch(err => {
+							console.log(err)
+							this.$catchError(err)
+						})
+					} else {
+						createModule(data).then(res => {
+							if(res.data.code === '0001') {
+								this.$message.success(res.data.message)
+								this.getModuleList()
+		  				} else {
+		  					this.$message.error(res.data.message)
+		  				}
+						}).catch(err => {
+							console.log(err)
+							this.$catchError(err)
+						})
+					}
 					this.moduleFormVisible = false
 				})
 			},

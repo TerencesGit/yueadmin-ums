@@ -96,7 +96,7 @@
 	</section>
 </template>
 <script>
-	import { getMyInfo, updatePwd, } from '@/api'
+	import { getMyInfo, updatePwd, emailActive } from '@/api'
 	import Md5 from '@/assets/js/md5'
 	export default {
 		data () {

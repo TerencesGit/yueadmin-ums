@@ -45,7 +45,7 @@
 							</li>
 							<li class="list-group-item">
 								<label>生日</label>
-								<span v-if="userInfo.birthday">{{userInfo.birthday}}</span>
+								<span v-if="userInfo.birthday">{{userInfo.birthday | formatDate}}</span>
 								<span v-else>未设置</span>
 							</li>
 							<li class="list-group-item">
@@ -217,8 +217,9 @@
 					city: [],
 					area: [],
 				},
-				// uploadAction: '/baseInter/uploadFile.do',
-				uploadAction: 'https://jsonplaceholder.typicode.com/posts/',
+				
+				uploadAction: '/ums/baseInter/uploadFile.do',
+				// uploadAction: 'https://jsonplaceholder.typicode.com/posts/',
 				avatarId: '',
 				avatarUrl: '',
 				idcardFrontUrl: '',
@@ -269,6 +270,7 @@
 					if(res.data.code === '0001') {
 						let userJson = JSON.stringify(res.data.result.userInfo);
 						this.userInfo = JSON.parse(userJson);
+						// this.userInfo.birthday = this.$moment(this.userInfo.birthday).format('YYYY-MM-DD')
 						this.userForm = JSON.parse(userJson);
 						this.avatarUrl = this.userInfo.avatar;
 						this.userInfo.areaId && (this.areaId = this.userInfo.areaId) && this.formatRegion(this.userInfo.areaId)
@@ -308,15 +310,15 @@
 			handleAvatarSuccess(res, file) {
 				console.log(res)
 				this.uploading = false;
-				this.$message.success('上传成功')
-				this.avatarUrl = URL.createObjectURL(file.raw);
-				// if(res.code === '0001') {
-				// 	this.$message.success('上传成功')
-				// 	this.avatarUrl = URL.createObjectURL(file.raw);
-				// 	this.avatarId = res.result.fileInfo.fileUuid;
-				// } else {
-				// 	this.$message.error(res.message)
-				// }
+				// this.$message.success('上传成功')
+				// this.avatarUrl = URL.createObjectURL(file.raw);
+				if(res.code === '0001') {
+					this.$message.success('上传成功')
+					this.avatarUrl = URL.createObjectURL(file.raw);
+					this.avatarId = res.result.fileInfo.fileUuid;
+				} else {
+					this.$message.error(res.message)
+				}
       },
       // 身份证正面上传成功
 			handleIdCardFrontSuccess(res, file) {
@@ -347,18 +349,19 @@
       	let data = {
       		avatar: this.avatarId
       	}
-      	this.userInfo.avatar = this.avatarUrl
-      	this.$message.success('更新成功')
-      	// updateAvatar(data).then(res => {
-      	// 	if(res.data.code === '0001') {
-      	// 		this.userInfo.avatar = this.avatarUrl
-      	// 		this.$message.success('更新成功')
-      	// 	} else {
-      	// 		this.$message.error(res.data.message)
-      	// 	}
-      	// }).catch(err => {
-      	// 	console.log(err)
-      	// })
+      	console.log(data)
+      	// this.userInfo.avatar = this.avatarUrl
+      	// this.$message.success('更新成功')
+      	updateAvatar(data).then(res => {
+      		if(res.data.code === '0001') {
+      			this.userInfo.avatar = this.avatarUrl
+      			this.$message.success('更新成功')
+      		} else {
+      			this.$message.error(res.data.message)
+      		}
+      	}).catch(err => {
+      		console.log(err)
+      	})
       	this.avatarVisible = false
       },
       // 账户信息编辑
@@ -380,7 +383,6 @@
       			name: this.userForm.name,
 						realname: this.userForm.realname,
 						qq: this.userForm.qq,
-						// avatar: this.userForm.avatar,
 						sexual: this.userForm.sexual,
 						areaId: this.areaId,
 						birthday: this.userForm.birthday,
@@ -390,6 +392,7 @@
       		}
       		console.log(data)
       		updateMyInfo(data).then(res => {
+      			console.log(res)
       			if(res.data.code === '0001') {
       				this.$message.success(res.data.message)
       				this.getUserInfo()

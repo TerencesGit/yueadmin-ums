@@ -290,6 +290,7 @@
 					typeId: row.typeId,
 					status: row.status
 				}
+				console.log(data)
 				updatePartnerTypeStatus(data).then(res => {
 					if(res.data.code === '0001') {
 						this.$message.success(res.data.message)

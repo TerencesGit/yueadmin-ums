@@ -27,6 +27,9 @@
 						<el-button size="small" type="primary" icon="setting" :disabled="roleDisabled" @click="handleOrgRoles">
 							权限
 						</el-button>
+						<!-- <el-button size="small" type="primary" icon="setting" @click="showOrgFunctions">
+							功能点
+						</el-button> -->
 						<el-button size="small" type="info" :disabled="disabled" @click="handleStatus">
 							<i class="fa fa-unlock"></i>
 							启用 
@@ -244,7 +247,7 @@
 	import '@/assets/plugins/zTree/css/zTreeStyle.css'
 	import '@/assets/plugins/zTree/js/jquery.min.js'
 	import '@/assets/plugins/zTree/js/jquery.ztree.all.min.js'
-	import { getMyPartnerOrgs, getMyPartnerRoles, getRolesByOrg, updateOrgRole, getOrganizeStaff, createOrganize, updateOrganize, delOrganize, updateOrgStatus, updateStaffOrg,updateStaffStatus, getPartnerTitle, updateStaffTitle, registerByAgency,removeUser } from '@/api'
+	import { getMyPartnerOrgs, getMyPartnerRoles, getRolesByOrg, updateOrgRole, getOrganizeStaff, createOrganize, updateOrganize, delOrganize, updateOrgStatus, updateStaffOrg, updateStaffStatus, getPartnerTitle, updateStaffTitle, registerByAgency, getFunctionsByOrg } from '@/api'
 	import { mapGetters } from 'vuex'
 	export default {
 		data() {
@@ -641,6 +644,29 @@
       		console.log(err)
       	})
       	this.orgRolesVisible = false
+			},
+			// 获取部门所拥有的功能点
+			getOrgFuncstions() {
+				let params = {
+					orgId: this.checkedNode.orgId
+				}
+				getFunctionsByOrg(params).then(res => {
+					if(res.data.code === '0001') {
+						let orgFuncs = res.data.result.orgFuncs;
+						console.log(orgFuncs)
+  				} else {
+  					this.$message.error(res.data.message)
+  				}
+      	}).catch(err => {
+      		console.log(err)
+      	})
+			},
+			// 功能点查看
+			showOrgFunctions() {
+				if (!this.checkedNode) {
+      		return this.$notify.warning({title: '提示', message: '请选择部门'})
+      	}
+      	this.getOrgFuncstions()
 			},
       // 状态设置
       handleStatus() {

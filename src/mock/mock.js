@@ -399,6 +399,45 @@ export default {
 				}, 500)
 			})
 		})
+		// 获取部门关联功能点列表
+		mock.onGet('/partnerInter/getFunctionsByOrg.do').reply(config => {
+			let { orgId } = config.params;
+			let currOrg = _Organizes.filter(org => org.orgId === orgId)[0];
+			let orgRoles = [];
+			if(currOrg.parentId === 0) {
+				orgRoles = _RoleList
+			} else {
+				orgRoles = _OrgRoles.filter(orgRole => orgRole.orgId === orgId);
+			}
+			let roleFuncs = []
+			orgRoles.forEach(orgRole => {
+				_RoleFuncs.forEach(roleFunc => {
+					if(orgRole.roleId === roleFunc.roleId) {
+						roleFuncs.push(roleFunc)
+					}
+				})
+			})
+			let orgFuncs = [];
+			roleFuncs.forEach(orgFunc => {
+				_FunctionList.forEach(func => {
+					if(orgFunc.funcId === func.funcId) {
+						orgFuncs.push(func)
+					}
+				})
+			})
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					orgFuncs
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
 		// 获取部门关联角色列表
 		mock.onGet('/partnerInter/getRolesByOrg.do').reply(config => {
 			let { orgId } = config.params;
