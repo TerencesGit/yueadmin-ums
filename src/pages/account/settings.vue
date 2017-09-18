@@ -3,9 +3,7 @@
 		<div v-title :data-title="this.$route.name"></div>
 	  <!-- 账号设置 -->
 		<el-card class="card-primary" v-loading="loading">
-			<div slot="header">
-				账号设置
-			</div>
+			<div slot="header">账号设置</div>
 			<ul class="account-group">
 				<li class="account-item">
 					<i class="el-icon-circle-check"></i>
@@ -23,7 +21,7 @@
 					<i class="el-icon-warning"></i>
 					<label>邮箱验证</label>
 					<span>验证后，可用于快速找回密码。</span>
-					<el-button size="small" type="success" @click="verifyEmail">立即验证</el-button>
+					<el-button size="small" type="success" :loading="emailLoading" @click="verifyEmail">立即验证</el-button>
 				</li>
 				<li v-if="userInfo.mobile" class="account-item">
 					<i class="el-icon-circle-check"></i>
@@ -158,6 +156,7 @@
 				disabled: false,
 				buttonText: '获取验证码',
 				sendEmail: false,
+				emailLoading: false,
 			}
 		},
 		methods: {
@@ -209,10 +208,26 @@
 			},
 			// 验证邮箱
 			verifyEmail() {
-				!this.sendEmail && 
-				this.$message(`验证信息已发送到${this.userInfo.email}，请注意查收`) || 
-				this.$notify({ type: 'warning', title: '提示', message: '邮件已发送，不可重复发送' })
-				this.sendEmail = true;
+				if(this.sendEmail) {
+				 this.$notify({ type: 'warning', title: '提示', message: '验证邮件已发送，请注意查收' })
+				 return;
+				}
+				let params = {
+					email: this.userInfo.email
+				}
+				this.emailLoading = true;
+				emailActive(params).then(res => {
+					this.emailLoading = false;
+					if(res.data.code === '0001') {
+						this.$message(`验证信息已发送到${this.userInfo.email}，请注意查收`)
+						this.sendEmail = true;
+					} else {
+						this.$message.error(res.data.message)
+					}
+				}).catch(err => {
+					this.emailLoading = false;
+					console.log(err)
+				})
 			},
 			// 
 			bindMobile() {
@@ -244,19 +259,15 @@
 					}
 				})
 			},
-			// 绑定手机号
+			// 绑定手机号提交
 			submitMobile() {
 				this.$refs.mobileForm.validate(valid => {
-					console.log(valid)
-					if(valid) {
-						let data = {
-							mobile: this.mobileForm.mobile,
-							smsCode: this.mobileForm.smsCode
-						}
-						console.log(data)
-					} else {
-						console.log('err submit')
+					if(!valid) return;
+					let data = {
+						mobile: this.mobileForm.mobile,
+						smsCode: this.mobileForm.smsCode
 					}
+					console.log(data)
 				})
 			},
 			modifyMobile() {

@@ -285,6 +285,16 @@ export default {
 				}, 500)
 			})
 		})
+		// 账户邮箱激活
+		mock.onGet('/baseInter/emailActiveAccount.do').reply(config => {
+			let { email } = config.params;
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+						resolve([200, retObj])
+				}, 500)
+			})
+		})
 		// 新建商家信息
 		mock.onPost('/accountInter/createPartner.do').reply(config => {
 			let partnerInfo = JSON.parse(config.data);

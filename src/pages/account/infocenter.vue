@@ -45,7 +45,7 @@
 							</li>
 							<li class="list-group-item">
 								<label>生日</label>
-								<span v-if="userInfo.birthday">{{userInfo.birthday | formatDate}}</span>
+								<span v-if="userInfo.birthday">{{userInfo.birthday}}</span>
 								<span v-else>未设置</span>
 							</li>
 							<li class="list-group-item">
@@ -217,7 +217,6 @@
 					city: [],
 					area: [],
 				},
-				
 				uploadAction: '/ums/baseInter/uploadFile.do',
 				// uploadAction: 'https://jsonplaceholder.typicode.com/posts/',
 				avatarId: '',
@@ -270,6 +269,7 @@
 					if(res.data.code === '0001') {
 						let userJson = JSON.stringify(res.data.result.userInfo);
 						this.userInfo = JSON.parse(userJson);
+						console.log(this.userInfo)
 						// this.userInfo.birthday = this.$moment(this.userInfo.birthday).format('YYYY-MM-DD')
 						this.userForm = JSON.parse(userJson);
 						this.avatarUrl = this.userInfo.avatar;
@@ -353,7 +353,9 @@
       	// this.userInfo.avatar = this.avatarUrl
       	// this.$message.success('更新成功')
       	updateAvatar(data).then(res => {
+      		console.log(res)
       		if(res.data.code === '0001') {
+      			// this.userInfo.avatar = res.data.result.avatar;
       			this.userInfo.avatar = this.avatarUrl
       			this.$message.success('更新成功')
       		} else {
@@ -361,6 +363,7 @@
       		}
       	}).catch(err => {
       		console.log(err)
+      		this.$catchError(err)
       	})
       	this.avatarVisible = false
       },
@@ -389,6 +392,7 @@
 						idcardNum: this.userForm.idcardNum,
 						idcardPicFront: this.userForm.idcardPicFront,
 						idcardPicBack: this.userForm.idcardPicBack,
+						versionId: this.userForm.versionId,
       		}
       		console.log(data)
       		updateMyInfo(data).then(res => {

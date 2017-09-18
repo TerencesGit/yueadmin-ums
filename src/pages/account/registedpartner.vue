@@ -75,11 +75,13 @@
 						</el-row>
 						<el-row>
 							<el-col :span="12">
-								<el-form-item label="LOGO" prop="telphone">
+								<el-form-item label="LOGO" prop="logo">
 									<el-upload
 									  class="uploader"
-									  action="https://jsonplaceholder.typicode.com/posts/"
+									  accept="image/jpeg, image/png"
+									  :action="uploadAction"
 									  :show-file-list="false"
+									  :on-error="handleError"
 									  :on-success="handleLogoSuccess"
 									  :before-upload="beforeUpload">
 									  <img v-if="logoUrl" :src="logoUrl">
@@ -88,10 +90,11 @@
 								</el-form-item>
 							</el-col>
 							<el-col :span="12">
-								<el-form-item label="营业执照图片" prop="email">
+								<el-form-item label="营业执照图片" prop="licensePic">
 									<el-upload
 									  class="uploader lisence-uploader"
-									  action="https://jsonplaceholder.typicode.com/posts/"
+									  accept="image/jpeg, image/png"
+									  :action="uploadAction"
 									  :show-file-list="false"
 									  :on-success="handleLicenseSuccess"
 									  :before-upload="beforeUpload">
@@ -131,6 +134,8 @@
         }, 0);
       }
 			return {
+				uploadAction: '/ums/baseInter/uploadFile.do',
+				// uploadAction: 'https://jsonplaceholder.typicode.com/posts/',
 				partnerForm: {
 					name: '',
 					shortName: '',
@@ -138,14 +143,14 @@
 					telphone: '',
 					mobile: '',
 					post: '',
-					logo: '',
+					logo: '111',
 					memberNum: '',
 					idcardNum: '',
 					idcardPicFront: '',
 					contactName: '',
 					contactAddress: '',
 					licenseNum: '',
-					licensePic: '',
+					licensePic: '111',
 					corporationName: '',
 					note: ''
 				},
@@ -157,7 +162,7 @@
 						{ required: true, message: '请输入企业简称', trigger: 'blur'},
 					],
 					mobile: [
-						{ required: true, validator: validateMobile, trigger: 'blur'}
+						{ required: true, message: '请输入联系电话', trigger: 'blur' },
 					],
 					post: [
 						{ required: true, message: '请输入企业邮编', trigger: 'blur'},
@@ -174,24 +179,25 @@
 					corporationName: [
 						{ required: true, message: '请输入企业法定代表人', trigger: 'blur'},
 					],
+					logo: [
+						{ required: true, message: '请选择企业logo', trigger: 'blur'},
+					],
+					licensePic: [
+						{ required: true, message: '请选择企业营业执照', trigger: 'blur'},
+					],
+					note: [
+						{ required: true, message: '请输入企业简介', trigger: 'blur'},
+					],
 				},
 				logoUrl: '',
 				licenseUrl: ''
 			}
 		},
 		methods: {
-			handleLogoSuccess(res, file) {
-        this.logoUrl = URL.createObjectURL(file.raw);
-        this.partnerForm.logo = URL.createObjectURL(file.raw);
-      },
-      handleLicenseSuccess(res, file) {
-        this.licenseUrl = URL.createObjectURL(file.raw);
-        this.partnerForm.licensePic = URL.createObjectURL(file.raw);
-      },
-      beforeUpload(file) {
-        const isJPG = file.type === 'image/jpeg';
+			// 上传验证
+			beforeUpload(file) {
+        const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
         const isLt2M = file.size / 1024 / 1024 < 2;
-
         if (!isJPG) {
           this.$message.error('上传头像图片只能是 JPG 格式!');
         }
@@ -199,6 +205,38 @@
           this.$message.error('上传头像图片大小不能超过 2MB!');
         }
         return isJPG && isLt2M;
+      },
+      // 上传失败
+			handleError(err, file) {
+				console.log(err)
+				this.$message.error('上传失败')
+				this.logoUrl = URL.createObjectURL(file.raw);
+			},
+			// logo上传成功
+			handleLogoSuccess(res, file) {
+				console.log(res)
+        this.logoUrl = URL.createObjectURL(file.raw);
+        this.partnerForm.logo = file.uid;
+        if(res.code === '0001') {
+					this.$message.success('上传成功')
+					this.logoUrl = URL.createObjectURL(file.raw);
+					this.partnerForm.logo = res.result.fileInfo.fileUuid;
+				} else {
+					this.$message.error(res.message)
+				}
+      },
+      // 营业执照上传成功
+      handleLicenseSuccess(res, file) {
+        console.log(res)
+        this.licenseUrl = URL.createObjectURL(file.raw);
+        this.partnerForm.licensePic = file.uid;
+        if(res.code === '0001') {
+					this.$message.success('上传成功')
+					this.licenseUrl = URL.createObjectURL(file.raw);
+					this.partnerForm.licensePic = res.result.fileInfo.fileUuid;
+				} else {
+					this.$message.error(res.message)
+				}
       },
       resetForm() {
       	this.$refs.partnerForm.resetFields()
@@ -226,12 +264,8 @@
 				})
 			}
 		},
-		mounted() {
-
-		}
 	}
 </script>
-
 <style scoped lang="scss">
 	.partner-form {
 		margin: 30px 0
