@@ -66,14 +66,14 @@ const router = new Router({
 })
 router.beforeEach((to, from, next) => {
   Vue.prototype.$fromPath = from.path;
-  let user = Utils.getCookie('userId');
-  let logRequired = to.path.indexOf('account') !== -1 || 
-                    to.path.indexOf('admin') !== -1 ||
-                    to.path.indexOf('system') !== -1;
-  if(logRequired && !user) {
-    // ElementUI.Message('尚未登录或当前会话已过期')
-    return router.push('/login')
-  }
+  // let user = Utils.getCookie('userId');
+  // let logRequired = to.path.indexOf('account') !== -1 || 
+  //                   to.path.indexOf('admin') !== -1 ||
+  //                   to.path.indexOf('system') !== -1;
+  // if(logRequired && !user) {
+  //   // ElementUI.Message('尚未登录或当前会话已过期')
+  //   return router.push('/login')
+  // }
   NProgress.start()
   next()
 })

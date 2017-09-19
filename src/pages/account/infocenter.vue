@@ -14,7 +14,7 @@
 						  :content="avatarUrl ? '更换头像' : '上传头像'"
 						  popper-class="text-center">
 						</el-popover>
-						<div class="avatar" v-popover:avatarPop @click="uploadAvatar">
+						<div class="avatar" @click="uploadAvatar">
 							<img v-if="userInfo.avatar" :src="userInfo.avatar">
 							<img v-else src="../../assets/img/avatar.gif" alt="头像"/>
 						</div>
@@ -81,8 +81,8 @@
 				v-loading="uploading"
 			  class="uploader avatar-uploader"
 			  accept="image/jpeg, image/png"
-			  :action="uploadAction"
 			  name='uploadFile'
+			  :action="uploadAction"
 			  :data="{category: 'avatar'}"
 			  :show-file-list="false"
 			  :on-progress="handleProgress"
@@ -165,8 +165,10 @@
 						<el-form-item label="身份证正面：" prop="idcard">
 							<el-upload
 							  class="uploader idcard-uploader"
-							  action="https://jsonplaceholder.typicode.com/posts/"
 							  accept="image/jpeg, image/png"
+							  name='uploadFile'
+							  :action="uploadAction"
+							  :data="{category: 'idcard'}"
 							  :show-file-list="false"
 							  :on-success="handleIdCardFrontSuccess"
 							  :before-upload="beforeAvatarUpload">
@@ -177,7 +179,9 @@
 						<el-form-item label="身份证背面：" prop="idcard">
 							<el-upload
 							  class="uploader idcard-uploader"
-							  action="https://jsonplaceholder.typicode.com/posts/"
+							  name='uploadFile'
+							  :action="uploadAction"
+							  :data="{category: 'idcard'}"
 							  accept="image/jpeg, image/png"
 							  :show-file-list="false"
 							  :on-success="handleIdCardBackSuccess"
@@ -217,8 +221,8 @@
 					city: [],
 					area: [],
 				},
+				// uploadAction: '/uploadFileUrl',
 				uploadAction: '/ums/baseInter/uploadFile.do',
-				// uploadAction: 'https://jsonplaceholder.typicode.com/posts/',
 				avatarId: '',
 				avatarUrl: '',
 				idcardFrontUrl: '',
@@ -269,8 +273,6 @@
 					if(res.data.code === '0001') {
 						let userJson = JSON.stringify(res.data.result.userInfo);
 						this.userInfo = JSON.parse(userJson);
-						console.log(this.userInfo)
-						// this.userInfo.birthday = this.$moment(this.userInfo.birthday).format('YYYY-MM-DD')
 						this.userForm = JSON.parse(userJson);
 						this.avatarUrl = this.userInfo.avatar;
 						this.userInfo.areaId && (this.areaId = this.userInfo.areaId) && this.formatRegion(this.userInfo.areaId)
@@ -304,14 +306,12 @@
       handleError(err) {
       	console.log(err)
       	this.uploading = false;
-      	this.$message.error('上传失败，图片大小超过限制')
+      	this.$message.error('上传失败，请稍后重试')
       },
 			// 头像上传成功
 			handleAvatarSuccess(res, file) {
 				console.log(res)
 				this.uploading = false;
-				// this.$message.success('上传成功')
-				// this.avatarUrl = URL.createObjectURL(file.raw);
 				if(res.code === '0001') {
 					this.$message.success('上传成功')
 					this.avatarUrl = URL.createObjectURL(file.raw);
@@ -322,15 +322,23 @@
       },
       // 身份证正面上传成功
 			handleIdCardFrontSuccess(res, file) {
-        this.idcardFrontUrl = URL.createObjectURL(file.raw);
-        this.userForm.idcardPicFront = URL.createObjectURL(file.raw);
-        this.$message.success('上传成功')
+        if(res.code === '0001') {
+					this.$message.success('上传成功')
+					this.idcardFrontUrl = URL.createObjectURL(file.raw);
+					this.userForm.idcardPicFront = res.result.fileInfo.fileUuid;
+				} else {
+					this.$message.error(res.message)
+				}
       },
       // 身份证背面上传成功
 			handleIdCardBackSuccess(res, file) {
-        this.idcardBackUrl = URL.createObjectURL(file.raw);
-        this.userForm.idcardPicBack = URL.createObjectURL(file.raw);
-        this.$message.success('上传成功')
+        if(res.code === '0001') {
+					this.$message.success('上传成功')
+					this.idcardBackUrl = URL.createObjectURL(file.raw);
+					this.userForm.idcardPicBack = res.result.fileInfo.fileUuid;
+				} else {
+					this.$message.error(res.message)
+				}
       },
       dateChange(val) {
       	this.userForm.birthday = val
@@ -349,9 +357,6 @@
       	let data = {
       		avatar: this.avatarId
       	}
-      	console.log(data)
-      	// this.userInfo.avatar = this.avatarUrl
-      	// this.$message.success('更新成功')
       	updateAvatar(data).then(res => {
       		console.log(res)
       		if(res.data.code === '0001') {
@@ -392,7 +397,6 @@
 						idcardNum: this.userForm.idcardNum,
 						idcardPicFront: this.userForm.idcardPicFront,
 						idcardPicBack: this.userForm.idcardPicBack,
-						versionId: this.userForm.versionId,
       		}
       		console.log(data)
       		updateMyInfo(data).then(res => {

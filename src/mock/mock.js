@@ -375,7 +375,7 @@ export default {
 		// 更新当前用户所属商户信息
 		mock.onPost('/partnerInter/updateMyPartnerInfo.do').reply(config => {
 			let { partnerId, name, shortName } = JSON.parse(config.data);
-			console.log(partnerId, name, shortName)
+			// console.log(partnerId, name, shortName)
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {

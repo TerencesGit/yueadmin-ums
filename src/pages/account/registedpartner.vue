@@ -79,7 +79,9 @@
 									<el-upload
 									  class="uploader"
 									  accept="image/jpeg, image/png"
+									  name='uploadFile'
 									  :action="uploadAction"
+									  :data="{category: 'partner'}"
 									  :show-file-list="false"
 									  :on-error="handleError"
 									  :on-success="handleLogoSuccess"
@@ -94,7 +96,9 @@
 									<el-upload
 									  class="uploader lisence-uploader"
 									  accept="image/jpeg, image/png"
+									  name='uploadFile'
 									  :action="uploadAction"
+									  :data="{category: 'partner'}"
 									  :show-file-list="false"
 									  :on-success="handleLicenseSuccess"
 									  :before-upload="beforeUpload">
@@ -134,8 +138,8 @@
         }, 0);
       }
 			return {
+				// uploadAction: '/uploadFileUrl',
 				uploadAction: '/ums/baseInter/uploadFile.do',
-				// uploadAction: 'https://jsonplaceholder.typicode.com/posts/',
 				partnerForm: {
 					name: '',
 					shortName: '',
@@ -143,14 +147,14 @@
 					telphone: '',
 					mobile: '',
 					post: '',
-					logo: '111',
+					logo: '',
 					memberNum: '',
 					idcardNum: '',
 					idcardPicFront: '',
 					contactName: '',
 					contactAddress: '',
 					licenseNum: '',
-					licensePic: '111',
+					licensePic: '',
 					corporationName: '',
 					note: ''
 				},
@@ -180,10 +184,10 @@
 						{ required: true, message: '请输入企业法定代表人', trigger: 'blur'},
 					],
 					logo: [
-						{ required: true, message: '请选择企业logo', trigger: 'blur'},
+						{ required: true, message: '请选择企业logo', trigger: 'change'},
 					],
 					licensePic: [
-						{ required: true, message: '请选择企业营业执照', trigger: 'blur'},
+						{ required: true, message: '请选择企业营业执照', trigger: 'change'},
 					],
 					note: [
 						{ required: true, message: '请输入企业简介', trigger: 'blur'},
@@ -208,15 +212,12 @@
       },
       // 上传失败
 			handleError(err, file) {
-				console.log(err)
-				this.$message.error('上传失败')
-				this.logoUrl = URL.createObjectURL(file.raw);
+				// console.log(err)
+				this.$message.error('上传失败，请稍后重试')
 			},
-			// logo上传成功
+			// 企业logo上传成功
 			handleLogoSuccess(res, file) {
 				console.log(res)
-        this.logoUrl = URL.createObjectURL(file.raw);
-        this.partnerForm.logo = file.uid;
         if(res.code === '0001') {
 					this.$message.success('上传成功')
 					this.logoUrl = URL.createObjectURL(file.raw);
@@ -228,8 +229,6 @@
       // 营业执照上传成功
       handleLicenseSuccess(res, file) {
         console.log(res)
-        this.licenseUrl = URL.createObjectURL(file.raw);
-        this.partnerForm.licensePic = file.uid;
         if(res.code === '0001') {
 					this.$message.success('上传成功')
 					this.licenseUrl = URL.createObjectURL(file.raw);

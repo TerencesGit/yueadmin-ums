@@ -78,7 +78,9 @@
 								<el-form-item label="LOGO" prop="telphone">
 									<el-upload
 									  class="uploader"
-									  action="https://jsonplaceholder.typicode.com/posts/"
+									  name='uploadFile'
+									  :action="uploadAction"
+									  :data="{category: 'partner'}"
 									  :show-file-list="false"
 									  :on-success="handleLogoSuccess"
 									  :before-upload="beforeUpload">
@@ -91,7 +93,9 @@
 								<el-form-item label="营业执照图片" prop="email">
 									<el-upload
 									  class="uploader lisence-uploader"
-									  action="https://jsonplaceholder.typicode.com/posts/"
+									  name='uploadFile'
+									  :action="uploadAction"
+									  :data="{category: 'partner'}"
 									  :show-file-list="false"
 									  :on-success="handleLicenseSuccess"
 									  :before-upload="beforeUpload">
@@ -131,6 +135,8 @@
         }, 0);
       }
 			return {
+				// uploadAction: '/uploadFileUrl',
+				uploadAction: '/ums/baseInter/uploadFile.do',
 				partnerForm: {
 					name: '',
 					shortName: '',
@@ -183,12 +189,14 @@
 			}
 		},
 		methods: {
+			// 获取企业信息
 			getPartnerInfo() {
 				getMyPartnerInfo().then(res => {
-					// console.log(res)
+					console.log(res)
 					if(res.data.code === '0001') {
 						this.partnerForm = res.data.result.partnerInfo
 						this.logoUrl = res.data.result.partnerInfo.logo
+						this.licenseUrl = res.data.result.partnerInfo.licensePic
 					} else {
 						this.$message.error(res.data.message)
 					}
@@ -197,15 +205,8 @@
 					this.$catchError(err)
 				})
 			},
-			handleLogoSuccess(res, file) {
-        this.logoUrl = URL.createObjectURL(file.raw);
-        this.partnerForm.logo = URL.createObjectURL(file.raw);
-      },
-      handleLicenseSuccess(res, file) {
-        this.licenseUrl = URL.createObjectURL(file.raw);
-        this.partnerForm.licensePic = URL.createObjectURL(file.raw);
-      },
-      beforeUpload(file) {
+			// 上传校验
+			beforeUpload(file) {
         const isJPG = file.type === 'image/jpeg';
         const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -217,9 +218,37 @@
         }
         return isJPG && isLt2M;
       },
+      // 上传失败
+			handleError(err, file) {
+				// console.log(err)
+				this.$message.error('上传失败，请稍后重试')
+			},
+			// 企业logo上传成功
+			handleLogoSuccess(res, file) {
+				console.log(res)
+        if(res.code === '0001') {
+					this.$message.success('上传成功')
+					this.logoUrl = URL.createObjectURL(file.raw);
+					this.partnerForm.logo = res.result.fileInfo.fileUuid;
+				} else {
+					this.$message.error(res.message)
+				}
+      },
+      // 营业执照上传成功
+      handleLicenseSuccess(res, file) {
+        console.log(res)
+        if(res.code === '0001') {
+					this.$message.success('上传成功')
+					this.licenseUrl = URL.createObjectURL(file.raw);
+					this.partnerForm.licensePic = res.result.fileInfo.fileUuid;
+				} else {
+					this.$message.error(res.message)
+				}
+      },
       back() {
       	this.$router.back()
       },
+      // 更新企业信息提交
 			submitForm() {
 				this.$refs.partnerForm.validate(valid => {
 					if(valid) {
@@ -250,7 +279,6 @@
 		}
 	}
 </script>
-
 <style scoped lang="scss">
 	.partner-form {
 		margin: 30px 0

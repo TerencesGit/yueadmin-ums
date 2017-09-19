@@ -60,7 +60,7 @@
 			</div>
 		</el-dialog>
 		<!-- 绑定手机号 -->
-		<el-dialog :visible.sync="mobileFormVisible" title="绑定手机号">
+		<el-dialog :visible.sync="mobileFormVisible" :title="mobileFormTitle">
 			<el-row>
 				<el-col :span="14" :offset="5">
 					<el-form :model="mobileForm" ref="mobileForm" :rules="rules" label-width="120px">
@@ -157,6 +157,7 @@
 				buttonText: '获取验证码',
 				sendEmail: false,
 				emailLoading: false,
+				mobileFormTitle: '',
 			}
 		},
 		methods: {
@@ -231,6 +232,7 @@
 			},
 			// 
 			bindMobile() {
+				this.mobileFormTitle = '绑定手机号';
 				this.mobileFormVisible = true; 
 			},
 			countDown() {
@@ -271,6 +273,7 @@
 				})
 			},
 			modifyMobile() {
+				this.mobileFormTitle = '修改手机号';
 				this.mobileFormVisible = true;
 			}
 		},

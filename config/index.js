@@ -43,7 +43,8 @@ module.exports = {
       //   }
       // },
       '/uploadFileUrl': {
-         target: 'http://localhost:8080/ums/baseInter/uploadFile.do',
+         // target: 'http://localhost:8080/ums/baseInter/uploadFile.do',
+         target: 'http://192.168.1.110:8080/ums/baseInter/uploadFile.do',
          changeOrigin: true,
          pathRewrite: {
            '^/uploadFileUrl': ''

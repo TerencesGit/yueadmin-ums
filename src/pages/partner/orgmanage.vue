@@ -673,9 +673,10 @@
       	if (!this.checkedNode) {
       		return this.$notify.warning({title: '提示', message: '请选择部门'})
       	}
+      	let status = this.checkedNode.status === 1 ? 0 : 1
       	let data = {
       		orgId: this.checkedNode.orgId,
-      		status: this.checkedNode.status
+      		status
       	}
       	updateOrgStatus(data).then(res => {
       		if(res.data.code === '0001') {
@@ -724,6 +725,7 @@
       		}).catch(err => {
       			console.log(err)
       		})
+      		this.registFormVisible = false
       	})
       },
       // 员工信息
