@@ -121,7 +121,9 @@
 		    		<el-form-item label="合同附件：" prop="attachFiles">
 		    			<el-upload
 							  class="file-uploader"
-							  action="https://jsonplaceholder.typicode.com/posts/"
+							  name='uploadFile'
+							  :action="uploadAction"
+							  :data="{category: 'contract'}"
 							  :on-change="handleChange"
 							  :on-remove="handleRemove"
 							  :file-list="fileList">
@@ -147,6 +149,8 @@
 	export default {
 		data () {
 			return {
+				// uploadAction: '/uploadFileUrl',
+				uploadAction: '/ums/baseInter/uploadFile.do',
 				loading: false,
 				pageNo: 1,
 				pageSize: 10,
@@ -218,6 +222,7 @@
 				}).catch(err => {
 					console.log(err)
 					this.loading = false
+					this.$catchError(err)
 				})
 			},
 			getTemplateList() {

@@ -109,12 +109,6 @@
 					console.log(err)
 				})
 			},
-			// handleDetail() {
-			// 	this.$notify.error({
-   //    		title: '提示',
-   //    		message: '暂无该功能！', 
-   //    	})
-			// },
 			// 职位新增
 			handleAdd() {
 				this.titleForm = {
@@ -148,6 +142,9 @@
 								} else {
 									this.$message.error(res.data.message)
 								}
+							}).catch(err => {
+								console.log(err)
+								this.$catchError(err)
 							})
 						} else {
 							createTitle(data).then(res => {
@@ -157,6 +154,9 @@
 								} else {
 									this.$message.error(res.data.message)
 								}
+							}).catch(err => {
+								console.log(err)
+								this.$catchError(err)
 							})
 						}
 						this.titleFormVisible = false;
@@ -178,12 +178,11 @@
 						} else {
 							this.$message.error(res.data.message)
 						}
+					}).catch(err => {
+						console.log(err)
+						this.$catchError(err)
 					})
 				})
-				// this.$notify.error({
-    //   		title: '提示',
-    //   		message: '暂无该功能！', 
-    //   	})
 			},
 			handleSizeChange(val) {
 				this.pageSize = val

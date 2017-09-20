@@ -510,7 +510,6 @@
       			let data = Object.assign({}, this.organizeForm)
       			if(data.orgId) {
       				updateOrganize(data).then(res => {
-	      				console.log(res)
 	      				if(res.data.code === '0001') {
 	      					this.$message.success(res.data.message)
 	      					this.getOrganizeTree()
@@ -522,7 +521,6 @@
 	      			})
       			} else {
       				createOrganize(data).then(res => {
-	      				console.log(res)
 	      				if(res.data.code === '0001') {
 	      					this.$message.success(res.data.message)
 	      					this.getOrganizeTree()
@@ -544,7 +542,6 @@
       	if (!this.checkedNode) {
       		return this.$notify.warning({title: '提示', message: '请选择部门'})
       	}
-      	// console.log(this.checkedNode)
       	if(this.checkedNode.children) {
       		return this.$notify.error({title: '提示', message: '该部门有下级部门，不可删除'})
       	}
@@ -678,7 +675,7 @@
       		orgId: this.checkedNode.orgId,
       		status
       	}
-      	updateOrgStatus(data).then(res => {
+       	updateOrgStatus(data).then(res => {
       		if(res.data.code === '0001') {
       			this.$message.success(res.data.message)
       			this.checkedNode.status = this.checkedNode.status === 1 ? 0 : 1;
@@ -831,14 +828,12 @@
 	      	console.log(err)
 	      })
       },
-      // 删除员工
       handleRemove(row) {
       	this.$confirm(`确定将 ${row.realname} 从该公司删除？`, '提示', {type: 'warning'}).then(() => {
       		let data = {
 	      		userId: row.userId
 	      	}
       		removeUser(data).then(res => {
-      			console.log(res)
       			if(res.data.code === '0001') {
       				this.$message.success(res.data.message)
       				this.getStaffList()

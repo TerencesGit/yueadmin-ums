@@ -73,7 +73,9 @@
 		    		<el-form-item label="模板文件" prop="templateFile">
 		    			<el-upload
 							  class="file-uploader"
-							  action="https://jsonplaceholder.typicode.com/posts/"
+							  name='uploadFile'
+							  :action="uploadAction"
+							  :data="{category: 'contract'}"
 							  :on-change="handleChange"
 							  :on-remove="handleRemove"
 							  :file-list="fileList">
@@ -127,6 +129,8 @@
 	export default {
 		data() {
 			return {
+				// uploadAction: '/uploadFileUrl',
+				uploadAction: '/ums/baseInter/uploadFile.do',
 				loading: false,
 				pageNo: 1,
 				pageSize: 10,
@@ -221,7 +225,6 @@
 				this.$refs.templateForm.validate(valid => {
 					if(!valid) return;
 					let data = Object.assign({}, this.templateForm)
-					// console.log(data)
 					if(data.templateId) {
 						updateTemplate(data).then(res => {
 							if(res.data.code === '0001') {

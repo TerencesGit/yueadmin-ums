@@ -196,7 +196,7 @@
 	export default {
 		data() {
 			return {
-				moduleId: 20170906001,
+				moduleId: '',
 				moduleList: [],
 				moduleFormTitle: '',
 				moduleFormVisible: false,
@@ -279,6 +279,7 @@
 				getModules().then(res => {
 					if(res.data.code === '0001') {
 						this.moduleList = res.data.result.modules
+						this.moduleId = this.moduleList[0].moduleId;
   				} else {
   					this.$message.error(res.data.message)
   				}
@@ -328,7 +329,6 @@
 				this.$refs.moduleForm.validate(valid => {
 					if(!valid) return;
 					let data = Object.assign({}, this.moduleForm)
-					console.log(data)
 					if(data.moduleId) {
 						updateModule(data).then(res => {
 							if(res.data.code === '0001') {
@@ -479,7 +479,7 @@
       	this.$refs.funcForm.validate(valid => {
       		if(valid) {
       			let data = Object.assign({}, this.funcForm)
-      			console.log(data)
+      			// console.log(data)
       			if(data.funcId) {
       				updateFunction(data).then(res => {
       					if(res.data.code === '0001') {
@@ -493,7 +493,6 @@
 	      			})
       			} else {
       				createFunction(data).then(res => {
-	      				// console.log(res)
 	      				if(res.data.code === '0001') {
 	      					this.$message.success(res.data.message)
 	      					this.getFuncTree()
@@ -532,6 +531,7 @@
 	  				}
 	      	}).catch(err => {
 	      		console.log(err)
+	      		this.$catchError(err)
 	      	})
       	}).catch(err => {
       		console.log(err)

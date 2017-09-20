@@ -250,6 +250,7 @@
 					moduleId: 20170906001
 				}
 				getModuleFunctionList(data).then(res => {
+					console.log(res)
 					this.treeLoading = false
 					if(res.data.code === '0001') {
 						this.funTreeList = res.data.result.functions;
@@ -302,6 +303,7 @@
 					roleId: this.selectedRole.roleId
 				}
 				getRoleFunctions(params).then(res => {
+					console.log(res)
 					if(res.data.code === '0001') {
 						let treeObj = $.fn.zTree.getZTreeObj("functionTree");
 						let nodes = treeObj.transformToArray(treeObj.getNodes()).filter(node => node.isParent === false);
@@ -341,7 +343,6 @@
 					roleId: this.selectedRole.roleId,
 					funcIdList: funcIds
 				}
-				// console.log(data)
 				updateRoleFunction(data).then(res => {
 					if(res.data.code === '0001') {
 						this.$message.success(res.data.message)
@@ -360,6 +361,3 @@
 		}
 	}
 </script>
-<style scoped lang="scss">
-	
-</style>

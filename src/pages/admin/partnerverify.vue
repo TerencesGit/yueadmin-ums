@@ -283,7 +283,6 @@
 						partnerId: this.partInfo.partnerId,
 						rejectInfo: this.rejectForm.rejectInfo
 					}
-					// console.log(data)
 					rejectPartner(data).then(res => {
 						if(res.data.code === '0001') {
 							this.$message.success(res.data.message)
