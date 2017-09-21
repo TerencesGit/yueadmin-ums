@@ -126,8 +126,8 @@
 			}
 		},
 		methods: {
-			formatTime() {
-				return this.$moment(new Date()).format('YYYY-MM-DD')
+			formatTime(row) {
+				return this.$moment(row.updateTime).format('YYYY-MM-DD')
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;
@@ -290,7 +290,7 @@
 					typeId: row.typeId,
 					status: row.status
 				}
-				console.log(data)
+				// console.log(data)
 				updatePartnerTypeStatus(data).then(res => {
 					if(res.data.code === '0001') {
 						this.$message.success(res.data.message)

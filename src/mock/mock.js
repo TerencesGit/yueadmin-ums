@@ -887,9 +887,10 @@ export default {
 		})
 		// 获取角色分页列表
 		mock.onGet('/adminInter/getSysRoles.do').reply(config => {
-			let { pageNo, pageSize } = config.params;
-			let total = _RoleList.length;
-			let rolePage = _RoleList.filter((role, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize)
+			let { pageNo, pageSize, moduleId } = config.params;
+			let _roleList = _RoleList.filter(role => role.moduleId === moduleId)
+			let total = _roleList.length;
+			let rolePage = _roleList.filter((role, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize)
 			retObj.result = {
 				roleList: rolePage,
 				pageInfo: {
@@ -919,12 +920,14 @@ export default {
 		})
 		// 新建角色
 		mock.onPost('/adminInter/createRole.do').reply(config => {
-			let { roleName, roleDesc } = JSON.parse(config.data)
+			let { moduleId, roleName, roleDesc } = JSON.parse(config.data)
 			_RoleList.push({
 				roleId: new Date().getTime(),
+				moduleId,
 				roleName,
 				roleDesc,
-				status: 1
+				status: 1,
+				updateTime: new Date(),
 			})
 			retObj.result = {}
 			return new Promise((resolve, reject) => {

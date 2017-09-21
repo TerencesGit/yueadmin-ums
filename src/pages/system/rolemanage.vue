@@ -2,7 +2,16 @@
 	<section>
 			<div v-title :data-title="this.$route.name"></div>
 	    <el-row class="toolbar">
-	      <el-button type="primary" @click="handleAdd">新增角色</el-button>
+	    	<label>当前模块：</label>
+				<el-select v-model="moduleId" @change="moduleChange">
+					<el-option 
+						v-for="item in moduleList" 
+						:key="item.moduleId"
+						:label="item.name"
+						:value="item.moduleId">
+					</el-option>
+				</el-select>
+	      <el-button type="primary" class="m-l" @click="handleAdd">新增角色</el-button>
 	    </el-row>
 	    <!-- 角色列表 -->
       <el-table 
@@ -15,7 +24,7 @@
 	      <el-table-column prop="roleId" label="角色编号" sortable width="140"></el-table-column>
 	      <el-table-column prop="roleName" label="角色名称"></el-table-column>
 	      <el-table-column prop="roleDesc" label="角色描述"></el-table-column>
-	      <el-table-column prop="createTime" label="创建时间" sortable width="180" :formatter="formatTime"></el-table-column>
+	      <el-table-column prop="updateTime" label="更新时间" sortable width="180" :formatter="formatTime"></el-table-column>
 	      <el-table-column prop="status" label="状态" width="120" :formatter="formatStatus">
 	      	<template scope="scope">
 	      		<el-switch
@@ -85,7 +94,7 @@
 	import '@/assets/plugins/zTree/css/zTreeStyle.css'
 	import '@/assets/plugins/zTree/js/jquery.min.js'
 	import '@/assets/plugins/zTree/js/jquery.ztree.all.min.js'
-	import { getSysRoles, createRole, updateRole, updateRoleStatus, delRole, getModuleFunctionList, getRoleFunctions, updateRoleFunction } from '@/api'
+	import { getModules, getSysRoles, createRole, updateRole, updateRoleStatus, delRole, getModuleFunctionList, getRoleFunctions, updateRoleFunction } from '@/api'
 	export default {
 		data () {
 			return {
@@ -93,6 +102,8 @@
 				pageSize: 10,
 				total: 0,
 				loading: false,
+				moduleId: '',
+				moduleList: [],
 				roleList: [],
 				roleForm: {
 					roleName: '',
@@ -118,8 +129,8 @@
 			formatStatus(row) {
 				return row.status === 1 ? '启用' : '禁用'
 			},
-			formatTime() {
-				return this.$moment(new Date()).format('YYYY-MM-DD')
+			formatTime(row) {
+				return this.$moment(row.updateTime).format('YYYY-MM-DD HH:mm:ss')
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;
@@ -129,11 +140,30 @@
 				this.pageNo = val;
 				this.getRoleList()
 			},
+			// 获取功能模块列表
+			getModuleList() {
+				getModules().then(res => {
+					if(res.data.code === '0001') {
+						this.moduleList = res.data.result.modules
+						this.moduleId = this.moduleList[0].moduleId;
+  				} else {
+  					this.$message.error(res.data.message)
+  				}
+				}).catch(err => {
+					console.log(err)
+					this.$catchError(err)
+				})
+			},
+			moduleChange(val) {
+				this.moduleId = val
+				this.getRoleList()
+			},
 			// 角色分页列表
 			getRoleList() {
 				let params = {
 					pageNo: this.pageNo,
-					pageSize: this.pageSize
+					pageSize: this.pageSize,
+					moduleId: this.moduleId,
 				}
 				this.loading = true;
 				getSysRoles(params).then(res => {
@@ -171,6 +201,7 @@
 			// 角色新增
 			handleAdd() {
 				this.roleForm = {
+					moduleId: this.moduleId,
 					roleName: '',
 					roleDesc: ''
 				}
@@ -244,13 +275,12 @@
 			},
 			// 获取系统功能树
 			getFuncTree() {
-				if(this.funTreeList.length !== 0) return;
+				// if(this.funTreeList.length !== 0) return;
 				this.treeLoading = true;
 				let data = {
-					moduleId: 20170906001
+					moduleId: this.moduleId
 				}
 				getModuleFunctionList(data).then(res => {
-					console.log(res)
 					this.treeLoading = false
 					if(res.data.code === '0001') {
 						this.funTreeList = res.data.result.functions;
@@ -357,6 +387,7 @@
 			},
 		},
 		mounted() {
+			this.getModuleList()
 			this.getRoleList()
 		}
 	}

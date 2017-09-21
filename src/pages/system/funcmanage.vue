@@ -46,7 +46,7 @@
 			      <el-table-column prop="name" label="名称"></el-table-column>
 			      <el-table-column prop="md5" label="编码"></el-table-column>
 			      <el-table-column prop="funcurl" label="路由"></el-table-column>
-			      <el-table-column prop="updateTime" label="更新时间" width="120" :formatter="formatTime"></el-table-column>
+			      <el-table-column prop="updateTime" label="更新时间" width="120"></el-table-column>
 			      <el-table-column prop="status" label="状态" :formatter="formatStatus" width="80"></el-table-column>
 			      <el-table-column label="详情" width="80">
 			      	<template scope="scope">
@@ -200,7 +200,7 @@
 				moduleList: [],
 				moduleFormTitle: '',
 				moduleFormVisible: false,
-				clientList: [],
+				// clientList: [],
 				functionTree: [],
         funcData: [],
 	      checkedNode: null,
@@ -212,7 +212,11 @@
 	      	orgId: '',
 	      	name: '',
 	      	note: '',
-	      	parentId: ''
+	      	parentId: '',
+	      	funcMd5: '',
+	      	funcSeq: '',
+	      	funcUrl: '',
+	      	funcDesc: '',
 	      },
 	      loading: false,
 	      tableLoading: false,
@@ -264,9 +268,6 @@
 		methods: {
 			formatStatus(row) {
 				return row.status === 1 ? '启用' : '禁用'
-			},
-			formatTime(row) {
-				return this.$moment(new Date()).format('YYYY-MM-DD ')
 			},
 			handleSizeChange(val) {
 				this.pageSize = val
@@ -334,6 +335,7 @@
 							if(res.data.code === '0001') {
 								this.$message.success(res.data.message)
 								this.getModuleList()
+
 		  				} else {
 		  					this.$message.error(res.data.message)
 		  				}
@@ -464,7 +466,7 @@
       		name: this.checkedNode.name,
       		funcMd5: this.checkedNode.md5,
       		funcUrl: this.checkedNode.funcurl,
-      		funcSeq: this.checkedNode.seq,
+      		funcSeq: this.checkedNode.seq + '',
       		viewname: this.checkedNode.viewname,
       		funcIco: this.checkedNode.ico,
       		funcDesc: this.checkedNode.desc,
@@ -485,6 +487,7 @@
       					if(res.data.code === '0001') {
 	      					this.$message.success(res.data.message)
 	      					this.getFuncTree()
+	      					this.funcData = [];
 	      				} else {
 	      					this.$message.error(res.data.message)
 	      				}

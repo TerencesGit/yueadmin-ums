@@ -129,8 +129,8 @@
 	export default {
 		data() {
 			return {
-				// uploadAction: '/uploadFileUrl',
-				uploadAction: '/ums/baseInter/uploadFile.do',
+				uploadAction: '/uploadFileUrl',
+				// uploadAction: '/ums/baseInter/uploadFile.do',
 				loading: false,
 				pageNo: 1,
 				pageSize: 10,
@@ -145,7 +145,7 @@
 						{ required: true, message: '请输入备注', trigger: 'blur'}
 					],
 					templateFile: [
-						{ required: true, type: 'array', message: '请选择模板文件', trigger: 'blur'}
+						{ required: true, message: '请选择模板文件', trigger: 'blur'}
 					],
 				},
 				fileList: [],
@@ -176,6 +176,9 @@
 					this.loading = false;
 					if(res.data.code === '0001') {
 						this.templateList = res.data.result.templateList;
+						this.templateList.forEach(template => {
+							template.templateFile = template.templateFile.split(',');
+						})
 						this.total = res.data.result.pageInfo.total;
 					} else {
 						this.$message.error(res.data.message)
@@ -183,11 +186,12 @@
 				}).catch(err => {
 					this.loading = false;
 					console.log(err)
-					this.$carchError(err)
+					this.$catchError(err)
 				})
 			},
 			handleChange(file, fileList) {
-				this.templateForm.templateFile = fileList.map(file => file.name);
+				console.log(file, fileList)
+				this.templateForm.templateFile = fileList.map(file => file.name).join(',');
         this.fileList = fileList;
         // fileList.slice(-1);
       },
