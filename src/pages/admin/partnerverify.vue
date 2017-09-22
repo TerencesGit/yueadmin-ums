@@ -4,7 +4,7 @@
 		<el-row class="toolbar">
 			<el-radio-group v-model="isVerified" @change="isVerifiedChange">
 		    <el-radio-button :label="0">待审核</el-radio-button>
-		    <el-radio-button :label="1">已通过</el-radio-button>
+		    <!-- <el-radio-button :label="1">已通过</el-radio-button> -->
 		    <el-radio-button :label="2">未通过</el-radio-button>
 		  </el-radio-group>
     </el-row>
@@ -14,12 +14,12 @@
       v-loading="loading" 
       highlight-current-row
       style="width: 100%">
-      <el-table-column type="index" width="60"></el-table-column>
+      <el-table-column type="index" width="55"></el-table-column>
       <el-table-column prop="partnerId" label="商家编号" sortable width="140"></el-table-column>
       <el-table-column prop="name" label="商家名称"></el-table-column>
       <el-table-column prop="corporationName" label="注册人"></el-table-column>
       <el-table-column prop="contactAddress" label="地址"></el-table-column>
-      <el-table-column prop="createTime" label="创建时间" sortable width="140" :formatter="formatTime"></el-table-column>
+      <el-table-column prop="createTime" label="创建时间" sortable width="180" :formatter="formatTime"></el-table-column>
       <el-table-column prop="status" label="状态" width="120" :formatter="formatStatus">
       </el-table-column>
       <el-table-column label="操作" width="200">
@@ -165,8 +165,8 @@
 			formatStatus(row) {
 				return row.isVerified === 0 ? '待审核' : row.isVerified === 1 ? '审核通过' : '审核未通过'
 			},
-			formatTime() {
-				return this.$moment(new Date()).format('YYYY-MM-DD')
+			formatTime(row) {
+				return this.$moment(row.createTime).format('YYYY-MM-DD HH:mm:ss')
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;

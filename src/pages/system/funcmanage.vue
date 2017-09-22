@@ -20,7 +20,7 @@
 				<el-col :span="5" class="tree" v-loading="loading">
 					<ul id="functionTree" class="ztree"></ul>
 				</el-col>
-				<el-col :span="19" v-if="functionTree.length === 0">
+				<el-col :span="19">
 					<el-row class="button-group">
 						<el-button size="small" type="success" @click="handleAdd">
 							<i class="fa fa-plus-square"></i>
@@ -281,6 +281,7 @@
 					if(res.data.code === '0001') {
 						this.moduleList = res.data.result.modules
 						this.moduleId = this.moduleList[0].moduleId;
+						this.functionTree.length === 0 && this.getFuncTree()
   				} else {
   					this.$message.error(res.data.message)
   				}
@@ -335,7 +336,6 @@
 							if(res.data.code === '0001') {
 								this.$message.success(res.data.message)
 								this.getModuleList()
-
 		  				} else {
 		  					this.$message.error(res.data.message)
 		  				}
@@ -378,7 +378,7 @@
 				}
 				getModuleFunctionList(data).then(res => {
 					if(res.data.code === '0001') {
-						const funcTree = res.data.result.functions;
+						const funcTree = this.functionTree = res.data.result.functions;
 				    const setting = {
 				      view: {
 				        selectedMulti: false,

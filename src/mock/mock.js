@@ -888,7 +888,12 @@ export default {
 		// 获取角色分页列表
 		mock.onGet('/adminInter/getSysRoles.do').reply(config => {
 			let { pageNo, pageSize, moduleId } = config.params;
-			let _roleList = _RoleList.filter(role => role.moduleId === moduleId)
+			let _roleList = [];
+			if(moduleId) {
+				_roleList = _RoleList.filter(role => role.moduleId === moduleId)
+			} else {
+				_roleList = _RoleList;
+			}
 			let total = _roleList.length;
 			let rolePage = _roleList.filter((role, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize)
 			retObj.result = {
@@ -1267,6 +1272,13 @@ export default {
 		mock.onPost('/domainInter/createContract.do').reply(config => {
 			let { contractCode, partyAName, partyB, templateId, signTime, effectiveDate,
 					expireDate, attachFiles, note } = JSON.parse(config.data);
+			let attachFileList = [];
+			attachFiles.forEach((file, index) => {
+				attachFileList.push({
+					fileUuid: file,
+					fileRawName: '合同'+index,
+				})
+			})
 			_Contracts.push({
 				contractId: new Date().getTime(),
 				contractCode,
@@ -1276,7 +1288,7 @@ export default {
 				signTime,
 				effectiveDate,
 				expireDate, 
-				attachFiles,
+				attachFiles: attachFileList,
 				note,
 			})
 			retObj.result = {}
@@ -1291,6 +1303,14 @@ export default {
 			let { contractId, contractCode, partyAName, partyB, 
 					templateId, signTime, effectiveDate, expireDate, 
 					attachFiles, note } = JSON.parse(config.data);
+					console.log(attachFiles)
+			let attachFileList = [];
+			attachFiles.forEach((file, index) => {
+				attachFileList.push({
+					fileUuid: file,
+					fileRawName: '合同'+index,
+				})
+			})
 			_Contracts.some(contract => {
 				if(contract.contractId == contractId) {
 					contract.contractCode = contractCode;
@@ -1300,7 +1320,7 @@ export default {
 					contract.signTime = signTime;
 					contract.effectiveDate = effectiveDate;
 					contract.expireDate = expireDate;
-					contract.attachFiles = attachFiles;
+					contract.attachFiles = attachFileList;
 					contract.note = note;
 				}
 			})

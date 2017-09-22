@@ -29,7 +29,7 @@
 	            <span >{{ scope.row.signTime }}</span>
 	          </el-form-item>
 	          <el-form-item label="合同文件">
-	          	<el-tag type="gray" v-for="(item, index) in scope.row.attachFiles" :key="index">{{item}}</el-tag>
+	          	<el-tag type="gray" v-for="(item, index) in scope.row.attachFiles" :key="index">{{item.fileRawName}}</el-tag>
 	          </el-form-item>
 	          <el-form-item label="生效日期">
 	            <span >{{ scope.row.effectiveDate }}</span>
@@ -124,6 +124,8 @@
 							  name='uploadFile'
 							  :action="uploadAction"
 							  :data="{category: 'contract'}"
+							  :on-error="handleError"
+							  :on-success="handleSuccess"
 							  :on-change="handleChange"
 							  :on-remove="handleRemove"
 							  :file-list="fileList">
@@ -286,25 +288,40 @@
 					signTime: new Date(row.signTime),
 					effectiveDate: new Date(row.effectiveDate),
 					expireDate: new Date(row.expireDate),
-					attachFiles: row.attachFiles,
 					note: row.note,
 				}
-				this.fileList = []
+				this.contractForm.attachFiles = row.attachFiles.map(file => file.fileUuid)
+				this.fileList = [];
 				row.attachFiles.forEach((file, index) => {
 					this.fileList.push({
-						uid: index,
-						name: file
+						uid: file.fileUuid,
+						name: file.fileRawName
 					})
 				})
 				this.contractFormTitle = '编辑合同'
 				this.contractFormVisible = true
 			},
+			handleError(err) {
+				console.log(err)
+				this.$message.error('上传失败，请稍后重试')
+			},
+			handleSuccess(res, file, fileList) {
+				console.log(res)
+				if(res.code === '0001') {
+					this.contractForm.attachFiles.push(res.result.fileInfo.fileUuid);
+					this.fileList = fileList;
+				} else {
+					this.$message.error('上传失败，请稍后重试')
+				}
+			},
 			handleChange(file, fileList) {
-				this.contractForm.attachFiles = fileList.map(file => file.name);
-        this.fileList = fileList;
+				// console.log(fileList)
       },
       handleRemove(file, fileList) {
-      	this.contractForm.attachFiles = fileList.map(file => file.name)
+      	this.contractForm.attachFiles = [];
+      	fileList.forEach(file => {
+      		this.contractForm.attachFiles.push(file.uid)
+      	})
       },
       contractFormSubmit() {
       	this.$refs.contractForm.validate(valid => {
@@ -313,6 +330,7 @@
       		data.signTime = this.$moment(data.signTime).format('YYYY-MM-DD')
       		data.effectiveDate = this.$moment(data.effectiveDate).format('YYYY-MM-DD')
       		data.expireDate = this.$moment(data.expireDate).format('YYYY-MM-DD')
+      		console.log(data)
       		if(data.contractId) {
       			updateContract(data).then(res => {
       			  if(res.data.code === '0001') {

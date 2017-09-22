@@ -3,14 +3,14 @@
 		<div v-title :data-title="this.$route.name"></div>
 		<el-row class="toolbar">
 			<el-form inline>
-				<el-form-item label="商家编号">
-					<el-input placeholder="商家编号"></el-input>
-				</el-form-item>
+				<!-- <el-form-item label="商家编号">
+					<el-input v-model="filter.code" placeholder="商家编号"></el-input>
+				</el-form-item> -->
 				<el-form-item label="商家名称">
-					<el-input placeholder="商家名称"></el-input>
+					<el-input v-model="partnerName" placeholder="商家名称"></el-input>
 				</el-form-item>
 				<el-form-item label="">
-					<el-button type="primary">搜索</el-button>
+					<el-button type="primary" @click="getPartnerList">搜索</el-button>
 				</el-form-item>
 			</el-form>
     </el-row>
@@ -20,7 +20,7 @@
       v-loading="loading" 
       highlight-current-row
       style="width: 100%">
-      <el-table-column type="index" width="60"></el-table-column>
+      <el-table-column type="index" width="55"></el-table-column>
       <el-table-column prop="partnerId" label="商家编号" sortable width="140"></el-table-column>
       <el-table-column prop="name" label="商家名称"></el-table-column>
       <el-table-column prop="corporationName" label="注册人"></el-table-column>
@@ -130,6 +130,7 @@
 				pageNo: 1,
 				pageSize: 10,
 				total: 0,
+				partnerName: '',
 				loading: false,
 				partnerList: [],
 				partInfo: {},
@@ -155,11 +156,17 @@
 				this.pageNo = val;
 				this.getPartnerList()
 			},
+			handleSearch() {
+				console.log(Object.assign({}, this.filter))
+			},
 			getPartnerList() {
 				let params = {
 					pageNo: this.pageNo,
-					pageSize: this.pageSize
+					pageSize: this.pageSize,
+					partnerName: this.partnerName,
+					isVerified: 1
 				}
+				console.log(params)
 				this.loading = true
 				getPartners(params).then(res => {
 					if(res.data.code === '0001') {

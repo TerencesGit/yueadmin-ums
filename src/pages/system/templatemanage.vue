@@ -18,7 +18,7 @@
 	            <span>{{ scope.row.templateId }}</span>
 	          </el-form-item>
 	          <el-form-item label="模板文件">
-	          	<el-tag type="gray" v-for="(item, index) in scope.row.templateFile" :key="index">{{item}}</el-tag>
+	          	<el-tag type="gray">{{scope.row.templateFile}}</el-tag>
 	          </el-form-item>
 	          <el-form-item label="模板名称">
 	            <span >{{ scope.row.name }}</span>
@@ -35,15 +35,15 @@
 	        </el-form>
 	      </template>
       </el-table-column>
-      <el-table-column prop="templateId" label="模板编号" sortable width="140"></el-table-column>
+      <el-table-column prop="templateId" label="模板编号" sortable></el-table-column>
       <el-table-column prop="name" label="模板名称"></el-table-column>
       <el-table-column prop="templateFile" label="模板文件" class-name="file-cell">
       	<template scope="scope">
-      		<el-tag type="gray" v-for="(item, index) in scope.row.templateFile" :key="index">{{item}}</el-tag>
+      		<el-tag type="gray">{{scope.row.templateFile}}</el-tag>
       	</template>
       </el-table-column>
-      <el-table-column prop="createTime" label="更新时间" sortable width="160" :formatter="formatTime"></el-table-column>
-      <el-table-column label="操作" width="180">
+      <el-table-column prop="updateTime" label="更新时间" sortable :formatter="formatTime"></el-table-column>
+      <el-table-column label="操作">
         <template scope="scope">
         	<!-- <el-button size="small" type="info" @click="handleDetail(scope.row)">查看</el-button> -->
           <el-button size="small" type="warning" @click="handleEdit(scope.row)">编辑</el-button>
@@ -76,6 +76,8 @@
 							  name='uploadFile'
 							  :action="uploadAction"
 							  :data="{category: 'contract'}"
+							  :on-error="handleError"
+							  :on-success="handleSuccess"
 							  :on-change="handleChange"
 							  :on-remove="handleRemove"
 							  :file-list="fileList">
@@ -129,8 +131,8 @@
 	export default {
 		data() {
 			return {
-				uploadAction: '/uploadFileUrl',
-				// uploadAction: '/ums/baseInter/uploadFile.do',
+				// uploadAction: '/uploadFileUrl',
+				uploadAction: '/ums/baseInter/uploadFile.do',
 				loading: false,
 				pageNo: 1,
 				pageSize: 10,
@@ -155,8 +157,8 @@
 			}
 		},
 		methods: {
-			formatTime() {
-				return this.$moment(new Date()).format('YYYY-MM-DD')
+			formatTime(row) {
+				return this.$moment(row.updateTime).format('YYYY-MM-DD HH:mm:ss')
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;
@@ -176,9 +178,9 @@
 					this.loading = false;
 					if(res.data.code === '0001') {
 						this.templateList = res.data.result.templateList;
-						this.templateList.forEach(template => {
-							template.templateFile = template.templateFile.split(',');
-						})
+						// this.templateList.forEach(template => {
+						// 	template.templateFile = template.templateFile.split(',');
+						// })
 						this.total = res.data.result.pageInfo.total;
 					} else {
 						this.$message.error(res.data.message)
@@ -189,14 +191,24 @@
 					this.$catchError(err)
 				})
 			},
+			handleError(err) {
+				this.$message.error('上传失败，请稍后重试')
+			},
+			handleSuccess(res, file, fileList) {
+				// console.log(res)
+				if(res.code === '0001') {
+					this.templateForm.templateFile = res.result.fileInfo.fileUuid;
+					this.fileList = fileList.slice(-1);
+				} else {
+					this.fileList = [];
+					this.$message.error('上传失败，请稍后重试')
+				}
+			},
 			handleChange(file, fileList) {
-				console.log(file, fileList)
-				this.templateForm.templateFile = fileList.map(file => file.name).join(',');
-        this.fileList = fileList;
-        // fileList.slice(-1);
+				// this.templateForm.templateFile = fileList.map(file => file.name).join(',');
       },
       handleRemove(file, fileList) {
-      	this.templateForm.templateFile = fileList.map(file => file.name)
+      	this.templateForm.templateFile = ''
       },
 			handleAdd() {
 				this.templateForm = {
@@ -215,13 +227,10 @@
 					name: row.name,
 					note: row.note,
 				}
-				this.fileList = []
-				row.templateFile.forEach((file, index) => {
-					this.fileList.push({
-						uid: index,
-						name: file
-					})
-				})
+				this.fileList = [{
+						uid: new Date().getTime(),
+						name: row.templateFile,
+				}]
 				this.templateFormTitle = '编辑模板';
 				this.templateFormVisible = true
 			},
