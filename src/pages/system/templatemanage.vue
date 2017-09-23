@@ -18,7 +18,7 @@
 	            <span>{{ scope.row.templateId }}</span>
 	          </el-form-item>
 	          <el-form-item label="模板文件">
-	          	<el-tag type="gray">{{scope.row.templateFile}}</el-tag>
+	          	<el-tag type="gray">{{scope.row.templateFileName}}</el-tag>
 	          </el-form-item>
 	          <el-form-item label="模板名称">
 	            <span >{{ scope.row.name }}</span>
@@ -39,7 +39,7 @@
       <el-table-column prop="name" label="模板名称"></el-table-column>
       <el-table-column prop="templateFile" label="模板文件" class-name="file-cell">
       	<template scope="scope">
-      		<el-tag type="gray">{{scope.row.templateFile}}</el-tag>
+      		<el-tag type="gray">{{scope.row.templateFileName}}</el-tag>
       	</template>
       </el-table-column>
       <el-table-column prop="updateTime" label="更新时间" sortable :formatter="formatTime"></el-table-column>
@@ -47,7 +47,7 @@
         <template scope="scope">
         	<!-- <el-button size="small" type="info" @click="handleDetail(scope.row)">查看</el-button> -->
           <el-button size="small" type="warning" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+         <!--  <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -104,7 +104,7 @@
 		    			<span>{{templateForm.name}}</span>
 		    		</el-form-item>
 		    		<el-form-item label="模板文件：">
-		    			<span>{{templateForm.templateFile}}</span>
+		    			<span>{{templateForm.templateFileName}}</span>
 		    		</el-form-item>
 		    		<el-form-item label="模板描述：">
 		    			<span>{{templateForm.note}}</span>
@@ -195,7 +195,6 @@
 				this.$message.error('上传失败，请稍后重试')
 			},
 			handleSuccess(res, file, fileList) {
-				// console.log(res)
 				if(res.code === '0001') {
 					this.templateForm.templateFile = res.result.fileInfo.fileUuid;
 					this.fileList = fileList.slice(-1);
@@ -229,7 +228,7 @@
 				}
 				this.fileList = [{
 						uid: new Date().getTime(),
-						name: row.templateFile,
+						name: row.templateFileName,
 				}]
 				this.templateFormTitle = '编辑模板';
 				this.templateFormVisible = true
@@ -238,6 +237,7 @@
 				this.$refs.templateForm.validate(valid => {
 					if(!valid) return;
 					let data = Object.assign({}, this.templateForm)
+					console.log(data)
 					if(data.templateId) {
 						updateTemplate(data).then(res => {
 							if(res.data.code === '0001') {

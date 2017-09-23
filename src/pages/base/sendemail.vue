@@ -74,14 +74,14 @@
 				this.$refs.emailForm.validate(valid => {
 					if(!valid) return;
 					let data = {
-						email: this.emailForm.email
+						emailTo: this.emailForm.email
 					}
 					sendForgotPwdEmail(data).then(res => {
 						if(res.data.code === '0001') {
 							this.$router.push({
 								path: 'verifyemail',
 								query: {
-									email: data.email
+									email: this.emailForm.email
 								}
 							})
 						} else {
@@ -105,7 +105,8 @@
 		width: 40%;
 		margin: 50px auto;
 		.canvas-code {
-			background: #1D8CE0
+			background: #fff;
+			box-shadow: 1px 1px 5px #ccc;
 		}
 	}
 </style>

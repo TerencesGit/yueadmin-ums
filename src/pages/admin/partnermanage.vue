@@ -21,12 +21,12 @@
       highlight-current-row
       style="width: 100%">
       <el-table-column type="index" width="55"></el-table-column>
-      <el-table-column prop="partnerId" label="商家编号" sortable width="140"></el-table-column>
+      <el-table-column prop="partnerId" label="商家编号" sortable></el-table-column>
       <el-table-column prop="name" label="商家名称"></el-table-column>
       <el-table-column prop="corporationName" label="注册人"></el-table-column>
       <el-table-column prop="contactAddress" label="地址"></el-table-column>
-      <el-table-column prop="createTime" label="创建时间" sortable width="180" :formatter="formatTime"></el-table-column>
-      <el-table-column prop="status" label="状态" width="120">
+      <el-table-column prop="createTime" label="创建时间" sortable :formatter="formatTime"></el-table-column>
+      <el-table-column prop="status" label="状态">
       	<template scope="scope">
       		<el-switch
 					  v-model="scope.row.status"
@@ -38,10 +38,10 @@
 					</el-switch>
       	</template>
       </el-table-column>
-      <el-table-column label="操作" width="180">
+      <el-table-column label="详情">
         <template scope="scope">
-        	<el-button size="small" type="info" @click="handleDetail(scope.row)">详情</el-button>
-        	<el-button size="small" type="primary" @click="handlePartType(scope.row)">商家类型</el-button>
+        	<el-button size="small" type="info" @click="handleDetail(scope.row)">查看</el-button>
+        	<!-- <el-button size="small" type="primary" @click="handlePartType(scope.row)">商家类型</el-button> -->
         </template>
       </el-table-column>
     </el-table>

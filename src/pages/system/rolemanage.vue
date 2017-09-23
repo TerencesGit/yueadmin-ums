@@ -20,12 +20,12 @@
 	      v-loading="loading" 
 	      highlight-current-row
 	      style="width: 100%">
-	      <el-table-column type="index" width="60"></el-table-column>
-	      <el-table-column prop="roleId" label="角色编号" sortable width="140"></el-table-column>
+	      <el-table-column type="index" width="55"></el-table-column>
+	      <el-table-column prop="roleId" label="角色编号" sortable></el-table-column>
 	      <el-table-column prop="roleName" label="角色名称"></el-table-column>
 	      <el-table-column prop="roleDesc" label="角色描述"></el-table-column>
 	      <el-table-column prop="updateTime" label="更新时间" sortable width="180" :formatter="formatTime"></el-table-column>
-	      <el-table-column prop="status" label="状态" width="120" :formatter="formatStatus">
+	      <el-table-column prop="status" label="状态" :formatter="formatStatus">
 	      	<template scope="scope">
 	      		<el-switch
 						  v-model="scope.row.status"
@@ -37,11 +37,11 @@
 						</el-switch>
 	      	</template>
 	      </el-table-column>
-	      <el-table-column label="操作" width="240">
+	      <el-table-column label="操作">
 	        <template scope="scope">
 	        	<el-button size="small" type="info" @click="handleFunc(scope.row)">权限</el-button>
 	          <el-button size="small" type="warning" @click="handleEdit(scope.row)">编辑</el-button>
-	          <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+	          <!-- <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button> -->
 	        </template>
 	      </el-table-column>
 	    </el-table>

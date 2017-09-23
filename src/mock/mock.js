@@ -2,10 +2,11 @@ import axios from 'axios'
 import Utils from '@/assets/js/utils'
 import Region from '@/assets/js/region'
 import MockAdapter from 'axios-mock-adapter'
-import { UserList, PartnerList, OrganizeList, ModuleList, FunctionList, 
-				TitleList, RoleList, OrgRoles, RoleFuncs, ContractTempList, PartnerTypeList, 
-				TypeRoles, Contracts } from './data/user'
-let _UserList = UserList,
+import { Menus, UserList, PartnerList, OrganizeList, ModuleList, FunctionList, 
+				TitleList, RoleList, OrgRoles, RoleFuncs, ContractTempList, 
+				PartnerTypeList, TypeRoles, Contracts } from './data/user'
+let _Menus = Menus,
+		_UserList = UserList,
 		_PartnerList = PartnerList,
 		_Organizes = OrganizeList,
 		_ModuleList = ModuleList,
@@ -196,6 +197,21 @@ export default {
 				message: '操作成功',
 				result: {
 					userInfo: _userInfo
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取功能菜单
+		mock.onGet('/accountInter/getMyMenus.do').reply(config => {
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					menus: _Menus
 				}
 			}
 			return new Promise((resolve, reject) => {
@@ -1045,9 +1061,9 @@ export default {
 			let { templateId, name, templateFile, note } = JSON.parse(config.data);
 			_ContractTempList.filter(temp => {
 				if(temp.templateId == templateId) {
-					temp.name = name,
-					temp.templateFile = templateFile,
-					temp.note = note
+					temp.name = name;
+					temp.templateFile = templateFile;
+					temp.note = note;
 				}
 			})
 			retObj.result = {}
