@@ -1,5 +1,6 @@
 <template>
 	<section class="page">
+		<div v-title :data-title="this.$route.name"></div>
 	  <el-row>
 	  	<el-col :span="18" :offset="3">
 	  		<el-card class="card-primary" style="margin-top: 10%">

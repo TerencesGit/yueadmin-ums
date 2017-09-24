@@ -94,7 +94,7 @@
 	</section>
 </template>
 <script>
-	import { getMyInfo, updatePwd, emailActive } from '@/api'
+	import { getMyInfo, updatePwd, emailActive, getMobileSmsCode, bindMobile } from '@/api'
 	import Md5 from '@/assets/js/md5'
 	export default {
 		data () {
@@ -214,7 +214,7 @@
 				 return;
 				}
 				let params = {
-					email: this.userInfo.email
+					email: this.userInfo.email // 'xfl0927@126.com'
 				}
 				this.emailLoading = true;
 				emailActive(params).then(res => {
@@ -253,9 +253,21 @@
 			// 获取短信验证码
 			getSmsCode() {
 				this.$refs.mobileForm.validateField('mobile', (errMessage) => {
-					if(!errMessage){
-						this.countDown()
-						this.$message('短信已发送，请注意查收')
+					if(!errMessage) {
+						let params = {
+							mobile: this.mobileForm.mobile
+						}
+						getMobileSmsCode(params).then(res => {
+							if(res.data.code === '0001') {
+								this.countDown()
+								this.$message('短信已发送，请注意查收')
+							} else {
+								this.$message.error(res.data.message)
+							}
+						}).catch(err => {
+							console.log(err)
+							this.$catchError(err)
+						})
 					} else {
 						console.log('err submit')
 					}
@@ -270,6 +282,17 @@
 						smsCode: this.mobileForm.smsCode
 					}
 					console.log(data)
+					bindMobile(data).then(res => {
+						if(res.data.code === '0001') {
+							this.$message(res.data.message)
+							this.getUserInfo()
+						} else {
+							this.$message.error(res.data.message)
+						}
+					}).catch(err => {
+						console.log(err)
+						this.$catchError(err)
+					})
 				})
 			},
 			modifyMobile() {
