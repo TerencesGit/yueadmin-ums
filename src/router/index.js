@@ -2,6 +2,7 @@ import Layout from '@/components/Layout'
 import Login from '@/pages/login'
 import CASLogin from '@/pages/casLogin'
 import Register from '@/pages/register'
+import Expired from '@/pages/Expired'
 import NotFound from '@/pages/NotFound'
 import NoPermission from '@/pages/NoPermission'
 import Welcome from '@/pages/welcome'
@@ -166,18 +167,23 @@ const routes = [
     ]
   },
   {
-    path: '/NoPermission',
+    path: '/nopermission',
     name: 'nopermission',
     component: NoPermission
   },
   {
-    path: '/NotFound',
+    path: '/expired',
+    name: 'expired',
+    component: Expired
+  },
+  {
+    path: '/notfound',
     name: 'notfound',
     component: NotFound
   },
   {
   	path: '*',
-  	redirect: '/NotFound'
+  	redirect: '/notfound'
   }
 ]
 export default routes

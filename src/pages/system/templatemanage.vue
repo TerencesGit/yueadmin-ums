@@ -200,7 +200,7 @@
 					this.fileList = fileList.slice(-1);
 				} else {
 					this.fileList = [];
-					this.$message.error('上传失败，请稍后重试')
+					this.$message.error(res.message)
 				}
 			},
 			handleChange(file, fileList) {

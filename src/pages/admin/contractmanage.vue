@@ -311,7 +311,7 @@
 					this.contractForm.attachFiles.push(res.result.fileInfo.fileUuid);
 					this.fileList = fileList;
 				} else {
-					this.$message.error('上传失败，请稍后重试')
+					this.$message.error(res.message)
 				}
 			},
 			handleChange(file, fileList) {

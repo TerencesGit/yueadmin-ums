@@ -18,7 +18,7 @@ import 'nprogress/nprogress.css'
 import '@/assets/css/base.scss'
 import Utils from '@/assets/js/utils'
 NProgress.configure({ ease: 'ease', speed: 500, minimum: 0.5, showSpinner: false})
-Mock.bootstrap()
+// Mock.bootstrap()
 Vue.use(Vuex)
 Vue.use(Router)
 Vue.use(ElementUI)

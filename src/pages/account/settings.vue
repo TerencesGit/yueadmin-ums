@@ -236,7 +236,7 @@
 				this.mobileFormVisible = true; 
 			},
 			countDown() {
-				let count = 10;
+				let count = 60;
 				let timer = null;
 				this.disabled = true;
 				timer = setInterval(() => {
@@ -258,6 +258,7 @@
 							mobile: this.mobileForm.mobile
 						}
 						getMobileSmsCode(params).then(res => {
+							// console.log(res)
 							if(res.data.code === '0001') {
 								this.countDown()
 								this.$message('短信已发送，请注意查收')
@@ -268,6 +269,7 @@
 							console.log(err)
 							this.$catchError(err)
 						})
+						this.mobileFormVisible = false; 
 					} else {
 						console.log('err submit')
 					}
