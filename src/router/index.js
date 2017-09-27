@@ -15,7 +15,7 @@ import BaseResetSuccess from '@/pages/base/resetsuccess'
 
 import AccountCenter from '@/pages/account/infocenter'
 import AccountSettings from '@/pages/account/settings'
-import RegistedPartner from '@/pages/account/registedpartner'
+import CreatePartner from '@/pages/account/createpartner'
 import WaittingVerify from '@/pages/account/waittingverify'
 
 import PartnerEdit from '@/pages/partner/partneredit'
@@ -39,8 +39,8 @@ const routes = [
   {
     path: '/login',
     name: '欢迎登录',
-    // component: Login
-    component: CASLogin
+    component: Login
+    // component: CASLogin
   },
   {
     path: '/register',
@@ -84,9 +84,9 @@ const routes = [
         component: AccountSettings
       },
       {
-        path: 'registedpartner',
+        path: 'createpartner',
         name: '注册我的企业',
-        component: RegistedPartner
+        component: CreatePartner
       },
       {
         path: 'waittingverify',

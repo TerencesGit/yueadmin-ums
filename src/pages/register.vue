@@ -3,7 +3,7 @@
     <div class="container">
       <div v-title :data-title="this.$route.name"></div>
       <el-form :model="loginForm" :rules="loginRules" ref="loginForm" class="login-form" :class="{'animated shake': invalid}" :label-width="labelWidth">
-        <h2 class="page-header">欢迎注册</h2>
+        <h2 class="page-header">悦.欢迎注册</h2>
         <el-form-item label="邮 箱 号" prop="email">
           <el-input v-model.string="loginForm.email" placeholder="请输入邮箱号"></el-input>
         </el-form-item>
@@ -211,17 +211,19 @@ export default {
             passwd:  Md5.hex_md5(this.loginForm.passwd),
             passwd2: Md5.hex_md5(this.loginForm.confirmPass),
           }
-          console.log(data)
           requestRegist(data).then(res => {
             if (res.data.code === '0001') {
               this.$message.success('注册成功')
-              this.loginSubmit()
-              // this.$router.push({ path: '/login' })
+              this.$router.push({ path: '/login' })
+              // this.loginSubmit()
             } else {
               this.$message.error(res.data.message)
               this.drawCode()
             }
             this.logging = false
+          }).catchError(err => {
+            console.log(err)
+            this.$catchError(err)
           })
         } else {
           this.invalid = true
@@ -261,9 +263,12 @@ export default {
 	.login-form {
 		width: 430px;
 		margin: 8% auto 0;
-		padding: 15px 30px;
+		padding: 30px 30px 15px;
 		border-radius: 5px;
 		background: #fff;
+    .page-header {
+      font-size: 22px;
+    }
 	}
   .content {
     h4 {

@@ -5,9 +5,9 @@
 	  	<el-col :span="18" :offset="3">
 	  		<el-card class="card-primary" style="margin-top: 10%">
 	  			<div slot="header">找回密码</div>
-		  		<el-steps space="20%" :active="stepActive" align-center center finish-status="success">
+		  		<el-steps space="22%" :active="stepActive" align-center center finish-status="success">
 					  <el-step title="填写绑定邮箱"></el-step>
-					  <el-step title="发送邮件成功"></el-step>
+					  <el-step title="验证邮箱"></el-step>
 					  <el-step title="重置密码"></el-step>
 					  <el-step title="重置密码成功"></el-step>
 					</el-steps>

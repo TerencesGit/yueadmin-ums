@@ -21,7 +21,7 @@
 					<i class="el-icon-warning"></i>
 					<label>邮箱验证</label>
 					<span>验证后，可用于快速找回密码。</span>
-					<el-button size="small" type="success" :loading="emailLoading" @click="verifyEmail">立即验证</el-button>
+					<el-button size="small" type="success" @click="verifyEmail">立即验证</el-button>
 				</li>
 				<li v-if="userInfo.mobile" class="account-item">
 					<i class="el-icon-circle-check"></i>
@@ -59,6 +59,32 @@
 				<el-button type="primary" @click="submitPass">确定</el-button>
 			</div>
 		</el-dialog>
+		<!-- 邮箱验证 -->
+		<el-dialog :visible.sync="emailFormVisible" title="激活邮箱">
+			<el-row>
+				<el-col :span="14" :offset="5">
+					<el-form :model="emailForm" ref="emailForm" :rules="rules" label-width="120px">
+						<el-form-item v-if="userInfo.email" label="邮箱号：">
+							<span>{{userInfo.email}}</span>
+						</el-form-item>
+						<el-form-item label="激活码：" prop="activeCode">
+							<el-row>
+								<el-col :span="15">
+									<el-input v-model.trim="emailForm.activeCode" placeholder="输入激活码"></el-input>
+								</el-col>
+								<el-col :span="8" :offset="1">
+									<el-button type="success" :disabled="disabled" :loading="emailLoading" @click="getActiveCode">获取激活码</el-button>
+								</el-col>
+							</el-row>
+						</el-form-item>
+					</el-form>
+				</el-col>
+			</el-row>
+			<div slot="footer">
+				<el-button @click="emailFormVisible = false">取消</el-button>
+				<el-button type="primary" @click="activeEmail">确定</el-button>
+			</div>
+		</el-dialog>
 		<!-- 绑定手机号 -->
 		<el-dialog :visible.sync="mobileFormVisible" :title="mobileFormTitle">
 			<el-row>
@@ -94,7 +120,7 @@
 	</section>
 </template>
 <script>
-	import { getMyInfo, updatePwd, emailActive, getMobileSmsCode, bindMobile } from '@/api'
+	import { getMyInfo, updatePwd, getEmailActiveCode, emailActive, getMobileSmsCode, bindMobile } from '@/api'
 	import Md5 from '@/assets/js/md5'
 	export default {
 		data () {
@@ -135,6 +161,10 @@
 					newMobile: '',
 					smsCode: '',
 				},
+				emailFormVisible: false,
+				emailForm: {
+					activeCode: ''
+				},
 				rules: {
 					oldPass: [
 						{ required: true, message: '请输入原密码', trigger: 'blur'}
@@ -151,6 +181,9 @@
 					],
 					smsCode: [
 						{ required: true, message: '请输入验证码', trigger: 'blur'}
+					],
+					activeCode: [
+						{ required: true, message: '请输入激活码', trigger: 'blur'}
 					],
 				},
 				disabled: false,
@@ -199,6 +232,7 @@
 							this.$catchError(err)
 						})
 						this.passwordVisible = false;
+						this.$refs.passwordForm.resetFields()
 					} else {
 						console.log('err submit')
 					}
@@ -209,15 +243,19 @@
 			},
 			// 验证邮箱
 			verifyEmail() {
+				this.emailFormVisible = true;
+			},
+			// 获取邮箱激活码
+			getActiveCode() {
 				if(this.sendEmail) {
-				 this.$notify({ type: 'warning', title: '提示', message: '验证邮件已发送，请注意查收' })
+				 this.$notify({ type: 'warning', title: '提示', message: '激活邮件已发送，请注意查收' })
 				 return;
 				}
 				let params = {
-					email: this.userInfo.email // 'xfl0927@126.com'
+					email: this.userInfo.email
 				}
 				this.emailLoading = true;
-				emailActive(params).then(res => {
+				getEmailActiveCode(params).then(res => {
 					this.emailLoading = false;
 					if(res.data.code === '0001') {
 						this.$message(`验证信息已发送到${this.userInfo.email}，请注意查收`)
@@ -230,7 +268,28 @@
 					console.log(err)
 				})
 			},
-			// 
+			// 邮箱激活码提交
+			activeEmail() {
+				this.$refs.emailForm.validateField('activeCode', (errMessage) => {
+					if(errMessage) return;
+					let data = {
+						email: this.userInfo.email,
+						activeCode: this.emailForm.activeCode
+					}
+					emailActive(data).then(res => {
+						if(res.data.code === '0001') {
+							this.$message(res.data.message)
+							this.getUserInfo()
+						} else {
+							this.$message.error(res.data.message)
+						}
+					}).catch(err => {
+						console.log(err)
+						this.$catchError(err)
+					})
+					this.emailFormVisible = false;
+				})
+			},
 			bindMobile() {
 				this.mobileFormTitle = '绑定手机号';
 				this.mobileFormVisible = true; 
@@ -253,26 +312,22 @@
 			// 获取短信验证码
 			getSmsCode() {
 				this.$refs.mobileForm.validateField('mobile', (errMessage) => {
-					if(!errMessage) {
-						let params = {
-							mobile: this.mobileForm.mobile
-						}
-						getMobileSmsCode(params).then(res => {
-							// console.log(res)
-							if(res.data.code === '0001') {
-								this.countDown()
-								this.$message('短信已发送，请注意查收')
-							} else {
-								this.$message.error(res.data.message)
-							}
-						}).catch(err => {
-							console.log(err)
-							this.$catchError(err)
-						})
-						this.mobileFormVisible = false; 
-					} else {
-						console.log('err submit')
+					if(errMessage) return;
+					let params = {
+						mobile: this.mobileForm.mobile
 					}
+					getMobileSmsCode(params).then(res => {
+						// console.log(res)
+						if(res.data.code === '0001') {
+							this.countDown()
+							this.$message('短信已发送，请注意查收')
+						} else {
+							this.$message.error(res.data.message)
+						}
+					}).catch(err => {
+						console.log(err)
+						this.$catchError(err)
+					})
 				})
 			},
 			// 绑定手机号提交

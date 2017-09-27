@@ -68,7 +68,7 @@ export default {
 			}
 		})
 		// 登出
-		mock.onGet('/logout').reply(config => {
+		mock.onGet('/accountInter/logout.do').reply(config => {
 			Utils.delCookie('userId')
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
