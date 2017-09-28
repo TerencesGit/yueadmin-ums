@@ -2,10 +2,11 @@ import axios from 'axios'
 import Utils from '@/assets/js/utils'
 import Region from '@/assets/js/region'
 import MockAdapter from 'axios-mock-adapter'
-import { Menus, UserList, PartnerList, OrganizeList, ModuleList, FunctionList, 
+import { Menus, FileList, UserList, PartnerList, OrganizeList, ModuleList, FunctionList, 
 				TitleList, RoleList, OrgRoles, RoleFuncs, ContractTempList, 
 				PartnerTypeList, TypeRoles, Contracts } from './data/user'
 let _Menus = Menus,
+		_FileList = FileList,
 		_UserList = UserList,
 		_PartnerList = PartnerList,
 		_Organizes = OrganizeList,
@@ -67,16 +68,6 @@ export default {
 				})
 			}
 		})
-		// 登出
-		mock.onGet('/accountInter/logout.do').reply(config => {
-			Utils.delCookie('userId')
-			retObj.result = {}
-			return new Promise((resolve, reject) => {
-				setTimeout(() => {
-					resolve([200, retObj])
-				}, 500)
-			})
-		})
 		// 注册
 		mock.onPost('/baseInter/register.do').reply(config => {
 			let { email, passwd, passwd2 } = JSON.parse(config.data);
@@ -119,6 +110,15 @@ export default {
 		mock.onPost('/baseInter/sendForgotPwdEmail.do').reply(config => {
 			let { email } = JSON.parse(config.data)
 			console.log(email)
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 校验邮箱激活码
+		mock.onPost('/baseInter/validateEmailCode.do').reply(config => {
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
@@ -185,18 +185,36 @@ export default {
 					}, 500)
 				})
 			}
-			let _userInfo = _UserList.filter(user => user.userId == userId)[0];
-			_userInfo.areaName = _userInfo.areaId ? Region.filter(region => region.id === _userInfo.areaId)[0].name : '未设置';
+			let userInfo = _UserList.filter(user => user.userId == userId)[0];
+			userInfo.areaName = userInfo.areaId ? Region.filter(region => region.id === userInfo.areaId)[0].name : '未设置';
 			_Organizes.filter(org => {
-				if(org.orgId == _userInfo.orgId) {
-					_userInfo.orgName = org.name
+				if(userInfo.orgId && org.orgId == userInfo.orgId) {
+					userInfo.orgName = org.name
 				}
 			})
+			let avatar, idcardPicFront, idcardPicBack;
+			_FileList.filter(file => {
+				if(file.fileUuid === userInfo.avatar) {
+					avatar = file.fileUri
+				}
+				if(file.fileUuid === userInfo.idcardPicFront) {
+					idcardPicFront = file.fileUri
+				}
+				if(file.fileUuid === userInfo.idcardPicBack) {
+					idcardPicBack = file.fileUri
+				}
+			})
+			let fileInfos = {
+				avatar,
+				idcardPicFront,
+				idcardPicBack,
+			}
 			let retObj = {
 				code: '0001',
 				message: '操作成功',
 				result: {
-					userInfo: _userInfo
+					userInfo,
+					fileInfos,
 				}
 			}
 			return new Promise((resolve, reject) => {
@@ -302,7 +320,7 @@ export default {
 			})
 		})
 		// 账户邮箱激活
-		mock.onGet('/baseInter/emailActiveAccount.do').reply(config => {
+		mock.onGet('/accountInter/emailActiveAccount.do').reply(config => {
 			let { email } = config.params;
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
@@ -345,13 +363,45 @@ export default {
 			}
 			let _partnerId = _userInfo.partnerId;
 			let _partnerInfo = _PartnerList.filter(p => p.partnerId == _partnerId)[0]
+			let logo, licensePic, idcardPicFront, idcardPicBack;
+			_FileList.filter(file => {
+				if(file.fileUuid === _partnerInfo.logo) {
+						logo = file.fileUri
+				}
+				if(file.fileUuid === _partnerInfo.licensePic) {
+						licensePic = file.fileUri
+				}
+				if(file.fileUuid === _partnerInfo.idcardPicFront) {
+						idcardPicFront = file.fileUri
+				}
+				if(file.fileUuid === _partnerInfo.idcardPicBack) {
+						idcardPicBack = file.fileUri
+				}
+			})
+			let fileInfos = {
+				logo, 
+				licensePic, 
+				idcardPicFront, 
+				idcardPicBack,
+			}
 			retObj.result = {
-				partnerInfo: _partnerInfo
+				partnerInfo: _partnerInfo,
+				fileInfos
 			}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 					resolve([200, retObj])
 				})
+			})
+		})
+		// 登出
+		mock.onGet('/accountInter/logout.do').reply(config => {
+			Utils.delCookie('userId')
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
 			})
 		})
 		// 获取当前用户所属商户信息
@@ -378,9 +428,31 @@ export default {
 				})
 			}
 			let _partnerId = _userInfo.partnerId;
-			let _partnerInfo = _PartnerList.filter(p => p.partnerId == _partnerId)[0]
+			let _partnerInfo = _PartnerList.filter(p => p.partnerId == _partnerId)[0];
+			let logo, licensePic, idcardPicFront, idcardPicBack;
+			_FileList.filter(file => {
+				if(file.fileUuid === _partnerInfo.logo) {
+						logo = file.fileUri
+				}
+				if(file.fileUuid === _partnerInfo.licensePic) {
+						licensePic = file.fileUri
+				}
+				if(file.fileUuid === _partnerInfo.idcardPicFront) {
+						idcardPicFront = file.fileUri
+				}
+				if(file.fileUuid === _partnerInfo.idcardPicBack) {
+						idcardPicBack = file.fileUri
+				}
+			})
+			let fileInfos = {
+				logo, 
+				licensePic, 
+				idcardPicFront, 
+				idcardPicBack,
+			}
 			retObj.result = {
-				partnerInfo: _partnerInfo
+				partnerInfo: _partnerInfo,
+				fileInfos,
 			}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {

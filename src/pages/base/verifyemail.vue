@@ -24,7 +24,7 @@
 				},
 				rules: {
 					activeCode: [
-						{required: true, message: '输入邮箱验证码', trigger: 'blur'},
+						{required: true, message: '请输入邮箱验证码', trigger: 'blur'},
 					]
 				}
 			}
@@ -64,6 +64,7 @@
 		margin: 20px 0 0;
 		text-align: center;
 		font-size: 16px;
+		color: #666;
 	}
 	.el-form {
 		width: 40%;

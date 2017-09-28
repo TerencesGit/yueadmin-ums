@@ -10,6 +10,7 @@
 	</section>
 </template>
 <script>
+	import { getMyInfo } from '@/api'
 	export default {
 		data() {
 			return {
@@ -17,6 +18,7 @@
 			}
 		},
 		methods: {
+			// 倒计时
 			countDown() {
 				let timer = null;
 				timer = setInterval(() => {
@@ -26,11 +28,27 @@
 						this.$router.push('/login')
 					}
 				}, 1000)
-			}
+			},
+			// 判断用户是否登录
+			getUserInfo() {
+				getMyInfo().then(res => {
+					console.log(res)
+					if(res.data.code === '0001') {
+						this.$router.push({ path: '/account/infocenter' })
+					} else if(res.data.code === '0009') {
+						this.countDown()
+					} else {
+						this.$message.error(res.data.message)
+					}
+				}).catch(err => {
+					console.log(err)
+					this.$catchError(err)
+				})
+			},
 		},
 		mounted() {
+			this.getUserInfo()
 			this.$store.dispatch('changeStepActive', 4)
-			this.countDown()
 		}
 	}
 </script>

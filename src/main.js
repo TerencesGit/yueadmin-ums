@@ -90,7 +90,7 @@ axios.interceptors.response.use(res => {
     router.push('/login')
     return Promise.reject(res)
   } else if (res.data.code === '9999') {
-  	router.push('/NoPermission')
+  	router.push('/nopermission')
     return Promise.reject(res)
   }
   return res;

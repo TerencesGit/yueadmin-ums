@@ -214,7 +214,8 @@ export default {
           requestRegist(data).then(res => {
             if (res.data.code === '0001') {
               this.$message.success('注册成功')
-              this.$router.push({ path: '/login' })
+              window.location.href = res.data.result.redirectUrl;
+              // this.$router.push({ path: '/login' })
               // this.loginSubmit()
             } else {
               this.$message.error(res.data.message)

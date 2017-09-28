@@ -554,7 +554,7 @@
 		},
 		mounted () {
 			this.getModuleList()
-			this.getFuncTree()
+			// this.getFuncTree()
 		}
 	}
 </script>

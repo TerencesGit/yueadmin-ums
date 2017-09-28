@@ -350,6 +350,7 @@
 						console.log(err)
 						this.$catchError(err)
 					})
+					this.mobileFormVisible = false;
 				})
 			},
 			modifyMobile() {

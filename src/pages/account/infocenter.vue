@@ -5,7 +5,7 @@
 			<el-col :span="7">
 				<el-card v-loading="loading">
 					<div class="account-info">
-						<el-popover
+						<!-- <el-popover
 						  ref="avatarPop"
 						  placement="top"
 						  title=""
@@ -13,10 +13,10 @@
 						  trigger="hover"
 						  :content="avatarUrl ? '更换头像' : '上传头像'"
 						  popper-class="text-center">
-						</el-popover>
+						</el-popover> -->
 						<div class="avatar" @click="uploadAvatar">
-							<img v-if="userInfo.avatar" :src="userInfo.avatar">
-							<img v-else src="../../assets/img/avatar.gif" alt="头像"/>
+							<img v-if="userAvatar" :src="userAvatar" title="点击更新头像">
+							<img v-else src="../../assets/img/avatar.gif" title="点击上传头像" alt="头像"/>
 						</div>
 						<h3>{{userInfo.name}}</h3>
 						<ul class="list-group">
@@ -69,7 +69,7 @@
 					</div>
 					<div class="partner-info">
 						<h3>{{partnerInfo.name}}</h3>
-						<img :src="partnerInfo.logo" :title="partnerInfo.name">
+						<img :src="partnerLogo" :title="partnerInfo.name">
 						<p>{{partnerInfo.note}}</p>
 					</div>
 				</el-card>
@@ -223,7 +223,7 @@
 				},
 				// uploadAction: '/uploadFileUrl',
 				uploadAction: '/ums/baseInter/uploadFile.do',
-				avatarId: '',
+				userAvatar: '',
 				avatarUrl: '',
 				idcardFrontUrl: '',
 				idcardBackUrl: '',
@@ -231,6 +231,7 @@
 				uploading: false,
 				avatarVisible: false,
 				userFormVisible: false,
+				partnerLogo: '',
 				rules: {
 					name: [
 						{ required: true, message: '请输入用户名', trigger: 'blur' },
@@ -272,11 +273,17 @@
 					this.loading = false;
 					if(res.data.code === '0001') {
 						let userJson = JSON.stringify(res.data.result.userInfo);
+						let fileInfos = res.data.result.fileInfos;
 						this.userInfo = JSON.parse(userJson);
 						this.userForm = JSON.parse(userJson);
-						this.avatarUrl = this.userInfo.avatar;
-						this.userInfo.areaId && (this.areaId = this.userInfo.areaId) && this.formatRegion(this.userInfo.areaId)
-						this.userInfo.partnerId && this.getPartInfo()
+						this.userAvatar = fileInfos.avatar;
+						this.idcardFrontUrl = fileInfos.idcardPicFront;
+						this.idcardBackUrl = fileInfos.idcardPicBack;
+						if(this.userInfo.areaId) {
+							this.areaId = this.userInfo.areaId;
+							// this.formatRegion(this.userInfo.areaId)
+						}
+						this.userInfo.partnerId > 0 && this.getPartInfo()
 					} else {
 						this.$message.error(res.data.message)
 					}
@@ -291,10 +298,10 @@
         const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
         const isLt2M = file.size / 1024 / 1024 < 2;
         if (!isJPG) {
-          this.$message.error('上传头像图片只能是 JPG 或 PNG 格式!');
+          this.$message.error('上传图片只能是 JPG 或 PNG 格式!');
         }
         if (!isLt2M) {
-          this.$message.error('上传头像图片大小不能超过 2MB!');
+          this.$message.error('上传图片大小不能超过 2MB!');
         }
         return isJPG && isLt2M;
       },
@@ -315,7 +322,7 @@
 				if(res.code === '0001') {
 					this.$message.success('上传成功')
 					this.avatarUrl = URL.createObjectURL(file.raw);
-					this.avatarId = res.result.fileInfo.fileUuid;
+					this.userInfo.avatar = res.result.fileInfo.fileUuid;
 				} else {
 					this.$message.error(res.message)
 				}
@@ -349,19 +356,16 @@
       	}
       },
       uploadAvatar() {
-      	this.avatarUrl = this.userForm.avatar;
       	this.avatarVisible = true
       },
       // 头像提交
       uploadSubmit() {
       	let data = {
-      		avatar: this.avatarId
+      		avatar: this.userInfo.avatar
       	}
       	updateAvatar(data).then(res => {
-      		console.log(res)
       		if(res.data.code === '0001') {
-      			// this.userInfo.avatar = res.data.result.avatar;
-      			this.userInfo.avatar = this.avatarUrl
+      			this.userAvatar = this.avatarUrl
       			this.$message.success('更新成功')
       		} else {
       			this.$message.error(res.data.message)
@@ -398,9 +402,7 @@
 						idcardPicFront: this.userForm.idcardPicFront,
 						idcardPicBack: this.userForm.idcardPicBack,
       		}
-      		console.log(data)
       		updateMyInfo(data).then(res => {
-      			console.log(res)
       			if(res.data.code === '0001') {
       				this.$message.success(res.data.message)
       				this.getUserInfo()
@@ -419,6 +421,8 @@
       	getMyPartner().then(res => {
       		if(res.data.code === '0001') {
       			this.partnerInfo = res.data.result.partnerInfo
+      			let fileInfos = res.data.result.fileInfos;
+      			this.partnerLogo = fileInfos.logo
       		} else {
       			this.$message.error('获取企业信息失败')
       		}
@@ -429,6 +433,7 @@
       },
       // 选择省、市、区
       provinceChange (pid) {
+      	console.log(pid)
       	this.region.city = '';
       	this.areaId = pid;
       	this.regionList.city = Region.filter(region => region.pid === pid)
@@ -460,6 +465,7 @@
 			height: 200px;
 			margin: auto;
 			img {
+				display: inline-block;
 				width: 100%;
 				height: 100%;
 				border: 1px solid #ccc;

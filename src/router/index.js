@@ -5,7 +5,6 @@ import Register from '@/pages/register'
 import Expired from '@/pages/Expired'
 import NotFound from '@/pages/NotFound'
 import NoPermission from '@/pages/NoPermission'
-import Welcome from '@/pages/welcome'
 
 import BaseFindPasswd from '@/pages/base/findpasswd'
 import BaseSendEmail from '@/pages/base/sendemail'
@@ -15,21 +14,21 @@ import BaseResetSuccess from '@/pages/base/resetsuccess'
 
 import AccountCenter from '@/pages/account/infocenter'
 import AccountSettings from '@/pages/account/settings'
-import CreatePartner from '@/pages/account/createpartner'
-import WaittingVerify from '@/pages/account/waittingverify'
+import AccountCreatePartner from '@/pages/account/createpartner'
+import AccountWaittingVerify from '@/pages/account/waittingverify'
 
 import PartnerEdit from '@/pages/partner/partneredit'
 import PartnerOrgManage from '@/pages/partner/orgmanage'
 import PartnerTitleManage from '@/pages/partner/titlemanage'
 
-import AdminPartnerManage from '@/pages/admin/partnermanage'
-import AdminPartnerVerify from '@/pages/admin/partnerverify'
-import AdminContractManage from '@/pages/admin/contractmanage'
+import DomainPartnerManage from '@/pages/admin/partnermanage'
+import DomainPartnerVerify from '@/pages/admin/partnerverify'
+import DomainContractManage from '@/pages/admin/contractmanage'
 
-import SystemFuncManage from '@/pages/system/funcmanage'
-import SystemRoleManage from '@/pages/system/rolemanage'
-import SystemTemplateManage from '@/pages/system/templatemanage'
-import SystemPartnerTypeManage from '@/pages/system/partnertypemanage'
+import AdminFuncManage from '@/pages/system/funcmanage'
+import AdminRoleManage from '@/pages/system/rolemanage'
+import AdminTemplateManage from '@/pages/system/templatemanage'
+import AdminPartnerTypeManage from '@/pages/system/partnertypemanage'
 
 const routes = [
   {
@@ -39,12 +38,12 @@ const routes = [
   {
     path: '/login',
     name: '欢迎登录',
-    component: Login
-    // component: CASLogin
+    // component: Login
+    component: CASLogin
   },
   {
     path: '/register',
-    name: '欢迎注册',
+    name: ' ',
     component: Register
   },
   {
@@ -52,20 +51,9 @@ const routes = [
     component: BaseFindPasswd,
     children: [
       { path: '/', name: '找回密码', component: BaseSendEmail },
-      { path: '/verifyemail', name: '发送邮件', component: BaseVerifyEmail },
+      { path: '/verifyemail', name: '验证邮箱', component: BaseVerifyEmail },
       { path: '/resetpasswd', name: '重置密码', component: BaseResetPasswd },
       { path: '/resetsuccess', name: '重置密码成功', component: BaseResetSuccess },
-    ]
-  },
-  {
-    path: '/',
-    component: Layout,
-    children: [
-      {
-        path: 'welcome',
-        name: '欢迎',
-        component: Welcome
-      }
     ]
   },
   {
@@ -86,12 +74,12 @@ const routes = [
       {
         path: 'createpartner',
         name: '注册我的企业',
-        component: CreatePartner
+        component: AccountCreatePartner
       },
       {
         path: 'waittingverify',
         name: '等待企业审核',
-        component: WaittingVerify
+        component: AccountWaittingVerify
       },
     ]
   },
@@ -118,51 +106,51 @@ const routes = [
     ]
   },
   {
-    path: '/admin',
+    path: '/domain',
     name: '我的商家',
     component: Layout,
     children: [
       {
         path: 'partnerverify',
         name: '商家审核',
-        component: AdminPartnerVerify,
+        component: DomainPartnerVerify,
       },
       {
         path: 'partnermanage',
         name: '商家管理',
-        component: AdminPartnerManage,
+        component: DomainPartnerManage,
       },
       {
         path: 'contractmanage',
         name: '合同管理',
-        component: AdminContractManage,
+        component: DomainContractManage,
       },
     ]
   },
   {
-    path: '/system',
+    path: '/admin',
     name: '系统管理',
     component: Layout,
     children: [
       {
         path: 'funcmanage',
         name: '功能管理',
-        component: SystemFuncManage,
+        component: AdminFuncManage,
       },
       {
         path: 'rolemanage',
         name: '角色管理',
-        component: SystemRoleManage,
+        component: AdminRoleManage,
       },
       {
         path: 'templatemanage',
         name: '合同模板管理',
-        component: SystemTemplateManage,
+        component: AdminTemplateManage,
       },
       {
         path: 'partnertypemanage',
         name: '商家类型管理',
-        component: SystemPartnerTypeManage,
+        component: AdminPartnerTypeManage,
       },
     ]
   },
