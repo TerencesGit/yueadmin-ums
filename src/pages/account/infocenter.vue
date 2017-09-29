@@ -232,6 +232,7 @@
 				avatarVisible: false,
 				userFormVisible: false,
 				partnerLogo: '',
+				areaFormat: false,
 				rules: {
 					name: [
 						{ required: true, message: '请输入用户名', trigger: 'blur' },
@@ -281,7 +282,6 @@
 						this.idcardBackUrl = fileInfos.idcardPicBack;
 						if(this.userInfo.areaId) {
 							this.areaId = this.userInfo.areaId;
-							// this.formatRegion(this.userInfo.areaId)
 						}
 						this.userInfo.partnerId > 0 && this.getPartInfo()
 					} else {
@@ -378,6 +378,10 @@
       },
       // 账户信息编辑
       handleEdit() {
+      	if(!this.areaFormat) {
+      		this.formatRegion(this.userInfo.areaId)
+					this.areaFormat = true;
+      	}
       	this.userFormVisible = true
       },
       // 账户信息提交

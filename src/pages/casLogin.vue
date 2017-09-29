@@ -1,5 +1,5 @@
 <template>
-	<form id="casForm" action="http://www.yueshijue.com:8080/ums/ssoAjax/casProxy.do" style="display: none">
+	<form id="casForm" :action="action" style="display: none">
     <input type="text" name="rawUrl" :value="rawUrl">
   </form>
 </template>
@@ -8,11 +8,12 @@ export default {
 	data () {
     return {
       rawUrl: '',
+      action: '',
     }
   },
   mounted () {
   	this.rawUrl = '#'+this.$fromPath;
-  	console.log(this.rawUrl)
+    this.action = window.location.protocol+ '//' + window.location.host + '/ums/ssoAjax/casProxy.do';
     setTimeout(() => {
   	  document.getElementById('casForm').submit()
     }, 500)

@@ -160,14 +160,6 @@
 			formatTime(row) {
 				return this.$moment(row.updateTime).format('YYYY-MM-DD HH:mm:ss')
 			},
-			handleSizeChange(val) {
-				this.pageSize = val;
-				this.getTemplateList()
-			},
-			handleCurrentChange(val) {
-				this.pageNo = val;
-				this.getTemplateList()
-			},
 			getTemplateList() {
 				let params = {
 					pageNo: this.pageNo,
@@ -190,6 +182,14 @@
 					console.log(err)
 					this.$catchError(err)
 				})
+			},
+			handleSizeChange(val) {
+				this.pageSize = val;
+				this.getTemplateList()
+			},
+			handleCurrentChange(val) {
+				this.pageNo = val;
+				this.getTemplateList()
 			},
 			handleError(err) {
 				this.$message.error('上传失败，请稍后重试')
