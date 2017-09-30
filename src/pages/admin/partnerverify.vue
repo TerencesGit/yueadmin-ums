@@ -50,7 +50,7 @@
     		<el-col :span="14" :offset="5">
 		    	<el-form label-width="150px">
 		    		<el-form-item label="" label-width="100px">
-		    			<img :src="partInfo.logo" alt="logo" class="logo">
+		    			<img :src="partInfo.logoUri" alt="logo" class="logo">
 		    		</el-form-item>
 		    		<el-form-item label="商家名称：">
 		    			<span>{{partInfo.name}}</span>
@@ -178,7 +178,7 @@
 			},
 			isVerifiedChange(val) {
 				this.isVerified = val;
-				this.getPartnerList()
+				// this.getPartnerList()
 			},
 			getPartnerList() {
 				let params = {
