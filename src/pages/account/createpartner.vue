@@ -2,86 +2,135 @@
 	<section>
 		<div v-title :data-title="this.$route.name"></div>
 		<el-card class="card-primary">
-			<div slot="header">
-				注册我的企业
-			</div>
+			<div slot="header">注册我的企业</div>
+			<el-alert
+			  v-if="isVerified === 0"
+		    title="等待审核"
+		    type="success"
+		    :closable="false"
+		    description="注册企业信息已提交，请等待平台审核！"
+		    show-icon>
+		  </el-alert>
+		  <el-alert
+			  v-if="isVerified === 1"
+		    title="审核通过"
+		    type="success"
+		    :closable="false"
+		    description="审核已通过，不应该看到该页面！"
+		    show-icon>
+		  </el-alert>
+		  <el-alert
+		    v-if="isVerified === 2"
+		    title="审核未通过"
+		    type="warning"
+		    :description="'驳回原因：'+partnerForm.rejectInfo"
+		    show-icon>
+		  </el-alert>
 			<el-row>
 				<el-col :span="22" :offset="1">
 					<el-form 
 						:model="partnerForm" 
-						:rules="rules" 
+						:rules="rules"  
 						ref="partnerForm" 
 						label-width="120px" 
 						class="partner-form">
 						<el-row>
 							<el-col :span="12">
 								<el-form-item label="企业名称" prop="name">
-									<el-input v-model="partnerForm.name" placeholder="输入企业名称"></el-input>
+									<el-input v-model="partnerForm.name" placeholder="输入企业名称" :disabled="isVerified === 0"></el-input>
 								</el-form-item>
 							</el-col>
 							<el-col :span="12">
 								<el-form-item label="企业简称" prop="shortName">
-									<el-input v-model="partnerForm.shortName" placeholder="输入企业简称"></el-input>
+									<el-input v-model="partnerForm.shortName" placeholder="输入企业简称" :disabled="isVerified === 0"></el-input>
 								</el-form-item>
 							</el-col>
 						</el-row>
 						<el-row>
 							<el-col :span="12">
 								<el-form-item label="企业电话" prop="mobile">
-									<el-input v-model="partnerForm.mobile" placeholder="输入企业联系电话"></el-input>
+									<el-input v-model="partnerForm.mobile" placeholder="输入企业联系电话" :disabled="isVerified === 0"></el-input>
 								</el-form-item>
 							</el-col>
 							<el-col :span="12">
 								<el-form-item label="企业邮箱" prop="email">
-									<el-input v-model="partnerForm.email" placeholder="输入企业邮箱"></el-input>
+									<el-input v-model="partnerForm.email" placeholder="输入企业邮箱" :disabled="isVerified === 0"></el-input>
 								</el-form-item>
 							</el-col>
 						</el-row>
 						<el-row>
 							<el-col :span="12">
 								<el-form-item label="企业邮编" prop="post">
-									<el-input v-model="partnerForm.post" placeholder="输入企业邮编"></el-input>
+									<el-input v-model="partnerForm.post" placeholder="输入企业邮编" :disabled="isVerified === 0"></el-input>
 								</el-form-item>
 							</el-col>
 							<el-col :span="12">
 								<el-form-item label="联系地址" prop="contactAddress">
-									<el-input v-model="partnerForm.contactAddress" placeholder="输入企业联系地址"></el-input>
+									<el-input v-model="partnerForm.contactAddress" placeholder="输入企业联系地址" :disabled="isVerified === 0"></el-input>
 								</el-form-item>
 							</el-col>
 						</el-row>
 						<el-row>
 							<el-col :span="12">
 								<el-form-item label="企业法人" prop="corporationName">
-									<el-input v-model="partnerForm.corporationName" placeholder="输入企业法人"></el-input>
+									<el-input v-model="partnerForm.corporationName" placeholder="输入企业法人" :disabled="isVerified === 0"></el-input>
 								</el-form-item>
 							</el-col>
 							<el-col :span="12">
 								<el-form-item label="法人身份证号" prop="idcardNum">
-									<el-input v-model="partnerForm.idcardNum" placeholder="输入法人身份证号"></el-input>
+									<el-input v-model="partnerForm.idcardNum" placeholder="输入法人身份证号" :disabled="isVerified === 0"></el-input>
 								</el-form-item>
 							</el-col>
 						</el-row>
 						<el-row>
 							<el-col :span="12">
 								<el-form-item label="营业执照注册号" prop="licenseNum">
-									<el-input v-model="partnerForm.licenseNum" placeholder="输入营业执照注册号"></el-input>
+									<el-input v-model="partnerForm.licenseNum" placeholder="输入营业执照注册号" :disabled="isVerified === 0"></el-input>
 								</el-form-item>
 							</el-col>
 							<el-col :span="12">
 								<el-form-item label="联系人" prop="contactName">
-									<el-input v-model="partnerForm.contactName" placeholder="输入联系人"></el-input>
+									<el-input v-model="partnerForm.contactName" placeholder="输入联系人" :disabled="isVerified === 0"></el-input>
 								</el-form-item>
 							</el-col>
 						</el-row>
 						<el-row>
 							<el-col :span="12">
 								<el-form-item label="企业固话" prop="telphone">
-									<el-input v-model="partnerForm.telphone" placeholder="例如：010-12345678"></el-input>
+									<el-input v-model="partnerForm.telphone" placeholder="例如：010-12345678" :disabled="isVerified === 0"></el-input>
 								</el-form-item>
 							</el-col>
 							<el-col :span="12">
 								<el-form-item label="企业传真" prop="fax">
-									<el-input v-model="partnerForm.fax" placeholder="输入企业传真"></el-input>
+									<el-input v-model="partnerForm.fax" placeholder="输入企业传真" :disabled="isVerified === 0"></el-input>
+								</el-form-item>
+							</el-col>
+						</el-row>
+						<el-row>
+							<el-col :span="12">
+								<el-form-item label="企业所在地：" prop="areaId">
+									<el-row>
+										<el-col :span="11">
+											<el-select v-model="region.province" placeholder="选择省" @change="provinceChange" style="width: 100%">
+										    <el-option
+										      v-for="item in regionList.province"
+										      :key="item.id"
+										      :label="item.name"
+										      :value="item.id">
+										    </el-option>
+										  </el-select>
+										</el-col>
+										<el-col :offset="2" :span="11">
+											<el-select v-model="region.city" placeholder="选择市" @change="cityChange" style="width: 100%">
+										    <el-option
+										      v-for="item in regionList.city"
+										      :key="item.id"
+										      :label="item.name"
+										      :value="item.id">
+										    </el-option>
+										  </el-select>
+										</el-col>
+									</el-row>
 								</el-form-item>
 							</el-col>
 						</el-row>
@@ -92,6 +141,7 @@
 									  class="uploader"
 									  accept="image/jpeg, image/png"
 									  name='uploadFile'
+									  :disabled="isVerified === 0"
 									  :action="uploadAction"
 									  :data="{category: 'partner'}"
 									  :show-file-list="false"
@@ -109,6 +159,7 @@
 									  class="uploader lisence-uploader"
 									  accept="image/jpeg, image/png"
 									  name='uploadFile'
+									  :disabled="isVerified === 0"
 									  :action="uploadAction"
 									  :data="{category: 'partner'}"
 									  :show-file-list="false"
@@ -127,6 +178,7 @@
 									  class="uploader idcard-uploader"
 									  accept="image/jpeg, image/png"
 									  name='uploadFile'
+									  :disabled="isVerified === 0"
 									  :action="uploadAction"
 									  :data="{category: 'partner'}"
 									  :show-file-list="false"
@@ -144,6 +196,7 @@
 									  class="uploader idcard-uploader"
 									  accept="image/jpeg, image/png"
 									  name='uploadFile'
+									  :disabled="isVerified === 0"
 									  :action="uploadAction"
 									  :data="{category: 'partner'}"
 									  :show-file-list="false"
@@ -156,11 +209,15 @@
 							</el-col>
 						</el-row>
 						<el-form-item label="企业简介" prop="note">
-							<el-input type="textarea" :rows="4" v-model="partnerForm.note" placeholder="请输入企业简介"></el-input>
+							<el-input type="textarea" :rows="4" v-model="partnerForm.note" placeholder="请输入企业简介" :disabled="isVerified === 0"></el-input>
 						</el-form-item>
-						<el-form-item label="" class="button-item">
+						<el-form-item v-if="isVerified === -1" label="" class="button-item">
 							<el-button @click="resetForm">重 置</el-button>
 							<el-button type="primary" @click="submitForm">提 交</el-button>
+						</el-form-item>
+						<el-form-item v-if="isVerified === 2" label="" class="button-item">
+							<el-button @click="resetForm">重 置</el-button>
+							<el-button type="primary" @click="submitForm">重新提交</el-button>
 						</el-form-item>
 					</el-form>
 				</el-col>
@@ -169,7 +226,9 @@
 	</section>
 </template>
 <script>
-	import { createPartner } from '@/api'
+	import Region from '@/assets/js/region'
+	import { mapGetters } from 'vuex'
+	import { createPartner, getMyPartner } from '@/api'
 	export default {
 		data() {
 			const validateMobile = (rule, value, callback) => {
@@ -196,6 +255,7 @@
 					post: '',
 					logo: '',
 					fax: '',
+					areaId: '',
 					idcardNum: '',
 					idcardPicFront: '',
 					idcardPicBack: '',
@@ -222,6 +282,9 @@
 					],
 					post: [
 						{ required: true, message: '请输入企业邮编', trigger: 'blur'},
+					],
+					areaId: [
+						{ required: true, type: 'number', message: '请选择企业所在地', trigger: 'blur'},
 					],
 					contactName: [
 						{ required: true, message: '请输入企业联系人', trigger: 'blur'},
@@ -254,13 +317,50 @@
 						{ required: true, message: '请输入企业简介', trigger: 'blur'},
 					],
 				},
-				logoUrl: '',
+				logoUrl: '', 
 				licenseUrl: '',
 				idcardFrontUrl: '',
 				idcardBackUrl: '',
+				isVerified: -1,
+				region: {
+					province: '',
+					city: '',
+					area: ''
+				},
+				regionList: {
+					province: [],
+					city: [],
+					area: [],
+				},
+				provinceId: 1,
+				areaFormat: false,
 			}
 		},
 		methods: {
+			// 获取企业信息
+			getPartnerInfo() {
+      	getMyPartner().then(res => {
+      		if(res.data.code === '0001') {
+      			this.partnerForm = res.data.result.partnerInfo;
+      			this.fileInfos = res.data.result.fileInfos;
+      			this.isVerified = this.partnerForm.isVerified;
+      			this.logoUrl = this.fileInfos.logo;
+						this.licenseUrl = this.fileInfos.licensePic;
+						this.idcardFrontUrl = this.fileInfos.idcardPicFront;
+						this.idcardBackUrl = this.fileInfos.idcardPicBack;
+						if(this.partnerForm.areaId && !this.areaFormat) {
+							this.provinceId = Region.filter(region => region.id === this.partnerForm.areaId)[0].pid;
+							this.formatRegion(this.partnerForm.areaId)
+							this.areaFormat = true;
+						}
+      		} else {
+      			this.$message.error('获取企业信息失败')
+      		}
+      	}).catch(err => {
+      		console.log(err)
+      		this.$catchError(err)
+      	})
+      },
 			// 上传验证
 			beforeUpload(file) {
         const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -321,6 +421,7 @@
       resetForm() {
       	this.$refs.partnerForm.resetFields()
       },
+      // 企业信息提交
 			submitForm() {
 				this.$refs.partnerForm.validate(valid => {
 					if(valid) {
@@ -342,8 +443,42 @@
 						})
 					}
 				})
-			}
+			},
+			// 选择省、市、区
+      provinceChange (pid) {
+      	// console.log(pid)
+      	if(pid === this.provinceId) return;
+      	this.provinceId = pid;
+      	this.areaId = '';
+      	this.regionList.city = Region.filter(region => region.pid === pid)
+      	this.region.city = this.regionList.city[0].id;
+      },
+      cityChange (cid) {
+      	// console.log(cid)
+      	this.partnerForm.areaId = cid;
+      },
+      // 所在地回显
+			formatRegion(areaId) {
+				let origin = Region.filter(region => region.id === areaId)[0];
+				if(!origin) return;
+				if (origin.level === 2) {
+					this.region.province = Region.filter(region => region.id === origin.pid)[0].id;
+					this.regionList.city = Region.filter(region => region.pid === origin.pid);
+					this.region.city = areaId;
+				}
+			},
 		},
+		computed: {
+			...mapGetters([
+	  		'userInfo'
+	  	]),
+		},
+		mounted() {
+			if(this.userInfo.partnerId && this.userInfo.partnerId !== -1) {
+				this.getPartnerInfo()
+			}
+			this.regionList.province = Region.filter(region => region.level === 1)
+		}
 	}
 </script>
 <style scoped lang="scss">

@@ -2,9 +2,7 @@
 	<section>
 		<div v-title :data-title="this.$route.name"></div>
 		<el-card class="card-primary">
-			<div slot="header">
-				编辑企业信息
-			</div>
+			<div slot="header">编辑企业信息</div>
 			<el-row>
 				<el-col :span="22" :offset="1">
 					<el-form 
@@ -82,6 +80,34 @@
 							<el-col :span="12">
 								<el-form-item label="企业传真" prop="fax">
 									<el-input v-model="partnerForm.fax" placeholder="输入企业传真"></el-input>
+								</el-form-item>
+							</el-col>
+						</el-row>
+						<el-row>
+							<el-col :span="12">
+								<el-form-item label="企业所在地：" prop="areaId">
+									<el-row>
+										<el-col :span="11">
+											<el-select v-model="region.province" placeholder="选择省" @change="provinceChange" style="width: 100%">
+										    <el-option
+										      v-for="item in regionList.province"
+										      :key="item.id"
+										      :label="item.name"
+										      :value="item.id">
+										    </el-option>
+										  </el-select>
+										</el-col>
+										<el-col :offset="2" :span="11">
+											<el-select v-model="region.city" placeholder="选择市" @change="cityChange" style="width: 100%">
+										    <el-option
+										      v-for="item in regionList.city"
+										      :key="item.id"
+										      :label="item.name"
+										      :value="item.id">
+										    </el-option>
+										  </el-select>
+										</el-col>
+									</el-row>
 								</el-form-item>
 							</el-col>
 						</el-row>
@@ -169,6 +195,7 @@
 	</section>
 </template>
 <script>
+	 import Region from '@/assets/js/region'
 	import { getMyPartnerInfo, updateMyPartnerInfo } from '@/api'
 	export default {
 		data() {
@@ -258,6 +285,15 @@
 				licenseUrl: '',
 				idcardFrontUrl: '',
 				idcardBackUrl: '',
+				region: {
+					province: '',
+					city: '',
+				},
+				regionList: {
+					province: [],
+					city: [],
+				},
+				provinceId: 1,
 			}
 		},
 		methods: {
@@ -272,6 +308,10 @@
 						this.licenseUrl = fileInfos.licensePic;
 						this.idcardFrontUrl = fileInfos.idcardPicFront;
 						this.idcardBackUrl = fileInfos.idcardPicBack;
+						if(this.partnerForm.areaId) {
+							this.provinceId = Region.filter(region => region.id === this.partnerForm.areaId)[0].pid;
+							this.formatRegion(this.partnerForm.areaId)
+						}
 					} else {
 						this.$message.error(res.data.message)
 					}
@@ -342,6 +382,26 @@
       back() {
       	this.$router.back()
       },
+      // 选择省、市、区
+      provinceChange (pid) {
+      	if(pid === this.provinceId) return;
+      	this.provinceId = pid;
+      	this.regionList.city = Region.filter(region => region.pid === pid)
+      	this.region.city = this.regionList.city[0].id;
+      },
+      cityChange (cid) {
+      	this.partnerForm.areaId = cid;
+      },
+      // 所在地回显
+			formatRegion(areaId) {
+				let origin = Region.filter(region => region.id === areaId)[0];
+				if(!origin) return;
+				if (origin.level === 2) {
+					this.region.province = Region.filter(region => region.id === origin.pid)[0].id;
+					this.regionList.city = Region.filter(region => region.pid === origin.pid);
+					this.region.city = areaId;
+				}
+			},
       // 更新企业信息提交
 			submitForm() {
 				this.$refs.partnerForm.validate(valid => {
@@ -370,6 +430,7 @@
 		},
 		mounted() {
 			this.getPartnerInfo()
+			this.regionList.province = Region.filter(region => region.level === 1)
 		}
 	}
 </script>

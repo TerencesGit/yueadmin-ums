@@ -28,13 +28,13 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      // '/baseInter': {
-      //   target: 'http://localhost:8080/ums',
-      //   changeOrigin: true,
-      //   pathRewrite: {
-      //     '^/baseInter': ''
-      //   }
-      // },
+      '/baseInter': {
+        target: 'http://ums.yueshijue.com/ums',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/baseInter': ''
+        }
+      },
       // '/mailInter': {
       //   target: 'http://192.168.1.110:8080/yue_mail',
       //   changeOrigin: true,
@@ -44,7 +44,8 @@ module.exports = {
       // },
       '/uploadFileUrl': {
          // target: 'http://localhost:8080/ums/baseInter/uploadFile.do',
-         target: 'http://192.168.1.110:8080/ums/baseInter/uploadFile.do',
+         // target: 'http://192.168.1.110:8080/ums/baseInter/uploadFile.do',
+         target: 'http://ums.yueshijue.com/ums/baseInter/uploadFile.do',
          changeOrigin: true,
          pathRewrite: {
            '^/uploadFileUrl': ''

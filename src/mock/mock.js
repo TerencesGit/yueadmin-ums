@@ -319,9 +319,29 @@ export default {
 				}, 500)
 			})
 		})
-		// 账户邮箱激活
-		mock.onGet('/accountInter/emailActiveAccount.do').reply(config => {
+		// 获取邮箱激活码
+		mock.onGet('/accountInter/getEmailActiveCode.do').reply(config => {
 			let { email } = config.params;
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+						resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 账户邮箱激活
+		mock.onPost('/accountInter/emailActive.do').reply(config => {
+			let { email, activeCode } = JSON.parse(config.data);
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+						resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取短信验证码
+		mock.onGet('/accountInter/getMobileSmsCode.do').reply(config => {
+			let { mobile } = config.params;
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
@@ -1291,6 +1311,41 @@ export default {
 						total
 					}
 				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 通过ID获得商家信息
+		mock.onGet('/domainInter/getPartnerInfoById.do').reply(config => {
+			let { partnerId } = config.params;
+			let _partnerInfo = _PartnerList.filter(p => p.partnerId == partnerId)[0];
+			let logo, licensePic, idcardPicFront, idcardPicBack;
+			_FileList.filter(file => {
+				if(file.fileUuid === _partnerInfo.logo) {
+						logo = file.fileUri
+				}
+				if(file.fileUuid === _partnerInfo.licensePic) {
+						licensePic = file.fileUri
+				}
+				if(file.fileUuid === _partnerInfo.idcardPicFront) {
+						idcardPicFront = file.fileUri
+				}
+				if(file.fileUuid === _partnerInfo.idcardPicBack) {
+						idcardPicBack = file.fileUri
+				}
+			})
+			let fileInfos = {
+				logo, 
+				licensePic, 
+				idcardPicFront, 
+				idcardPicBack,
+			}
+			retObj.result = {
+				partnerInfo: _partnerInfo,
+				fileInfos
 			}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {

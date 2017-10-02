@@ -17,6 +17,7 @@ import AccountSettings from '@/pages/account/settings'
 import AccountCreatePartner from '@/pages/account/createpartner'
 import AccountWaittingVerify from '@/pages/account/waittingverify'
 
+import PartnerInfo from '@/pages/partner/partnerinfo'
 import PartnerEdit from '@/pages/partner/partneredit'
 import PartnerOrgManage from '@/pages/partner/orgmanage'
 import PartnerTitleManage from '@/pages/partner/titlemanage'
@@ -24,6 +25,8 @@ import PartnerTitleManage from '@/pages/partner/titlemanage'
 import DomainPartnerManage from '@/pages/admin/partnermanage'
 import DomainPartnerVerify from '@/pages/admin/partnerverify'
 import DomainContractManage from '@/pages/admin/contractmanage'
+import DomainVerifyInfo from '@/pages/admin/verifyinfo'
+import DomainPartnerInfo from '@/pages/admin/partnerinfo'
 
 import AdminFuncManage from '@/pages/system/funcmanage'
 import AdminRoleManage from '@/pages/system/rolemanage'
@@ -38,8 +41,8 @@ const routes = [
   {
     path: '/login',
     name: '欢迎登录',
-    component: Login
-    // component: CASLogin
+    // component: Login
+    component: CASLogin
   },
   {
     path: '/register',
@@ -89,6 +92,11 @@ const routes = [
     component: Layout,
     children: [
       {
+        path: 'partnerinfo',
+        name: '企业信息',
+        component: PartnerInfo,
+      },
+       {
         path: 'infoedit',
         name: '信息编辑',
         component: PartnerEdit,
@@ -114,6 +122,16 @@ const routes = [
         path: 'partnerverify',
         name: '商家审核',
         component: DomainPartnerVerify,
+      },
+      {
+        path: 'verifyinfo',
+        name: '商家审核详情',
+        component: DomainVerifyInfo,
+      },
+      {
+        path: 'partnerinfo',
+        name: '商家详情',
+        component: DomainPartnerInfo,
       },
       {
         path: 'partnermanage',

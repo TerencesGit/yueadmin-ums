@@ -120,6 +120,7 @@
 					      v-model="userForm.birthday"
 					      type="date"
 					      placeholder="选择日期"
+					      :default-value="new Date('2000-01-01')"
 					      :picker-options="pickerOptions"
 					      style="width: 100%"
 					      @change="dateChange">
@@ -210,7 +211,6 @@
 				userForm: {},
 				partnerInfo: {},
 				areaId: '',
-				areaName: '',
 				region: {
 					province: '',
 					city: '',
@@ -221,6 +221,8 @@
 					city: [],
 					area: [],
 				},
+				provinceId: '',
+				cityId: '',
 				// uploadAction: '/uploadFileUrl',
 				uploadAction: '/ums/baseInter/uploadFile.do',
 				userAvatar: '',
@@ -247,25 +249,6 @@
 			}
 		},
 		methods: {
-			// 所在地回显
-			formatRegion(areaId) {
-				let origin = Region.filter(region => region.id === areaId)[0];
-				if(!origin) return;
-				if(origin.level === 1) {
-					this.areaName = this.region.province = origin.name
-				} else if (origin.level === 2) {
-					this.areaName = this.region.city = origin.name;
-					this.region.province = Region.filter(region => region.id === origin.pid)[0].name;
-					this.regionList.city = Region.filter(region => region.pid === origin.pid);
-				} else if (origin.level === 3) {
-					this.areaName = this.region.area = origin.name;
-					let city = Region.filter(region => region.id === origin.pid)[0];
-					this.region.city = city.name;
-					this.region.province = Region.filter(region => region.id === city.pid)[0].name;
-					this.regionList.city = Region.filter(region => region.id === origin.pid);
-					this.regionList.area = Region.filter(region => region.pid === city.id);
-				}
-			},
 			// 获取用户信息
 			getUserInfo() {
 				this.loading = true;
@@ -280,9 +263,7 @@
 						this.userAvatar = fileInfos.avatar;
 						this.idcardFrontUrl = fileInfos.idcardPicFront;
 						this.idcardBackUrl = fileInfos.idcardPicBack;
-						if(this.userInfo.areaId) {
-							this.areaId = this.userInfo.areaId;
-						}
+						this.areaId = this.userInfo.areaId || '';
 						this.userInfo.partnerId > 0 && this.getPartInfo()
 					} else {
 						this.$message.error(res.data.message)
@@ -378,8 +359,8 @@
       },
       // 账户信息编辑
       handleEdit() {
-      	if(!this.areaFormat) {
-      		this.formatRegion(this.userInfo.areaId)
+      	if(this.areaId && !this.areaFormat) {
+      		this.formatRegion(this.areaId)
 					this.areaFormat = true;
       	}
       	this.userFormVisible = true
@@ -406,6 +387,7 @@
 						idcardPicFront: this.userForm.idcardPicFront,
 						idcardPicBack: this.userForm.idcardPicBack,
       		}
+      		// console.log(data)
       		updateMyInfo(data).then(res => {
       			if(res.data.code === '0001') {
       				this.$message.success(res.data.message)
@@ -437,19 +419,32 @@
       },
       // 选择省、市、区
       provinceChange (pid) {
-      	console.log(pid)
-      	this.region.city = '';
-      	this.areaId = pid;
-      	this.regionList.city = Region.filter(region => region.pid === pid)
+      	if(this.provinceId === pid) return;
+      	this.regionList.city = Region.filter(region => region.pid === pid);
+      	this.region.city = this.regionList.city[0].id;
       },
       cityChange (cid) {
-      	this.region.area = '';
-      	this.areaId = cid;
-      	this.regionList.area = Region.filter(region => region.pid === cid)
+      	if(this.cityId === cid) return;
+      	this.regionList.area = Region.filter(region => region.pid === cid);
+      	this.region.area = this.regionList.area[0].id;
       },
       areaChange(aid) {
       	this.areaId = aid;
-      }
+      },
+      // 所在地回显
+			formatRegion(areaId) {
+				let origin = Region.filter(region => region.id === areaId)[0];
+				if(!origin) return;
+				if (origin.level === 3) {
+					let city = Region.filter(region => region.id === origin.pid)[0];
+					let province = Region.filter(region => region.id === city.pid)[0];
+					this.regionList.city = Region.filter(region => region.pid === province.id);
+					this.regionList.area = Region.filter(region => region.pid === city.id);
+					this.region.province = province.id;
+					this.region.city = city.id;
+					this.region.area = origin.id;
+				}
+			},
 		},
 		mounted() {
 			this.getUserInfo()

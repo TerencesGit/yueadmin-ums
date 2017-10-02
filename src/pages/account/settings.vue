@@ -278,7 +278,7 @@
 					}
 					emailActive(data).then(res => {
 						if(res.data.code === '0001') {
-							this.$message(res.data.message)
+							this.$message.success(res.data.message)
 							this.getUserInfo()
 						} else {
 							this.$message.error(res.data.message)
@@ -287,6 +287,7 @@
 						console.log(err)
 						this.$catchError(err)
 					})
+					this.emailForm.activeCode = '';
 					this.emailFormVisible = false;
 				})
 			},
@@ -313,6 +314,7 @@
 			getSmsCode() {
 				this.$refs.mobileForm.validateField('mobile', (errMessage) => {
 					if(errMessage) return;
+					this.mobileForm.smsCode = '';
 					let params = {
 						mobile: this.mobileForm.mobile
 					}
@@ -338,7 +340,7 @@
 						mobile: this.mobileForm.mobile,
 						smsCode: this.mobileForm.smsCode
 					}
-					console.log(data)
+					// console.log(data)
 					bindMobile(data).then(res => {
 						if(res.data.code === '0001') {
 							this.$message(res.data.message)
@@ -350,6 +352,7 @@
 						console.log(err)
 						this.$catchError(err)
 					})
+					this.mobileForm.smsCode = '';
 					this.mobileFormVisible = false;
 				})
 			},

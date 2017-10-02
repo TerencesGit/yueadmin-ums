@@ -23,8 +23,9 @@
       <el-table-column type="index" width="55"></el-table-column>
       <el-table-column prop="partnerId" label="商家编号" sortable></el-table-column>
       <el-table-column prop="name" label="商家名称"></el-table-column>
+      <el-table-column prop="typeName" label="商家类型"></el-table-column>
       <el-table-column prop="corporationName" label="注册人"></el-table-column>
-      <el-table-column prop="contactAddress" label="地址"></el-table-column>
+      <el-table-column prop="areaName" label="所在地"></el-table-column>
       <el-table-column prop="createTime" label="创建时间" sortable :formatter="formatTime"></el-table-column>
       <el-table-column prop="status" label="状态">
       	<template scope="scope">
@@ -95,7 +96,7 @@
     	</div>
     </el-dialog>
     <!-- 商家类型列表 -->
-    <el-dialog title="商家类型列表" :visible.sync="typeListVisible">
+   <!--  <el-dialog title="商家类型列表" :visible.sync="typeListVisible">
       <el-row>
         <el-col :span="22" :offset="1">
           <el-table 
@@ -119,7 +120,7 @@
         <el-button @click="typeListVisible = false">取消</el-button>
         <el-button type="primary" @click="setTypeSubmit">确定</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
 	</section>
 </template>
 <script>
@@ -182,8 +183,10 @@
 				})
 			},
 			handleDetail(row) {
-				this.partInfo = row;
-				this.partInfoVisible = true
+				this.$router.push({
+					path: `/domain/partnerinfo?partnerId=${row.partnerId}`,
+				})
+				// this.partInfoVisible = true
 			},
 			handleStatus(row) {
 				let data = {
