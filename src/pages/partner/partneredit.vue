@@ -293,21 +293,24 @@
 					province: [],
 					city: [],
 				},
-				provinceId: 1,
+				provinceId: 0,
 			}
 		},
 		methods: {
 			// 获取企业信息
 			getPartnerInfo() {
 				getMyPartnerInfo().then(res => {
-					console.log(res)
+					// console.log(res)
 					if(res.data.code === '0001') {
-						this.partnerForm = res.data.result.partnerInfo
+						this.partnerForm = res.data.result.partnerInfo;
+						this.isVerified = this.partnerForm.isVerified;
 						let fileInfos = res.data.result.fileInfos;
-						this.logoUrl = fileInfos.logo;
-						this.licenseUrl = fileInfos.licensePic;
-						this.idcardFrontUrl = fileInfos.idcardPicFront;
-						this.idcardBackUrl = fileInfos.idcardPicBack;
+						if(JSON.stringify(fileInfos) !== '{}') {
+	      			this.logoUrl = this.partnerForm.logo && fileInfos[this.partnerForm.logo].fileUri;
+							this.licenseUrl = this.partnerForm.licensePic && fileInfos[this.partnerForm.licensePic].fileUri;
+							this.idcardFrontUrl = this.partnerForm.idcardPicFront && fileInfos[this.partnerForm.idcardPicFront].fileUri;
+							this.idcardBackUrl = this.partnerForm.idcardPicBack && fileInfos[this.partnerForm.idcardPicBack].fileUri;
+						}
 						if(this.partnerForm.areaId) {
 							this.provinceId = Region.filter(region => region.id === this.partnerForm.areaId)[0].pid;
 							this.formatRegion(this.partnerForm.areaId)

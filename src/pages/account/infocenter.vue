@@ -253,16 +253,18 @@
 			getUserInfo() {
 				this.loading = true;
 				getMyInfo().then(res => {
-					console.log(res)
+					// console.log(res)
 					this.loading = false;
 					if(res.data.code === '0001') {
 						let userJson = JSON.stringify(res.data.result.userInfo);
 						let fileInfos = res.data.result.fileInfos;
 						this.userInfo = JSON.parse(userJson);
 						this.userForm = JSON.parse(userJson);
-						this.userAvatar = fileInfos.avatar;
-						this.idcardFrontUrl = fileInfos.idcardPicFront;
-						this.idcardBackUrl = fileInfos.idcardPicBack;
+						if(JSON.stringify(fileInfos) !== '{}') {
+							this.userAvatar = this.userForm.avatar && fileInfos[this.userForm.avatar].fileUri;
+							this.idcardFrontUrl = this.userForm.idcardPicFront && fileInfos[this.userForm.idcardPicFront].fileUri;
+							this.idcardBackUrl = this.userForm.idcardPicBack && fileInfos[this.userForm.idcardPicBack].fileUri;
+						}
 						this.areaId = this.userInfo.areaId || '';
 						this.userInfo.partnerId > 0 && this.getPartInfo()
 					} else {
@@ -408,7 +410,7 @@
       		if(res.data.code === '0001') {
       			this.partnerInfo = res.data.result.partnerInfo
       			let fileInfos = res.data.result.fileInfos;
-      			this.partnerLogo = fileInfos.logo
+      			this.partnerLogo = fileInfos[this.partnerInfo.logo].fileUri;
       		} else {
       			this.$message.error('获取企业信息失败')
       		}

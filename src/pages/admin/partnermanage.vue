@@ -42,7 +42,6 @@
       <el-table-column label="详情">
         <template scope="scope">
         	<el-button size="small" type="info" @click="handleDetail(scope.row)">查看</el-button>
-        	<!-- <el-button size="small" type="primary" @click="handlePartType(scope.row)">商家类型</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -95,32 +94,6 @@
     		<el-button type="primary" @click="partInfoVisible = false">确定</el-button>
     	</div>
     </el-dialog>
-    <!-- 商家类型列表 -->
-   <!--  <el-dialog title="商家类型列表" :visible.sync="typeListVisible">
-      <el-row>
-        <el-col :span="22" :offset="1">
-          <el-table 
-            border
-            max-height="350"
-            style="width: 100%"
-            v-loading="tpyeLoading" 
-            :data="typeList">
-            <el-table-column width="80" label="选择" align="center">
-              <template scope="scope">
-                <el-radio class="radio no-label" v-model="typeId" :label="scope.row.typeId">
-                </el-radio>
-              </template>
-            </el-table-column>
-            <el-table-column prop="typeName" label="类型名称"></el-table-column>
-            <el-table-column prop="note" label="类型描述"></el-table-column>
-          </el-table>
-        </el-col>
-      </el-row>
-      <div slot="footer">
-        <el-button @click="typeListVisible = false">取消</el-button>
-        <el-button type="primary" @click="setTypeSubmit">确定</el-button>
-      </div>
-    </el-dialog> -->
 	</section>
 </template>
 <script>
@@ -167,7 +140,6 @@
 					partnerName: this.partnerName,
 					isVerified: 1
 				}
-				console.log(params)
 				this.loading = true
 				getPartners(params).then(res => {
 					if(res.data.code === '0001') {
@@ -180,6 +152,7 @@
 				}).catch(err => {
 					console.log(err)
 					this.loading = false
+					this.$catchError(err)
 				})
 			},
 			handleDetail(row) {

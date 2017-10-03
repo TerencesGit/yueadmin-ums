@@ -192,23 +192,25 @@ export default {
 					userInfo.orgName = org.name
 				}
 			})
-			let avatar, idcardPicFront, idcardPicBack;
+			// let avatar = userInfo.avatar, 
+			// 		idcardPicFront = userInfo.idcardPicFront, 
+			// 		idcardPicBack = userInfo.idcardPicBack;
+			let avatarObj, idcardPicFrontObj, idcardPicBackObj;
 			_FileList.filter(file => {
 				if(file.fileUuid === userInfo.avatar) {
-					avatar = file.fileUri
+					avatarObj = file
 				}
 				if(file.fileUuid === userInfo.idcardPicFront) {
-					idcardPicFront = file.fileUri
+					idcardPicFrontObj = file
 				}
 				if(file.fileUuid === userInfo.idcardPicBack) {
-					idcardPicBack = file.fileUri
+					idcardPicBackObj = file
 				}
 			})
-			let fileInfos = {
-				avatar,
-				idcardPicFront,
-				idcardPicBack,
-			}
+			let fileInfos = {};
+			fileInfos[userInfo.avatar] = avatarObj;
+			fileInfos[userInfo.idcardPicFront] = idcardPicFrontObj;
+			fileInfos[userInfo.idcardPicBack] = idcardPicBackObj;
 			let retObj = {
 				code: '0001',
 				message: '操作成功',
@@ -382,30 +384,29 @@ export default {
 				})
 			}
 			let _partnerId = _userInfo.partnerId;
-			let _partnerInfo = _PartnerList.filter(p => p.partnerId == _partnerId)[0]
-			let logo, licensePic, idcardPicFront, idcardPicBack;
+			let partnerInfo = _PartnerList.filter(p => p.partnerId == _partnerId)[0];
+			let logoFile, licensePicFile, idcardPicFrontFile, idcardPicBackFile;
 			_FileList.filter(file => {
-				if(file.fileUuid === _partnerInfo.logo) {
-						logo = file.fileUri
+				if(file.fileUuid === partnerInfo.logo) {
+						logoFile = file
 				}
-				if(file.fileUuid === _partnerInfo.licensePic) {
-						licensePic = file.fileUri
+				if(file.fileUuid === partnerInfo.licensePic) {
+						licensePicFile = file
 				}
-				if(file.fileUuid === _partnerInfo.idcardPicFront) {
-						idcardPicFront = file.fileUri
+				if(file.fileUuid === partnerInfo.idcardPicFront) {
+						idcardPicFrontFile = file
 				}
-				if(file.fileUuid === _partnerInfo.idcardPicBack) {
-						idcardPicBack = file.fileUri
+				if(file.fileUuid === partnerInfo.idcardPicBack) {
+						idcardPicBackFile = file
 				}
 			})
-			let fileInfos = {
-				logo, 
-				licensePic, 
-				idcardPicFront, 
-				idcardPicBack,
-			}
+			let fileInfos = {};
+			fileInfos[partnerInfo.logo] = logoFile;
+			fileInfos[partnerInfo.licensePic] = licensePicFile;
+			fileInfos[partnerInfo.idcardPicFront] = idcardPicFrontFile;
+			fileInfos[partnerInfo.idcardPicBack] = idcardPicBackFile;
 			retObj.result = {
-				partnerInfo: _partnerInfo,
+				partnerInfo,
 				fileInfos
 			}
 			return new Promise((resolve, reject) => {
@@ -448,30 +449,29 @@ export default {
 				})
 			}
 			let _partnerId = _userInfo.partnerId;
-			let _partnerInfo = _PartnerList.filter(p => p.partnerId == _partnerId)[0];
-			let logo, licensePic, idcardPicFront, idcardPicBack;
+			let partnerInfo = _PartnerList.filter(p => p.partnerId == _partnerId)[0];
+			let logoFile, licensePicFile, idcardPicFrontFile, idcardPicBackFile;
 			_FileList.filter(file => {
-				if(file.fileUuid === _partnerInfo.logo) {
-						logo = file.fileUri
+				if(file.fileUuid === partnerInfo.logo) {
+						logoFile = file
 				}
-				if(file.fileUuid === _partnerInfo.licensePic) {
-						licensePic = file.fileUri
+				if(file.fileUuid === partnerInfo.licensePic) {
+						licensePicFile = file
 				}
-				if(file.fileUuid === _partnerInfo.idcardPicFront) {
-						idcardPicFront = file.fileUri
+				if(file.fileUuid === partnerInfo.idcardPicFront) {
+						idcardPicFrontFile = file
 				}
-				if(file.fileUuid === _partnerInfo.idcardPicBack) {
-						idcardPicBack = file.fileUri
+				if(file.fileUuid === partnerInfo.idcardPicBack) {
+						idcardPicBackFile = file
 				}
 			})
-			let fileInfos = {
-				logo, 
-				licensePic, 
-				idcardPicFront, 
-				idcardPicBack,
-			}
+			let fileInfos = {};
+			fileInfos[partnerInfo.logo] = logoFile;
+			fileInfos[partnerInfo.licensePic] = licensePicFile;
+			fileInfos[partnerInfo.idcardPicFront] = idcardPicFrontFile;
+			fileInfos[partnerInfo.idcardPicBack] = idcardPicBackFile;
 			retObj.result = {
-				partnerInfo: _partnerInfo,
+				partnerInfo,
 				fileInfos,
 			}
 			return new Promise((resolve, reject) => {

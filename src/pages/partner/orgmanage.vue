@@ -24,7 +24,7 @@
 							<i class="el-icon-delete"></i>
 							删除
 						</el-button>
-						<el-button size="small" type="primary" icon="setting" :disabled="roleDisabled" @click="handleOrgRoles">
+						<el-button size="small" type="primary" icon="setting" @click="handleOrgRoles">
 							权限
 						</el-button>
 						<!-- <el-button size="small" type="primary" icon="setting" @click="showOrgFunctions">

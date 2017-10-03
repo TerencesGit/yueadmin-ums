@@ -111,7 +111,7 @@
 								<el-form-item label="企业所在地：" prop="areaId">
 									<el-row>
 										<el-col :span="11">
-											<el-select v-model="region.province" placeholder="选择省" @change="provinceChange" style="width: 100%">
+											<el-select v-model="region.province" placeholder="选择省" @change="provinceChange" style="width: 100%" :disabled="isVerified === 0">
 										    <el-option
 										      v-for="item in regionList.province"
 										      :key="item.id"
@@ -121,7 +121,7 @@
 										  </el-select>
 										</el-col>
 										<el-col :offset="2" :span="11">
-											<el-select v-model="region.city" placeholder="选择市" @change="cityChange" style="width: 100%">
+											<el-select v-model="region.city" placeholder="选择市" @change="cityChange" style="width: 100%" :disabled="isVerified === 0">
 										    <el-option
 										      v-for="item in regionList.city"
 										      :key="item.id"
@@ -332,7 +332,7 @@
 					city: [],
 					area: [],
 				},
-				provinceId: 1,
+				provinceId: 0,
 				areaFormat: false,
 			}
 		},
@@ -342,12 +342,14 @@
       	getMyPartner().then(res => {
       		if(res.data.code === '0001') {
       			this.partnerForm = res.data.result.partnerInfo;
-      			this.fileInfos = res.data.result.fileInfos;
       			this.isVerified = this.partnerForm.isVerified;
-      			this.logoUrl = this.fileInfos.logo;
-						this.licenseUrl = this.fileInfos.licensePic;
-						this.idcardFrontUrl = this.fileInfos.idcardPicFront;
-						this.idcardBackUrl = this.fileInfos.idcardPicBack;
+      			let fileInfos = res.data.result.fileInfos;
+						if(JSON.stringify(fileInfos) !== '{}') {
+	      			this.logoUrl = this.partnerForm.logo && fileInfos[this.partnerForm.logo].fileUri;
+							this.licenseUrl = this.partnerForm.licensePic && fileInfos[this.partnerForm.licensePic].fileUri;
+							this.idcardFrontUrl = this.partnerForm.idcardPicFront && fileInfos[this.partnerForm.idcardPicFront].fileUri;
+							this.idcardBackUrl = this.partnerForm.idcardPicBack && fileInfos[this.partnerForm.idcardPicBack].fileUri;
+						}
 						if(this.partnerForm.areaId && !this.areaFormat) {
 							this.provinceId = Region.filter(region => region.id === this.partnerForm.areaId)[0].pid;
 							this.formatRegion(this.partnerForm.areaId)
