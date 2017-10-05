@@ -37,11 +37,11 @@
 	          <el-form-item label="失效日期">
 	            <span >{{ scope.row.expireDate }}</span>
 	          </el-form-item>
-	          <el-form-item label="更新人">
-	            <span >{{ userInfo.name }}</span>
-	          </el-form-item>
+	          <!-- <el-form-item label="更新人">
+	            <span >{{ scope.row.updateBy }}</span>
+	          </el-form-item> -->
 	          <el-form-item label="更新时间">
-	            <span >{{ scope.row.updateTime | formatDate }}</span>
+	            <span >{{ scope.row.updateTime | formatDateTime }}</span>
 	          </el-form-item>
 	          <el-form-item label="合同备注">
 	            <span >{{ scope.row.note }}</span>
@@ -49,13 +49,13 @@
 	        </el-form>
 	      </template>
       </el-table-column>
-      <el-table-column prop="contractCode" label="合同编号" sortable width="160"></el-table-column>
+      <el-table-column prop="contractCode" label="合同编号" sortable></el-table-column>
       <el-table-column prop="partyAName" label="合同甲方"></el-table-column>
       <el-table-column prop="partyBName" label="合同乙方"></el-table-column>
       <el-table-column prop="templateName" label="合同模板"></el-table-column>
-      <el-table-column prop="signTime" label="签署时间" sortable width="140"></el-table-column>
-      <el-table-column prop="updateTime" label="更新时间" sortable width="140" :formatter="formatTime"></el-table-column>
-      <el-table-column label="操作" width="120">
+      <el-table-column prop="signTime" label="签署时间" sortable></el-table-column>
+      <el-table-column prop="updateTime" label="更新时间" sortable :formatter="formatTime" width="160"></el-table-column>
+      <el-table-column label="操作">
         <template scope="scope">
         	<el-button size="small" type="warning" @click="handleEdit(scope.row)">编辑</el-button>
         </template>
@@ -146,7 +146,7 @@
 	</section>
 </template>
 <script>
-	import { mapGetters } from 'vuex'
+	// import { mapGetters } from 'vuex'
 	import { getContracts, getPartners, getContractTemplates, createContract, updateContract } from '@/api'
 	export default {
 		data () {
@@ -197,7 +197,7 @@
 				return row.status === 1 ? '启用' : '禁用'
 			},
 			formatTime(row) {
-				return this.$moment(row.updateTime).format('YYYY-MM-DD')
+				return this.$moment(row.updateTime).format('YYYY-MM-DD HH:mm')
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;
@@ -360,11 +360,6 @@
 					this.contractFormVisible = false
       	})
       }
-		},
-		computed: {
-			...mapGetters([
-	  		'userInfo'
-	  	])
 		},
 		mounted () {
 			this.getContractList()

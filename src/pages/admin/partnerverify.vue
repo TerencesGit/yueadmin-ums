@@ -17,16 +17,14 @@
       <el-table-column type="index" width="55"></el-table-column>
       <el-table-column prop="partnerId" label="商家编号" sortable width="140"></el-table-column>
       <el-table-column prop="name" label="商家名称"></el-table-column>
-      <el-table-column prop="corporationName" label="注册人"></el-table-column>
-      <el-table-column prop="contactAddress" label="地址"></el-table-column>
-      <el-table-column prop="createTime" label="创建时间" sortable width="180" :formatter="formatTime"></el-table-column>
-      <el-table-column prop="status" label="状态" width="120" :formatter="formatStatus">
+      <el-table-column prop="corporationName" label="联系人"></el-table-column>
+      <el-table-column prop="contactAddress" label="联系地址"></el-table-column>
+      <el-table-column prop="createTime" label="创建时间" sortable :formatter="formatTime" width="160"></el-table-column>
+      <el-table-column prop="status" label="状态" :formatter="formatStatus">
       </el-table-column>
       <el-table-column label="操作">
         <template scope="scope" v-if="scope.row.isVerified === 0">
         	<el-button v-if="scope.row.isVerified === 0" size="small" type="info" @click="handleVerify(scope.row)">审核</el-button>
-        	<!-- <el-button v-if="scope.row.isVerified === 0" size="small" type="success" @click="handlePass(scope.row)">通过</el-button>
-        	<el-button v-if="scope.row.isVerified === 0" size="small" type="warning" @click="handleReject(scope.row)">驳回</el-button> -->
         	<el-button v-if="scope.row.isVerified === 2" size="small" type="info" @click="handleReason(scope.row)">驳回原因</el-button>
         </template>
       </el-table-column>
@@ -119,7 +117,7 @@
 				return row.isVerified === 0 ? '待审核' : row.isVerified === 1 ? '审核通过' : '审核未通过'
 			},
 			formatTime(row) {
-				return this.$moment(row.createTime).format('YYYY-MM-DD HH:mm:ss')
+				return this.$moment(row.createTime).format('YYYY-MM-DD HH:mm')
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;
@@ -176,81 +174,7 @@
 					this.$catchError(err)
 				})
 			},
-			// getTypeList() {
-			// 	let params = {
-			// 		pageNo: 1,
-			// 		pageSize: 100
-			// 	}
-			// 	this.tpyeLoading = true;
-			// 	getPartnerTypes(params).then(res => {
-			// 		this.tpyeLoading = false
-			// 		if(res.data.code === '0001') {
-			// 			this.typeList = res.data.result.partnerTypes;
-			// 		} else {
-			// 			this.$message.error(res.data.message)
-			// 		}
-			// 	}).catch(err => {
-			// 		console.log(err)
-			// 		this.tpyeLoading = false;
-			// 		this.$catchError(err)
-			// 	})
-			// },
-			// handlePass(row) {
-			// 	this.partInfo = row;
-			// 	this.typeList.length === 0 && this.getTypeList()
-			// 	this.typeListVisible = true
-			// },
-			// setTypeSubmit() {
-			// 	if(!this.typeId){
-			// 		this.$notify({
-			// 			type: 'warning',
-			// 			title: '提示',
-			// 			message: '请选择商家类型'
-			// 		})
-			// 		return;
-			// 	}
-			// 	let data = {
-			// 		partnerId: this.partInfo.partnerId,
-			// 		typeId: this.typeId
-			// 	}
-			// 	examPartner(data).then(res => {
-			// 		if(res.data.code === '0001') {
-			// 			this.$message.success(res.data.message)
-			// 			this.getPartnerList()
-			// 		} else {
-			// 			this.$message.error(res.data.message)
-			// 		}
-			// 	}).catch(err => {
-			// 		console.log(err)
-			// 		this.$catchError(err)
-			// 	})
-			// 	this.typeListVisible = false
-			// },
-			// handleReject(row) {
-			// 	this.partInfo = row
-			// 	this.rejectFormVisible = true
-			// },
-			// rejectFormSubmit() {
-			// 	this.$refs.rejectForm.validate(valid => {
-			// 		if(!valid) return;
-			// 		let data = {
-			// 			partnerId: this.partInfo.partnerId,
-			// 			rejectInfo: this.rejectForm.rejectInfo
-			// 		}
-			// 		rejectPartner(data).then(res => {
-			// 			if(res.data.code === '0001') {
-			// 				this.$message.success(res.data.message)
-			// 				this.getPartnerList()
-			// 			} else {
-			// 				this.$message.error(res.data.message)
-			// 			}
-			// 		}).catch(err => {
-			// 			console.log(err)
-			// 			this.$catchError(err)
-			// 		})
-			// 		this.rejectFormVisible = false
-			// 	})
-			// },
+			// 查看驳回原因
 			handleReason(row) {
 				this.partInfo = row
 				this.rejectInfoVisible = true;

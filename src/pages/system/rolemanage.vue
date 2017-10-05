@@ -130,7 +130,7 @@
 				return row.status === 1 ? '启用' : '禁用'
 			},
 			formatTime(row) {
-				return this.$moment(row.updateTime).format('YYYY-MM-DD HH:mm:ss')
+				return this.$moment(row.updateTime).format('YYYY-MM-DD HH:mm')
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;
@@ -300,9 +300,11 @@
 				    const zNode = [];
 				    this.funTreeList.forEach(func => {
 				      let iconSkin = '';
-				      if(!func.parentId){
+				      if(!func.parentId) {
 				        iconSkin = 'root'
-				      }else{
+				      } else if (func.isMenu === 0) {
+				      	iconSkin = 'star'
+				      } else {
 				        iconSkin = 'folder'
 				      }
 				      let treeObj = {

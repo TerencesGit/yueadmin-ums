@@ -170,10 +170,10 @@
 			<el-row>
 				<el-col :span="14" :offset="5">
 					<el-form :model="staffInfo" label-width="180px">
-						<el-form-item label="" label-width="120px">
-							<img v-if="staffInfo.avatar" :src="staffInfo.avatar" alt="头像" class="avatar">
+						<!-- <el-form-item label="" label-width="120px">
+							<img v-if="staffInfo.avatarUrl" :src="staffInfo.avatarUrl" alt="头像" class="avatar">
 							<img v-else src="../../assets/img/avatar.gif" alt="头像" class="avatar">
-						</el-form-item>
+						</el-form-item> -->
 						<el-form-item label="姓名：">
 							<span>{{staffInfo.realname}}</span>
 						</el-form-item>
@@ -244,6 +244,7 @@
 	</section>
 </template>
 <script>
+	import Md5 from '@/assets/js/md5'
 	import '@/assets/plugins/zTree/css/zTreeStyle.css'
 	import '@/assets/plugins/zTree/js/jquery.min.js'
 	import '@/assets/plugins/zTree/js/jquery.ztree.all.min.js'
@@ -397,6 +398,7 @@
 				    })
 				    $.fn.zTree.init($('#organizeTree'), setting, zNode);
 				    this.checkedNode = null;
+				    this.roleList.length === 0 && this.getPartnerRoles()
 					} else {
 						this.$message(res.data.message)
 					}
@@ -609,7 +611,7 @@
       	if (!this.checkedNode) {
       		return this.$notify.warning({title: '提示', message: '请选择部门'})
       	}
-      	this.roleList.length === 0 && this.getPartnerRoles()
+      	// this.roleList.length === 0 && this.getPartnerRoles()
       	this.getOrgRoles()
       	this.orgRolesVisible = true
       },
@@ -708,8 +710,8 @@
       			orgId: this.checkedNode.orgId,
       			realname: this.registForm.realname,
       			email: this.registForm.email,
-      			passwd: this.registForm.password,
-      			passwd2: this.registForm.confirmPass,
+      			passwd: Md5.hex_md5(this.registForm.password),
+      			passwd2: Md5.hex_md5(this.registForm.confirmPass),
       		}
       		registerByAgency(data).then(res => {
       			if(res.data.code === '0001') {

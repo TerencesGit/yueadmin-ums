@@ -351,6 +351,16 @@ export default {
 				}, 500)
 			})
 		})
+		// 绑定手机号
+		mock.onPost('/accountInter/bindMobile.do').reply(config => {
+			let { mobile, smsCode } = JSON.parse(config.data);
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+						resolve([200, retObj])
+				}, 500)
+			})
+		})
 		// 新建商家信息
 		mock.onPost('/accountInter/createPartner.do').reply(config => {
 			let partnerInfo = JSON.parse(config.data);
@@ -637,6 +647,11 @@ export default {
   	  			user.titleName = title.titleName
   	  		}
   	  	})
+  	  	_FileList.filter(file => {
+  	  		if(file.fileUuid === user.avatar) {
+  	  			user.avatarUrl = file.fileUri;
+  	  		}
+  	  	})
   	  })
 			retObj.result = {
 				userList: userPage,
@@ -821,11 +836,11 @@ export default {
 		mock.onPost('/partnerInter/createTitle.do').reply(config => {
 			let userId = Utils.getCookie('userId');
 			let partnerId = _UserList.filter(user => user.userId == userId)[0].partnerId;
-			let { titleName, titleDesc } = JSON.parse(config.data)
+			let { titleName, description } = JSON.parse(config.data)
 			_TitleList.push({
 				id: new Date().getTime(),
 				titleName,
-				titleDesc,
+				description,
 				partnerId,
 			})
 			retObj.result = {}
@@ -837,11 +852,11 @@ export default {
 		})
 		// 编辑职位
 		mock.onPost('/partnerInter/updateTitle.do').reply(config => {
-			let { id, titleName, titleDesc } = JSON.parse(config.data)
+			let { id, titleName, description } = JSON.parse(config.data)
 			_TitleList.filter(title => {
 				if(title.id === id) {
 					title.titleName = titleName;
-					title.titleDesc = titleDesc
+					title.description = description
 				}
 			})
 			retObj.result = {}
@@ -995,12 +1010,13 @@ export default {
 		})
 		// 获取角色分页列表
 		mock.onGet('/adminInter/getSysRoles.do').reply(config => {
-			let { pageNo, pageSize, moduleId } = config.params;
-			let _roleList = [];
+			let { pageNo, pageSize, moduleId, status } = config.params;
+			let _roleList = _RoleList;
 			if(moduleId) {
-				_roleList = _RoleList.filter(role => role.moduleId === moduleId)
-			} else {
-				_roleList = _RoleList;
+				_roleList = _roleList.filter(role => role.moduleId === moduleId)
+			}
+			if(status >= 0) {
+				_roleList = _roleList.filter(role => role.status === status)
 			}
 			let total = _roleList.length;
 			let rolePage = _roleList.filter((role, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize)
@@ -1178,11 +1194,15 @@ export default {
 		})
 		// 获取商家类型列表
 		mock.onGet('/adminInter/getPartnerTypes.do').reply(config => {
-			let { pageNo, pageSize } = config.params;
-			let total = _PartnerTypeList.length;
-			let partnerTypes = _PartnerTypeList.filter((temp, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize );
+			let { pageNo, pageSize, status } = config.params;
+			let partnerTypes = _PartnerTypeList;
+			if(status >= 0) {
+				partnerTypes = partnerTypes.filter(type => type.status === status)
+			}
+			let total = partnerTypes.length;
+			partnerTypes = partnerTypes.filter((temp, index) => index < pageNo * pageSize && index >= (pageNo - 1) * pageSize );
 			retObj.result = {
-				partnerTypes: partnerTypes,
+				partnerTypes,
 				pageInfo: {
 					total: total
 				}
@@ -1321,30 +1341,29 @@ export default {
 		// 通过ID获得商家信息
 		mock.onGet('/domainInter/getPartnerInfoById.do').reply(config => {
 			let { partnerId } = config.params;
-			let _partnerInfo = _PartnerList.filter(p => p.partnerId == partnerId)[0];
-			let logo, licensePic, idcardPicFront, idcardPicBack;
+			let partnerInfo = _PartnerList.filter(p => p.partnerId == partnerId)[0];
+			let logoFile, licensePicFile, idcardPicFrontFile, idcardPicBackFile;
 			_FileList.filter(file => {
-				if(file.fileUuid === _partnerInfo.logo) {
-						logo = file.fileUri
+				if(file.fileUuid === partnerInfo.logo) {
+						logoFile = file
 				}
-				if(file.fileUuid === _partnerInfo.licensePic) {
-						licensePic = file.fileUri
+				if(file.fileUuid === partnerInfo.licensePic) {
+						licensePicFile = file
 				}
-				if(file.fileUuid === _partnerInfo.idcardPicFront) {
-						idcardPicFront = file.fileUri
+				if(file.fileUuid === partnerInfo.idcardPicFront) {
+						idcardPicFrontFile = file
 				}
-				if(file.fileUuid === _partnerInfo.idcardPicBack) {
-						idcardPicBack = file.fileUri
+				if(file.fileUuid === partnerInfo.idcardPicBack) {
+						idcardPicBackFile = file
 				}
 			})
-			let fileInfos = {
-				logo, 
-				licensePic, 
-				idcardPicFront, 
-				idcardPicBack,
-			}
+			let fileInfos = {};
+			fileInfos[partnerInfo.logo] = logoFile;
+			fileInfos[partnerInfo.licensePic] = licensePicFile;
+			fileInfos[partnerInfo.idcardPicFront] = idcardPicFrontFile;
+			fileInfos[partnerInfo.idcardPicBack] = idcardPicBackFile;
 			retObj.result = {
-				partnerInfo: _partnerInfo,
+				partnerInfo,
 				fileInfos
 			}
 			return new Promise((resolve, reject) => {

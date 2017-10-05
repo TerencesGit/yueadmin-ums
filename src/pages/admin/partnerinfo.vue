@@ -11,7 +11,8 @@
 					<el-form 
 						:model="partnerForm" 
 						ref="partnerForm" 
-						label-width="150px">
+						label-width="150px"
+						v-loading="loading">
 						<el-row class="title">
 							<h3>{{partnerForm.name}}</h3>
 						</el-row>
@@ -112,7 +113,7 @@
 							</el-col>
 						</el-row>
 						<el-form-item label="商家简介：" prop="note">
-							<span>{{partnerForm.note}}</span>
+							<span style="word-wrap: break-word;">{{partnerForm.note}}</span>
 						</el-form-item>
 					</el-form>
 				</el-col>
@@ -121,7 +122,7 @@
 	</section>
 </template>
 <script>
-	import { getMyPartnerInfo } from '@/api'
+	import { getPartnerInfoById } from '@/api'
 	export default {
 		data() {
 			return {
@@ -148,25 +149,34 @@
 				licenseUrl: '',
 				idcardFrontUrl: '',
 				idcardBackUrl: '',
+				loading: false,
 			}
 		},
 		methods: {
 			// 获取商家信息
 			getPartnerInfo() {
-				getMyPartnerInfo().then(res => {
+				let params = {
+					partnerId: this.partnerId
+				}
+				this.loading = true;
+				getPartnerInfoById(params).then(res => {
 					console.log(res)
+					this.loading = false;
 					if(res.data.code === '0001') {
 						this.partnerForm = res.data.result.partnerInfo
 						let fileInfos = res.data.result.fileInfos;
-						this.logoUrl = fileInfos.logo;
-						this.licenseUrl = fileInfos.licensePic;
-						this.idcardFrontUrl = fileInfos.idcardPicFront;
-						this.idcardBackUrl = fileInfos.idcardPicBack;
+						if(JSON.stringify(fileInfos) !== '{}') {
+	      			this.logoUrl = this.partnerForm.logo && fileInfos[this.partnerForm.logo].fileUri;
+							this.licenseUrl = this.partnerForm.licensePic && fileInfos[this.partnerForm.licensePic].fileUri;
+							this.idcardFrontUrl = this.partnerForm.idcardPicFront && fileInfos[this.partnerForm.idcardPicFront].fileUri;
+							this.idcardBackUrl = this.partnerForm.idcardPicBack && fileInfos[this.partnerForm.idcardPicBack].fileUri;
+						}
 					} else {
 						this.$message.error(res.data.message)
 					}
 				}).catch(err => {
 					console.log(err)
+					this.loading = false;
 					this.$catchError(err)
 				})
 			},
@@ -175,7 +185,8 @@
 			}
 		},
 		mounted() {
-			this.getPartnerInfo()
+			this.partnerId = this.$route.query.partnerId;
+			this.partnerId && this.getPartnerInfo()
 		}
 	}
 </script>

@@ -10,13 +10,12 @@
 	      v-loading="loading" 
 	      highlight-current-row
 	      style="width: 100%">
-	      <el-table-column type="index" width="60"></el-table-column>
-	      <el-table-column prop="id" label="职位编号" sortable width="140"></el-table-column>
+	      <el-table-column type="index" width="55"></el-table-column>
+	      <el-table-column prop="id" label="职位编号" sortable></el-table-column>
 	      <el-table-column prop="titleName" label="职位名称"></el-table-column>
 	      <el-table-column prop="description" label="职位描述"></el-table-column>
-	      <el-table-column prop="updateBy" label="更新人" :formatter="formatUpdateBy"></el-table-column>
-	      <el-table-column prop="updateTime" label="更新时间" sortable width="180" :formatter="formatTime"></el-table-column>
-	      <el-table-column label="操作" width="180">
+	      <el-table-column prop="updateTime" label="更新时间" sortable :formatter="formatTime"></el-table-column>
+	      <el-table-column label="操作">
 	        <template scope="scope">
 	          <!-- <el-button type="primary" size="small" @click="handleDetail(scope.row)">详情</el-button> -->
 	          <el-button type="warning" size="small" @click="handleEdit(scope.row)">编辑</el-button>
@@ -57,7 +56,7 @@
 	</section>
 </template>
 <script>
-	import { mapGetters } from 'vuex'
+	// import { mapGetters } from 'vuex'
 	import { getPartnerTitle, createTitle, updateTitle, delTitle } from '@/api'
 	export default {
 		data () {
@@ -85,10 +84,7 @@
 		},
 		methods: {
 			formatTime(row) {
-				return this.$moment(new Date()).format('YYYY-MM-DD HH:mm')
-			},
-			formatUpdateBy(row) {
-				return this.userInfo.name;
+				return this.$moment(row.updateTime).format('YYYY-MM-DD HH:mm')
 			},
 			getTitleList() {
 				let params = {
@@ -132,37 +128,35 @@
 			// 新增/编辑提交
 			submitForm() {
 				this.$refs.titleForm.validate(valid => {
-					if(valid) {
-						let data = Object.assign({}, this.titleForm)
-						if(data.id) {
-							updateTitle(data).then(res => {
-								if(res.data.code === '0001') {
-									this.$message.success(res.data.message)
-									this.getTitleList()
-								} else {
-									this.$message.error(res.data.message)
-								}
-							}).catch(err => {
-								console.log(err)
-								this.$catchError(err)
-							})
-						} else {
-							createTitle(data).then(res => {
-								if(res.data.code === '0001') {
-									this.$message.success(res.data.message)
-									this.getTitleList()
-								} else {
-									this.$message.error(res.data.message)
-								}
-							}).catch(err => {
-								console.log(err)
-								this.$catchError(err)
-							})
-						}
-						this.titleFormVisible = false;
+					if(!valid) return;
+					let data = Object.assign({}, this.titleForm);
+					console.log(data)
+					if(data.id) {
+						updateTitle(data).then(res => {
+							if(res.data.code === '0001') {
+								this.$message.success(res.data.message)
+								this.getTitleList()
+							} else {
+								this.$message.error(res.data.message)
+							}
+						}).catch(err => {
+							console.log(err)
+							this.$catchError(err)
+						})
 					} else {
-						console.log('err submit')
+						createTitle(data).then(res => {
+							if(res.data.code === '0001') {
+								this.$message.success(res.data.message)
+								this.getTitleList()
+							} else {
+								this.$message.error(res.data.message)
+							}
+						}).catch(err => {
+							console.log(err)
+							this.$catchError(err)
+						})
 					}
+					this.titleFormVisible = false;
 				})
 			},
 			// 删除职位
@@ -192,11 +186,6 @@
 				this.pageNo = val
 				this.getTitleList()
 			}
-		},
-		computed: {
-			...mapGetters([
-	  		'userInfo'
-	  	])
 		},
 		mounted() {
 			this.getTitleList()

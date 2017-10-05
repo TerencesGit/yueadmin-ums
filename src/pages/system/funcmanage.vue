@@ -397,7 +397,9 @@
 				      let iconSkin = '';
 				      if(!func.parentId){
 				        iconSkin = 'root'
-				      }else{
+				      } else if (func.isMenu === 0) {
+				      	iconSkin = 'star'
+				      } else {
 				        iconSkin = 'folder'
 				      }
 				      let treeObj = {

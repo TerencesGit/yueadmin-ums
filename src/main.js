@@ -28,7 +28,7 @@ Vue.config.productionTip = false
 Vue.filter('formatDate', (value) => {
 	return moment(value).format('YYYY-MM-DD')
 })
-Vue.filter('formatTime', (value) => {
+Vue.filter('formatDateTime', (value) => {
 	return moment(value).format('YYYY-MM-DD HH:mm:ss')
 })
 Vue.filter('mobile', (mobile) => {

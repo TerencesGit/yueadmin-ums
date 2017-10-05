@@ -9,13 +9,13 @@
 					<i class="el-icon-circle-check"></i>
 					<label>修改密码</label>
 					<span>建议您定期更改密码以保护账户安全。</span>
-					<el-button size="small" type="info" @click="modifyPass">修改</el-button>
+					<el-button size="small" type="primary" @click="modifyPass">修改</el-button>
 				</li>
 				<li v-if="userInfo.emailVerified === 1" class="account-item">
 					<i class="el-icon-circle-check"></i>
 					<label>邮箱验证</label>
 					<span>验证后，可用于快速找回密码。</span>
-					<el-button size="small" type="primary" @click="handleVerified">已验证</el-button>
+					<el-button size="small" type="info" @click="handleVerified">已验证</el-button>
 				</li>
 				<li v-else class="account-item">
 					<i class="el-icon-warning"></i>
@@ -27,7 +27,7 @@
 					<i class="el-icon-circle-check"></i>
 					<label>修改手机号</label>
 					<span>当前手机号： {{mobile}}</span>
-					<el-button size="small" type="info" @click="modifyMobile">修改</el-button>
+					<el-button size="small" type="primary" @click="modifyMobile">修改</el-button>
 				</li>
 				<li v-else class="account-item">
 					<i class="el-icon-warning"></i>
@@ -120,8 +120,9 @@
 	</section>
 </template>
 <script>
-	import { getMyInfo, updatePwd, getEmailActiveCode, emailActive, getMobileSmsCode, bindMobile } from '@/api'
+	import { mapGetters } from 'vuex'
 	import Md5 from '@/assets/js/md5'
+	import { getMyInfo, updatePwd, getEmailActiveCode, emailActive, getMobileSmsCode, bindMobile } from '@/api'
 	export default {
 		data () {
 			const validatePass = (rule, value, callback) => {
@@ -148,7 +149,6 @@
       }
 			return {
 				loading: false,
-				userInfo: {},
 				passwordVisible: false,
 				passwordForm: {
 					oldPass: '',
@@ -195,47 +195,44 @@
 		},
 		methods: {
 			// 获取用户信息
-			getUserInfo() {
-				this.loading = true;
-				getMyInfo().then(res => {
-					this.loading = false;
-					if(res.data.code === '0001') {
-						this.userInfo = res.data.result.userInfo;
-					} else {
-						this.$message.error(res.data.message)
-					}
-				}).catch(err => {
-					console.log(err)
-					this.loading = false;
-					this.$catchError(err)
-				})
-			},
+			// getUserInfo() {
+			// 	this.loading = true;
+			// 	getMyInfo().then(res => {
+			// 		this.loading = false;
+			// 		if(res.data.code === '0001') {
+			// 			this.userInfo = res.data.result.userInfo;
+			// 		} else {
+			// 			this.$message.error(res.data.message)
+			// 		}
+			// 	}).catch(err => {
+			// 		console.log(err)
+			// 		this.loading = false;
+			// 		this.$catchError(err)
+			// 	})
+			// },
 			modifyPass() {
 				this.passwordVisible = true
 			},
 			// 修改密码
 			submitPass () {
 				this.$refs.passwordForm.validate(valid => {
-					if(valid) {
-						let data = {
-							oldPassword: Md5.hex_md5(this.passwordForm.oldPass),
-							newPassword: Md5.hex_md5(this.passwordForm.newPass),
-						}
-						updatePwd(data).then(res => {
-							if(res.data.code === '0001') {
-								this.$message.success(res.data.message)
-							} else {
-								this.$message.error(res.data.message)
-							}
-						}).catch(err => {
-							console.log(err)
-							this.$catchError(err)
-						})
-						this.passwordVisible = false;
-						this.$refs.passwordForm.resetFields()
-					} else {
-						console.log('err submit')
+					if(!valid) return;
+					let data = {
+						oldPassword: Md5.hex_md5(this.passwordForm.oldPass),
+						newPassword: Md5.hex_md5(this.passwordForm.newPass),
 					}
+					updatePwd(data).then(res => {
+						if(res.data.code === '0001') {
+							this.$message.success(res.data.message)
+						} else {
+							this.$message.error(res.data.message)
+						}
+					}).catch(err => {
+						console.log(err)
+						this.$catchError(err)
+					})
+					this.passwordVisible = false;
+					this.$refs.passwordForm.resetFields()
 				})
 			},
 			handleVerified() {
@@ -279,7 +276,8 @@
 					emailActive(data).then(res => {
 						if(res.data.code === '0001') {
 							this.$message.success(res.data.message)
-							this.getUserInfo()
+							this.userInfo.emailVerified = 1;
+							// this.getUserInfo()
 						} else {
 							this.$message.error(res.data.message)
 						}
@@ -319,7 +317,6 @@
 						mobile: this.mobileForm.mobile
 					}
 					getMobileSmsCode(params).then(res => {
-						// console.log(res)
 						if(res.data.code === '0001') {
 							this.countDown()
 							this.$message('短信已发送，请注意查收')
@@ -340,11 +337,10 @@
 						mobile: this.mobileForm.mobile,
 						smsCode: this.mobileForm.smsCode
 					}
-					// console.log(data)
 					bindMobile(data).then(res => {
 						if(res.data.code === '0001') {
 							this.$message(res.data.message)
-							this.getUserInfo()
+							this.userInfo.mobile = data.mobile
 						} else {
 							this.$message.error(res.data.message)
 						}
@@ -362,13 +358,16 @@
 			}
 		},
 		computed: {
+			...mapGetters([
+	  		'userInfo'
+	  	]),
 			mobile() {
 				return this.userInfo.mobile && 
 							 this.userInfo.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
 			}
 		},
 		mounted () {
-			this.getUserInfo()
+			// this.getUserInfo()
 		}
 	}
 </script>

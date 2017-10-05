@@ -15,7 +15,7 @@
 						  popper-class="text-center">
 						</el-popover> -->
 						<div class="avatar" @click="uploadAvatar">
-							<img v-if="userAvatar" :src="userAvatar" title="点击更新头像">
+							<img v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" title="点击更新头像">
 							<img v-else src="../../assets/img/avatar.gif" title="点击上传头像" alt="头像"/>
 						</div>
 						<h3>{{userInfo.name}}</h3>
@@ -67,10 +67,13 @@
 					<div slot="header">
 						<span>企业信息</span>
 					</div>
-					<div class="partner-info">
+					<div v-if="partnerInfo.name" class="partner-info">
 						<h3>{{partnerInfo.name}}</h3>
-						<img :src="partnerLogo" :title="partnerInfo.name">
+						<img v-if="partnerLogo" :src="partnerLogo" :title="partnerInfo.name">
 						<p>{{partnerInfo.note}}</p>
+					</div>
+					<div v-else class="partner-info">
+						<p>暂无企业</p>
 					</div>
 				</el-card>
 			</el-col>
@@ -173,7 +176,7 @@
 							  :show-file-list="false"
 							  :on-success="handleIdCardFrontSuccess"
 							  :before-upload="beforeAvatarUpload">
-							  <img v-if="idcardFrontUrl" :src="idcardFrontUrl">
+							  <img v-if="userForm.idcardFrontUrl" :src="userForm.idcardFrontUrl">
 							  <i v-else class="el-icon-plus uploader-icon"></i>
 							</el-upload>
 						</el-form-item>
@@ -187,7 +190,7 @@
 							  :show-file-list="false"
 							  :on-success="handleIdCardBackSuccess"
 							  :before-upload="beforeAvatarUpload">
-							  <img v-if="idcardBackUrl" :src="idcardBackUrl">
+							  <img v-if="userForm.idcardBackUrl" :src="userForm.idcardBackUrl">
 							  <i v-else class="el-icon-plus uploader-icon"></i>
 							</el-upload>
 						</el-form-item>
@@ -203,14 +206,13 @@
 </template>
 <script>
 	import Region from '@/assets/js/region'
+	import { mapGetters } from 'vuex'
 	import { getMyInfo, updateMyInfo, getMyPartner, updateAvatar } from '@/api'
 	export default {
 		data() {
 			return {
-				userInfo: {},
 				userForm: {},
 				partnerInfo: {},
-				areaId: '',
 				region: {
 					province: '',
 					city: '',
@@ -225,10 +227,7 @@
 				cityId: '',
 				// uploadAction: '/uploadFileUrl',
 				uploadAction: '/ums/baseInter/uploadFile.do',
-				userAvatar: '',
 				avatarUrl: '',
-				idcardFrontUrl: '',
-				idcardBackUrl: '',
 				loading: false,
 				uploading: false,
 				avatarVisible: false,
@@ -253,20 +252,16 @@
 			getUserInfo() {
 				this.loading = true;
 				getMyInfo().then(res => {
-					// console.log(res)
 					this.loading = false;
 					if(res.data.code === '0001') {
-						let userJson = JSON.stringify(res.data.result.userInfo);
+						let userInfo = res.data.result.userInfo;
 						let fileInfos = res.data.result.fileInfos;
-						this.userInfo = JSON.parse(userJson);
-						this.userForm = JSON.parse(userJson);
 						if(JSON.stringify(fileInfos) !== '{}') {
-							this.userAvatar = this.userForm.avatar && fileInfos[this.userForm.avatar].fileUri;
-							this.idcardFrontUrl = this.userForm.idcardPicFront && fileInfos[this.userForm.idcardPicFront].fileUri;
-							this.idcardBackUrl = this.userForm.idcardPicBack && fileInfos[this.userForm.idcardPicBack].fileUri;
+							userInfo.avatarUrl = userInfo.avatar && fileInfos[userInfo.avatar].fileUri;
+							userInfo.idcardFrontUrl = userInfo.idcardPicFront && fileInfos[userInfo.idcardPicFront].fileUri;
+							userInfo.idcardBackUrl = userInfo.idcardPicBack && fileInfos[userInfo.idcardPicBack].fileUri;
 						}
-						this.areaId = this.userInfo.areaId || '';
-						this.userInfo.partnerId > 0 && this.getPartInfo()
+						this.$store.dispatch('saveUserInfo', userInfo)
 					} else {
 						this.$message.error(res.data.message)
 					}
@@ -314,7 +309,7 @@
 			handleIdCardFrontSuccess(res, file) {
         if(res.code === '0001') {
 					this.$message.success('上传成功')
-					this.idcardFrontUrl = URL.createObjectURL(file.raw);
+					this.userForm.idcardFrontUrl = URL.createObjectURL(file.raw);
 					this.userForm.idcardPicFront = res.result.fileInfo.fileUuid;
 				} else {
 					this.$message.error(res.message)
@@ -324,7 +319,7 @@
 			handleIdCardBackSuccess(res, file) {
         if(res.code === '0001') {
 					this.$message.success('上传成功')
-					this.idcardBackUrl = URL.createObjectURL(file.raw);
+					this.userForm.idcardBackUrl = URL.createObjectURL(file.raw);
 					this.userForm.idcardPicBack = res.result.fileInfo.fileUuid;
 				} else {
 					this.$message.error(res.message)
@@ -348,7 +343,8 @@
       	}
       	updateAvatar(data).then(res => {
       		if(res.data.code === '0001') {
-      			this.userAvatar = this.avatarUrl
+      			this.userInfo.avatarUrl = this.avatarUrl
+      			this.$store.dispatch('saveUserInfo', this.userInfo)
       			this.$message.success('更新成功')
       		} else {
       			this.$message.error(res.data.message)
@@ -361,8 +357,9 @@
       },
       // 账户信息编辑
       handleEdit() {
-      	if(this.areaId && !this.areaFormat) {
-      		this.formatRegion(this.areaId)
+      	this.userForm = JSON.parse(JSON.stringify(this.userInfo));
+      	if(this.userForm.areaId && !this.areaFormat) {
+      		this.formatRegion(this.userForm.areaId)
 					this.areaFormat = true;
       	}
       	this.userFormVisible = true
@@ -377,18 +374,19 @@
       			})
       			return;
       		}
-      		let data = {
-      			userId: this.userForm.userId,
-      			name: this.userForm.name,
-						realname: this.userForm.realname,
-						qq: this.userForm.qq,
-						sexual: this.userForm.sexual,
-						areaId: this.areaId,
-						birthday: this.userForm.birthday,
-						idcardNum: this.userForm.idcardNum,
-						idcardPicFront: this.userForm.idcardPicFront,
-						idcardPicBack: this.userForm.idcardPicBack,
-      		}
+      // 		let data = {
+      // 			userId: this.userForm.userId,
+      // 			name: this.userForm.name,
+						// realname: this.userForm.realname,
+						// qq: this.userForm.qq,
+						// sexual: this.userForm.sexual,
+						// areaId: this.userForm.areaId,
+						// birthday: this.userForm.birthday,
+						// idcardNum: this.userForm.idcardNum,
+						// idcardPicFront: this.userForm.idcardPicFront,
+						// idcardPicBack: this.userForm.idcardPicBack,
+      // 		}
+      		let data = Object.assign({}, this.userForm)
       		// console.log(data)
       		updateMyInfo(data).then(res => {
       			if(res.data.code === '0001') {
@@ -431,7 +429,7 @@
       	this.region.area = this.regionList.area[0].id;
       },
       areaChange(aid) {
-      	this.areaId = aid;
+      	this.userForm.areaId = aid;
       },
       // 所在地回显
 			formatRegion(areaId) {
@@ -448,8 +446,13 @@
 				}
 			},
 		},
+		computed: {
+		  ...mapGetters([
+	  		'userInfo'
+	  	])
+	  },
 		mounted() {
-			this.getUserInfo()
+			this.userInfo.partnerId > 0 && this.getPartInfo()
 			this.regionList.province = Region.filter(region => region.level === 1)
 		}
 	}

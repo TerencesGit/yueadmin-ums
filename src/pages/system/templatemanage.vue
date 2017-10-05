@@ -23,14 +23,14 @@
 	          <el-form-item label="模板名称">
 	            <span >{{ scope.row.name }}</span>
 	          </el-form-item>
-	          <el-form-item label="更新人">
-	            <span >{{ userInfo.name }}</span>
+	          <!-- <el-form-item label="更新人">
+	            <span >{{ scope.row.updateBy }}</span>
+	          </el-form-item> -->
+	          <el-form-item label="更新时间">
+	            <span >{{ scope.row.updateTime | formatDateTime }}</span>
 	          </el-form-item>
 	          <el-form-item label="模板描述">
 	            <span >{{ scope.row.note }}</span>
-	          </el-form-item>
-	          <el-form-item label="更新时间">
-	            <span >{{ scope.row.updateTime | formatDate }}</span>
 	          </el-form-item>
 	        </el-form>
 	      </template>
@@ -96,7 +96,7 @@
     	</div>
     </el-dialog>
     <!-- 模板详情 -->
-    <el-dialog :visible.sync="templateInfoVisible" title="模板信息">
+    <!-- <el-dialog :visible.sync="templateInfoVisible" title="模板信息">
 			<el-row>
     		<el-col :span="14" :offset="5">
 		    	<el-form label-width="180px">
@@ -110,7 +110,7 @@
 		    			<span>{{templateForm.note}}</span>
 		    		</el-form-item>
 		    		<el-form-item label="更新人：">
-		    			<span>{{userInfo.name}}</span>
+		    			<span>{{templateForm.updateBy}}</span>
 		    		</el-form-item>
 		    		<el-form-item label="更新时间：">
 		    			<span>{{templateForm.createTime | formatDate}}</span>
@@ -122,11 +122,11 @@
     		<el-button @click="templateInfoVisible = false">取消</el-button>
     		<el-button type="primary" @click="templateInfoVisible = false">确定</el-button>
     	</div>
-    </el-dialog>
+    </el-dialog> -->
 	</section>
 </template>
 <script>
-	import { mapGetters } from 'vuex'
+	// import { mapGetters } from 'vuex'
 	import { getContractTemplates, createTemplate, updateTemplate, delTemplate } from '@/api'
 	export default {
 		data() {
@@ -295,11 +295,6 @@
 					this.$message('已取消操作')
 				})
 			}
-		},
-		computed: {
-			...mapGetters([
-	  		'userInfo'
-	  	])
 		},
 		mounted() {
 			this.getTemplateList()

@@ -114,7 +114,7 @@
 							</el-col>
 						</el-row>
 						<el-form-item label="企业简介：" prop="note">
-							<span>{{partnerForm.note}}</span>
+							<span style="word-wrap: break-word;">{{partnerForm.note}}</span>
 						</el-form-item>
 						<el-form-item class="button-item">
         			<el-button type="warning" @click="handleReject">驳回</el-button>
@@ -225,12 +225,14 @@
 					console.log(res)
 					this.loading = false;
 					if(res.data.code === '0001') {
-						this.partnerForm = res.data.result.partnerInfo
+						this.partnerForm = res.data.result.partnerInfo;
 						let fileInfos = res.data.result.fileInfos;
-						this.logoUrl = fileInfos.logo;
-						this.licenseUrl = fileInfos.licensePic;
-						this.idcardFrontUrl = fileInfos.idcardPicFront;
-						this.idcardBackUrl = fileInfos.idcardPicBack;
+						if(JSON.stringify(fileInfos) !== '{}') {
+	      			this.logoUrl = this.partnerForm.logo && fileInfos[this.partnerForm.logo].fileUri;
+							this.licenseUrl = this.partnerForm.licensePic && fileInfos[this.partnerForm.licensePic].fileUri;
+							this.idcardFrontUrl = this.partnerForm.idcardPicFront && fileInfos[this.partnerForm.idcardPicFront].fileUri;
+							this.idcardBackUrl = this.partnerForm.idcardPicBack && fileInfos[this.partnerForm.idcardPicBack].fileUri;
+						}
 					} else {
 						this.$message.error(res.data.message)
 					}
@@ -243,10 +245,12 @@
 			back() {
 				this.$router.back()
 			},
+			// 获取商家类型
 			getTypeList() {
 				let params = {
 					pageNo: 1,
-					pageSize: 100
+					pageSize: 100,
+					status: 1
 				}
 				this.tpyeLoading = true;
 				getPartnerTypes(params).then(res => {
@@ -304,12 +308,11 @@
 						partnerId: this.partnerId,
 						rejectInfo: this.rejectForm.rejectInfo
 					}
-					console.log(data)
+					// console.log(data)
 					rejectPartner(data).then(res => {
 						if(res.data.code === '0001') {
 							this.$message.success(res.data.message)
 							this.back()
-							// this.getPartnerList()
 						} else {
 							this.$message.error(res.data.message)
 						}

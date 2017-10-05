@@ -28,7 +28,7 @@
 					</el-switch>
       	</template>
       </el-table-column>
-      <el-table-column label="操作" width="240">
+      <el-table-column label="操作">
         <template scope="scope">
         	<!-- <el-button size="small" type="info" @click="handleDetail(scope.row)">查看</el-button> -->
           <el-button size="small" type="warning" @click="handleEdit(scope.row)">编辑</el-button>
@@ -127,7 +127,7 @@
 		},
 		methods: {
 			formatTime(row) {
-				return this.$moment(row.updateTime).format('YYYY-MM-DD')
+				return this.$moment(row.updateTime).format('YYYY-MM-DD HH:mm:ss')
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;
@@ -210,7 +210,8 @@
 			getRoleList() {
 				let params = {
 					pageNo: 1,
-					pageSize: 100
+					pageSize: 100,
+					status: 1
 				}
 				this.roleLoading = true;
 				getSysRoles(params).then(res => {
