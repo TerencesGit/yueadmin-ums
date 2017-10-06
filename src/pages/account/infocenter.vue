@@ -67,13 +67,19 @@
 					<div slot="header">
 						<span>企业信息</span>
 					</div>
-					<div v-if="partnerInfo.name" class="partner-info">
+					<div v-if="!partnerInfo" class="partner-info">
+						<h4>尚未注册企业！</h4>
+					</div>
+					<div v-else-if="partnerInfo.isVerified === 0" class="partner-info">
+						<h4>注册企业信息已提交，请等待平台审核...</h4>
+					</div>
+					<div v-else-if="partnerInfo.isVerified === 2" class="partner-info">
+						<h4>注册企业信息未通过审核！</h4>
+					</div>
+					<div v-else-if="partnerInfo.isVerified === 1" class="partner-info">
 						<h3>{{partnerInfo.name}}</h3>
 						<img v-if="partnerLogo" :src="partnerLogo" :title="partnerInfo.name">
 						<p>{{partnerInfo.note}}</p>
-					</div>
-					<div v-else class="partner-info">
-						<p>暂无企业</p>
 					</div>
 				</el-card>
 			</el-col>
@@ -212,7 +218,7 @@
 		data() {
 			return {
 				userForm: {},
-				partnerInfo: {},
+				partnerInfo: null,
 				region: {
 					province: '',
 					city: '',
@@ -406,11 +412,13 @@
       getPartInfo() {
       	getMyPartner().then(res => {
       		if(res.data.code === '0001') {
-      			this.partnerInfo = res.data.result.partnerInfo
+      			this.partnerInfo = res.data.result.partnerInfo;
       			let fileInfos = res.data.result.fileInfos;
       			this.partnerLogo = fileInfos[this.partnerInfo.logo].fileUri;
+      		} else if(res.data.code === 'U0000') {
+      			this.partnerInfo = null;
       		} else {
-      			this.$message.error('获取企业信息失败')
+      			this.$message.error(res.data.message)
       		}
       	}).catch(err => {
       		console.log(err)
@@ -452,8 +460,8 @@
 	  	])
 	  },
 		mounted() {
-			this.userInfo.partnerId > 0 && this.getPartInfo()
 			this.regionList.province = Region.filter(region => region.level === 1)
+			this.getPartInfo()
 		}
 	}
 </script>
@@ -500,16 +508,17 @@
 	}
 	.partner-info {
 		text-align: center;
-		h3 {
+		h3, h4, p {
 			margin: 20px 0;
-			font-size: 20px;
+		}
+		h3 {
 			font-weight: bold;
+		}
+		h4 {
+			font-size: 18px;
 		}
 		img {
 			width: 60%
-		}
-		p {
-			margin: 20px 0;
 		}
 	}
 </style>

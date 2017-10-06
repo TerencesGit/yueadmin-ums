@@ -125,12 +125,12 @@ const routes = [
       },
       {
         path: 'verifyinfo',
-        name: '商家审核详情',
+        name: '商家信息审核',
         component: DomainVerifyInfo,
       },
       {
         path: 'partnerinfo',
-        name: '商家详情',
+        name: '商家信息查看',
         component: DomainPartnerInfo,
       },
       {

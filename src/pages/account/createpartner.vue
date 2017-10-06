@@ -355,8 +355,10 @@
 							this.formatRegion(this.partnerForm.areaId)
 							this.areaFormat = true;
 						}
+      		} else if(res.data.code === 'U0000') {
+      			// this.$message(res.data.message)
       		} else {
-      			this.$message.error('获取企业信息失败')
+      			this.$message.error(res.data.message)
       		}
       	}).catch(err => {
       		console.log(err)
@@ -476,9 +478,7 @@
 	  	]),
 		},
 		mounted() {
-			if(this.userInfo.partnerId && this.userInfo.partnerId !== -1) {
-				this.getPartnerInfo()
-			}
+			this.getPartnerInfo()
 			this.regionList.province = Region.filter(region => region.level === 1)
 		}
 	}

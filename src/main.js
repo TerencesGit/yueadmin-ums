@@ -81,8 +81,8 @@ router.afterEach((to, from, next) => {
   NProgress.done()
 })
 axios.interceptors.request.use(config => {
-  return config
-}, error => {
+  return config;
+}, error => { 
   return Promise.reject(error)
 })
 axios.interceptors.response.use(res => {

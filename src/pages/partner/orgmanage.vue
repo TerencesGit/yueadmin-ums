@@ -167,37 +167,90 @@
 		</el-dialog>
 		<!-- 员工信息 -->
 		<el-dialog :visible.sync="staffInfoVisible" title="员工信息">
-			<el-row>
-				<el-col :span="14" :offset="5">
-					<el-form :model="staffInfo" label-width="180px">
-						<!-- <el-form-item label="" label-width="120px">
+			<el-form :model="staffInfo" label-width="120px" v-loading="staffInfoLoading">
+				<el-row>
+					<el-col :span="12" :offset="5">
+						<el-form-item label="">
 							<img v-if="staffInfo.avatarUrl" :src="staffInfo.avatarUrl" alt="头像" class="avatar">
 							<img v-else src="../../assets/img/avatar.gif" alt="头像" class="avatar">
-						</el-form-item> -->
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
 						<el-form-item label="姓名：">
 							<span>{{staffInfo.realname}}</span>
 						</el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="性别：">
+							<span>{{staffInfo.sexaul === 0 ? '女' : '男' }}</span>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
 						<el-form-item label="邮箱：">
 							<span>{{staffInfo.email | email}}</span>
 						</el-form-item>
+					</el-col>
+					<el-col :span="12">
 						<el-form-item label="手机号：">
 							<span>{{staffInfo.mobile | mobile}}</span>
 						</el-form-item>
-						<el-form-item label="注册时间：">
-							<span>{{staffInfo.createTime}}</span>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="QQ：">
+							<span>{{staffInfo.qq || '暂无'}}</span>
 						</el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="生日：">
+							<span>{{staffInfo.birthday || '暂无'}}</span>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
 						<el-form-item label="部门：">
 							<span>{{staffInfo.orgName || '暂无'}}</span>
 						</el-form-item>
+					</el-col>
+					<el-col :span="12">
 						<el-form-item label="职位：">
-							<span>{{staffInfo.titleName}}</span>
+							<span>{{staffInfo.titleName || '暂无'}}</span>
 						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
 						<el-form-item label="所在地：">
 							<span>{{staffInfo.areaName}}</span>
 						</el-form-item>
-					</el-form>
-				</el-col>
-			</el-row>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="注册时间：">
+							<span>{{staffInfo.createTime}}</span>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="身份证正面：">
+							<img :src="staffInfo.idcardFrontUrl" alt="暂无身份证正面" class="idcard-pic">
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="身份证背面：">
+							<img :src="staffInfo.idcardBackUrl" alt="暂无身份证背面" class="idcard-pic">
+						</el-form-item>
+					</el-col>
+				</el-row>
+			</el-form>
 			<div slot="footer">
 				<el-button @click="staffInfoVisible = false">取消</el-button>
 				<el-button type="primary" @click="staffInfoVisible = false">确定</el-button>
@@ -248,7 +301,7 @@
 	import '@/assets/plugins/zTree/css/zTreeStyle.css'
 	import '@/assets/plugins/zTree/js/jquery.min.js'
 	import '@/assets/plugins/zTree/js/jquery.ztree.all.min.js'
-	import { getMyPartnerOrgs, getMyPartnerRoles, getRolesByOrg, updateOrgRole, getOrganizeStaff, createOrganize, updateOrganize, delOrganize, updateOrgStatus, updateStaffOrg, updateStaffStatus, getPartnerTitle, updateStaffTitle, registerByAgency, getFunctionsByOrg } from '@/api'
+	import { getMyPartnerOrgs, getMyPartnerRoles, getRolesByOrg, updateOrgRole, getOrganizeStaff, createOrganize, updateOrganize, delOrganize, updateOrgStatus, updateStaffOrg, updateStaffStatus, getPartnerTitle, updateStaffTitle, registerByAgency, getFunctionsByOrg, getUserInfoById } from '@/api'
 	import { mapGetters } from 'vuex'
 	export default {
 		data() {
@@ -266,6 +319,7 @@
 				loading: false,
 				staffList: [],
 	      staffLoading: false,
+	      staffInfoLoading: false,
 	      pageNo: 1,
 	      pageSize: 10,
 	      total: 0,
@@ -727,10 +781,29 @@
       		this.registFormVisible = false
       	})
       },
-      // 员工信息
+      // 员工信息展示
       handleShow(row) {
-      	this.staffInfo = Object.assign({}, row)
-      	this.staffInfoVisible = true
+      	this.staffInfo = {};
+      	this.staffInfoVisible = true;
+      	let params = {
+					userId: row.userId
+				}
+				this.staffInfoLoading = true;
+				getUserInfoById(params).then(res => {
+					this.staffInfoLoading = false;
+					let userInfo = res.data.result.userInfo;
+					let fileInfos = res.data.result.fileInfos;
+					if(JSON.stringify(fileInfos) !== '{}') {
+						userInfo.avatarUrl = userInfo.avatar && fileInfos[userInfo.avatar].fileUri;
+						userInfo.idcardFrontUrl = userInfo.idcardPicFront && fileInfos[userInfo.idcardPicFront].fileUri;
+						userInfo.idcardBackUrl = userInfo.idcardPicBack && fileInfos[userInfo.idcardPicBack].fileUri;
+					}
+					this.staffInfo = userInfo;
+				}).catch(err => {
+					console.log(err)
+					this.staffInfoLoading = false;
+					this.$catchError(err)
+				})
       },
       // 设置员工部门
       handleSetOrg(row) {
@@ -903,8 +976,8 @@
 		background: #fff;
 	}
 	.avatar {
-		width: 150px;
-		height: 150px;
+		width: 160px;
+		height: 160px;
 		border-radius: 50%;
 		border: 1px solid #ddd;
 	}

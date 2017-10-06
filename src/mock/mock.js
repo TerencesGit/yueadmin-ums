@@ -192,9 +192,6 @@ export default {
 					userInfo.orgName = org.name
 				}
 			})
-			// let avatar = userInfo.avatar, 
-			// 		idcardPicFront = userInfo.idcardPicFront, 
-			// 		idcardPicBack = userInfo.idcardPicBack;
 			let avatarObj, idcardPicFrontObj, idcardPicBackObj;
 			_FileList.filter(file => {
 				if(file.fileUuid === userInfo.avatar) {
@@ -381,12 +378,12 @@ export default {
 				})
 			}
 			let _userInfo = _UserList.filter(user => user.userId == userId)[0];
-			if(!(_userInfo && _userInfo.partnerId)) {
+			if(_userInfo.partnerId === -1) {
 				return new Promise((resolve, reject) => {
 					let retObj = {
-						code: '3001',
+						code: 'U0000',
 						message: '尚未注册企业',
-						result: {}
+						result: null
 					}
 					setTimeout(() => {
 						resolve([200, retObj])
@@ -415,9 +412,13 @@ export default {
 			fileInfos[partnerInfo.licensePic] = licensePicFile;
 			fileInfos[partnerInfo.idcardPicFront] = idcardPicFrontFile;
 			fileInfos[partnerInfo.idcardPicBack] = idcardPicBackFile;
-			retObj.result = {
-				partnerInfo,
-				fileInfos
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					partnerInfo,
+					fileInfos
+				}
 			}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
@@ -493,7 +494,6 @@ export default {
 		// 更新当前用户所属商户信息
 		mock.onPost('/partnerInter/updateMyPartnerInfo.do').reply(config => {
 			let { partnerId, name, shortName } = JSON.parse(config.data);
-			// console.log(partnerId, name, shortName)
 			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
@@ -657,6 +657,46 @@ export default {
 				userList: userPage,
 				pageInfo: {
 					total: total
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+						resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 根据userId获取员工信息
+		mock.onGet('/partnerInter/getUserInfoById.do').reply(config => {
+			let { userId } = config.params;
+			let userInfo = _UserList.filter(user => user.userId == userId)[0];
+			userInfo.areaName = userInfo.areaId ? Region.filter(region => region.id === userInfo.areaId)[0].name : '未设置';
+			_Organizes.filter(org => {
+				if(userInfo.orgId && org.orgId == userInfo.orgId) {
+					userInfo.orgName = org.name
+				}
+			})
+			let avatarObj, idcardPicFrontObj, idcardPicBackObj;
+			_FileList.filter(file => {
+				if(file.fileUuid === userInfo.avatar) {
+					avatarObj = file
+				}
+				if(file.fileUuid === userInfo.idcardPicFront) {
+					idcardPicFrontObj = file
+				}
+				if(file.fileUuid === userInfo.idcardPicBack) {
+					idcardPicBackObj = file
+				}
+			})
+			let fileInfos = {};
+			fileInfos[userInfo.avatar] = avatarObj;
+			fileInfos[userInfo.idcardPicFront] = idcardPicFrontObj;
+			fileInfos[userInfo.idcardPicBack] = idcardPicBackObj;
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					userInfo,
+					fileInfos,
 				}
 			}
 			return new Promise((resolve, reject) => {
@@ -1321,7 +1361,14 @@ export default {
 			}
 			let total = _partnerList.length;
 			let partnerPage = _partnerList.filter((part, index) => 
-				index < pageNo * pageSize && index >= (pageNo - 1) * pageSize)
+				index < pageNo * pageSize && index >= (pageNo - 1) * pageSize);
+			partnerPage.forEach(partner => {
+				_UserList.forEach(user => {
+					if(user.userId === partner.adminId) {
+						partner.adminName = user.name;
+					}
+				})
+			})
 			let retObj = {
 				code: '0001',
 				message: '操作成功',
@@ -1335,6 +1382,46 @@ export default {
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 根据userId获取注册人信息
+		mock.onGet('/domainInter/getUserInfoById.do').reply(config => {
+			let { userId } = config.params;
+			let userInfo = _UserList.filter(user => user.userId == userId)[0];
+			userInfo.areaName = userInfo.areaId ? Region.filter(region => region.id === userInfo.areaId)[0].name : '未设置';
+			_Organizes.filter(org => {
+				if(userInfo.orgId && org.orgId == userInfo.orgId) {
+					userInfo.orgName = org.name
+				}
+			})
+			let avatarObj, idcardPicFrontObj, idcardPicBackObj;
+			_FileList.filter(file => {
+				if(file.fileUuid === userInfo.avatar) {
+					avatarObj = file
+				}
+				if(file.fileUuid === userInfo.idcardPicFront) {
+					idcardPicFrontObj = file
+				}
+				if(file.fileUuid === userInfo.idcardPicBack) {
+					idcardPicBackObj = file
+				}
+			})
+			let fileInfos = {};
+			fileInfos[userInfo.avatar] = avatarObj;
+			fileInfos[userInfo.idcardPicFront] = idcardPicFrontObj;
+			fileInfos[userInfo.idcardPicBack] = idcardPicBackObj;
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					userInfo,
+					fileInfos,
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+						resolve([200, retObj])
 				}, 500)
 			})
 		})

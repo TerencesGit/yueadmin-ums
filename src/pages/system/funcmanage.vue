@@ -42,13 +42,13 @@
 			      highlight-current-row
 			      v-loading="tableLoading" 
 			      style="width: 100%">
-			      <el-table-column prop="funcId" label="编号" width="120"></el-table-column>
+			      <el-table-column prop="funcId" label="编号"></el-table-column>
 			      <el-table-column prop="name" label="名称"></el-table-column>
 			      <el-table-column prop="md5" label="编码"></el-table-column>
 			      <el-table-column prop="funcurl" label="路由"></el-table-column>
-			      <el-table-column prop="updateTime" label="更新时间" width="120"></el-table-column>
+			     <!--  <el-table-column prop="updateTime" label="更新时间" :formatter="formatTime"></el-table-column> -->
 			      <el-table-column prop="status" label="状态" :formatter="formatStatus" width="80"></el-table-column>
-			      <el-table-column label="详情" width="80">
+			      <el-table-column label="详情">
 			      	<template scope="scope">
 			      		<el-button type="primary" size="small" @click="handleShow(scope.row)">查看</el-button>
 			      	</template>
@@ -166,7 +166,7 @@
 							<span>{{funcDetail.ico}}</span>
 						</el-form-item>
 						<el-form-item label="是否为菜单项：">
-							<span>{{funcDetail.ismunu === 1 ? '是' : '否'}}</span>
+							<span>{{funcDetail.ismenu === 1 ? '是' : '否'}}</span>
 						</el-form-item>
 						<el-form-item label="功能点状态：">
 							<span>{{funcDetail.status === 1 ? '启用' : '禁用'}}</span>
@@ -175,7 +175,7 @@
 							<span>{{funcDetail.desc}}</span>
 						</el-form-item>
 						<el-form-item label="更新时间：">
-							<span>{{this.$moment(new Date()).format('YYYY-MM-DD')}}</span>
+							<span>{{this.$moment(funcDetail.updatetime).format('YYYY-MM-DD HH:mm:ss')}}</span>
 						</el-form-item>
 					</el-form>
 				</el-col>
@@ -266,6 +266,9 @@
 			}
 		},
 		methods: {
+			formatTime(row) {
+				return this.$moment(row.updateTime).format('YYYY-MM-DD')
+			},
 			formatStatus(row) {
 				return row.status === 1 ? '启用' : '禁用'
 			},
@@ -415,6 +418,7 @@
 				        desc: func.funcDesc,
 				        status: func.status,
 				        ismenu: func.isMenu,
+				        updatetime: func.updateTime,
 				        open: true,
 				        iconSkin: iconSkin,
 				      };

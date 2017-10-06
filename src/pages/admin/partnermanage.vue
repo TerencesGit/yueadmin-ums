@@ -24,7 +24,8 @@
       <el-table-column prop="partnerId" label="商家编号" sortable></el-table-column>
       <el-table-column prop="name" label="商家名称"></el-table-column>
       <el-table-column prop="typeName" label="商家类型"></el-table-column>
-      <el-table-column prop="corporationName" label="联系人"></el-table-column>
+      <el-table-column prop="adminName" label="管理员"></el-table-column>
+      <el-table-column prop="corporationName" label="商家法人"></el-table-column>
       <el-table-column prop="areaName" label="所在地"></el-table-column>
       <el-table-column prop="createTime" label="创建时间" sortable :formatter="formatTime"></el-table-column>
       <el-table-column prop="status" label="状态">
@@ -39,7 +40,7 @@
 					</el-switch>
       	</template>
       </el-table-column>
-      <el-table-column label="详情">
+      <el-table-column label="商家信息">
         <template scope="scope">
         	<el-button size="small" type="info" @click="handleDetail(scope.row)">查看</el-button>
         </template>

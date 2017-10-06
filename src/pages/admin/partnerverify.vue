@@ -4,7 +4,6 @@
 		<el-row class="toolbar">
 			<el-radio-group v-model="isVerified" @change="isVerifiedChange">
 		    <el-radio-button :label="0">待审核</el-radio-button>
-		    <!-- <el-radio-button :label="1">已通过</el-radio-button> -->
 		    <el-radio-button :label="2">未通过</el-radio-button>
 		  </el-radio-group>
     </el-row>
@@ -17,15 +16,17 @@
       <el-table-column type="index" width="55"></el-table-column>
       <el-table-column prop="partnerId" label="商家编号" sortable width="140"></el-table-column>
       <el-table-column prop="name" label="商家名称"></el-table-column>
-      <el-table-column prop="corporationName" label="联系人"></el-table-column>
-      <el-table-column prop="contactAddress" label="联系地址"></el-table-column>
+      <el-table-column prop="adminName" label="注册人"></el-table-column>
+      <el-table-column prop="corporationName" label="商家法人"></el-table-column>
+      <el-table-column prop="areaName" label="所在地"></el-table-column>
       <el-table-column prop="createTime" label="创建时间" sortable :formatter="formatTime" width="160"></el-table-column>
       <el-table-column prop="status" label="状态" :formatter="formatStatus">
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="200">
         <template scope="scope" v-if="scope.row.isVerified === 0">
-        	<el-button v-if="scope.row.isVerified === 0" size="small" type="info" @click="handleVerify(scope.row)">审核</el-button>
-        	<el-button v-if="scope.row.isVerified === 2" size="small" type="info" @click="handleReason(scope.row)">驳回原因</el-button>
+        	<el-button size="small" type="info" @click="handleAdminShow(scope.row)">注册人信息</el-button>
+        	<el-button v-if="scope.row.isVerified === 0" size="small" type="primary" @click="handleVerify(scope.row)">审核</el-button>
+        	<el-button v-if="scope.row.isVerified === 2" size="small" type="warning" @click="handleReason(scope.row)">驳回原因</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -41,43 +42,97 @@
         class="pull-right">
       </el-pagination>
     </el-row>
-    <!-- 商家信息 -->
-    <el-dialog :visible.sync="partInfoVisible" title="商家信息">
-    	<el-row>
-    		<el-col :span="14" :offset="5">
-		    	<el-form label-width="150px">
-		    		<el-form-item label="" label-width="100px">
-		    			<img :src="partInfo.logoUri" alt="logo" class="logo">
-		    		</el-form-item>
-		    		<el-form-item label="商家名称：">
-		    			<span>{{partInfo.name}}</span>
-		    		</el-form-item>
-		    		<el-form-item label="商家简称：">
-		    			<span>{{partInfo.shortName}}</span>
-		    		</el-form-item>
-		    		<el-form-item label="商家邮箱：">
-		    			<span>{{partInfo.email}}</span>
-		    		</el-form-item>
-		    		<el-form-item label="移动电话：">
-		    			<span>{{partInfo.mobile}}</span>
-		    		</el-form-item>
-		    		<el-form-item label="固话：">
-		    			<span>{{partInfo.telphone}}</span>
-		    		</el-form-item>
-		    		<el-form-item label="地址：">
-		    			<span>{{partInfo.contactAddress}}</span>
-		    		</el-form-item>
-		    		<el-form-item label="备注：">
-		    			<span>{{partInfo.note}}</span>
-		    		</el-form-item>
-		    	</el-form>
-    		</el-col>
-    	</el-row>
-    	<div slot="footer">
-    		<el-button @click="partInfoVisible = false">取消</el-button>
-    		<el-button type="primary" @click="partInfoVisible = false">确定</el-button>
-    	</div>
-    </el-dialog>
+   	<!-- 注册人信息 -->
+		<el-dialog :visible.sync="registrantVisible" title="注册人信息">
+			<el-form :model="registrantInfo" label-width="120px" v-loading="registrantLoading">
+				<el-row>
+					<el-col :span="12" :offset="5">
+						<el-form-item label="">
+							<img v-if="registrantInfo.avatarUrl" :src="registrantInfo.avatarUrl" alt="头像" class="avatar">
+							<img v-else src="../../assets/img/avatar.gif" alt="头像" class="avatar">
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="姓名：">
+							<span>{{registrantInfo.realname}}</span>
+						</el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="性别：">
+							<span>{{registrantInfo.sexaul === 0 ? '女' : '男' }}</span>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="邮箱：">
+							<span>{{registrantInfo.email | email}}</span>
+						</el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="手机号：">
+							<span>{{registrantInfo.mobile | mobile}}</span>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="QQ：">
+							<span>{{registrantInfo.qq || '暂无'}}</span>
+						</el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="生日：">
+							<span>{{registrantInfo.birthday || '暂无'}}</span>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<!-- <el-row>
+					<el-col :span="12">
+						<el-form-item label="部门：">
+							<span>{{registrantInfo.orgName || '暂无'}}</span>
+						</el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="职位：">
+							<span>{{registrantInfo.titleName || '暂无'}}</span>
+						</el-form-item>
+					</el-col>
+				</el-row> -->
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="所在地：">
+							<span>{{registrantInfo.areaName}}</span>
+						</el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="注册时间：">
+							<span>{{registrantInfo.createTime}}</span>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="身份证正面：">
+							<img :src="registrantInfo.idcardFrontUrl" alt="暂无身份证正面" class="idcard-pic">
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="身份证背面：">
+							<img :src="registrantInfo.idcardBackUrl" alt="暂无身份证背面" class="idcard-pic">
+						</el-form-item>
+					</el-col>
+				</el-row>
+			</el-form>
+			<div slot="footer">
+				<el-button @click="registrantVisible = false">取消</el-button>
+				<el-button type="primary" @click="registrantVisible = false">确定</el-button>
+			</div>
+		</el-dialog>
     <!-- 驳回原因 -->
     <el-dialog :visible.sync="rejectInfoVisible" title="驳回原因">
 			<p>{{partInfo.rejectInfo}}</p>
@@ -89,7 +144,7 @@
 	</section>
 </template>
 <script>
-	import { getPartners, getPartnerTypes, updatePartType, updatePartnerStatus, examPartner, rejectPartner } from '@/api'
+	import { getPartners, getAdminInfoById, getPartnerTypes, updatePartType, updatePartnerStatus, examPartner, rejectPartner } from '@/api'
 	export default {
 		data() {
 			return {
@@ -100,11 +155,9 @@
 				isVerified: 0,
 				partnerList: [],
 				partInfo: {},
-				partInfoVisible: false,
-				typeId: '',
-				typeList: [],
-				tpyeLoading: false,
-				typeListVisible: false,
+				registrantInfo: {},
+				registrantVisible: false,
+				registrantLoading: false,
 				rejectForm: {
 					rejectInfo: '',
 				},
@@ -151,27 +204,33 @@
 					this.loading = false
 				})
 			},
+			// 注册人信息查看
+			handleAdminShow(row) {
+      	this.registrantInfo = {};
+      	this.registrantVisible = true;
+      	let params = {
+					userId: row.adminId
+				}
+				this.registrantLoading = true;
+				getAdminInfoById(params).then(res => {
+					this.registrantLoading = false;
+					let userInfo = res.data.result.userInfo;
+					let fileInfos = res.data.result.fileInfos;
+					if(JSON.stringify(fileInfos) !== '{}') {
+						userInfo.avatarUrl = userInfo.avatar && fileInfos[userInfo.avatar].fileUri;
+						userInfo.idcardFrontUrl = userInfo.idcardPicFront && fileInfos[userInfo.idcardPicFront].fileUri;
+						userInfo.idcardBackUrl = userInfo.idcardPicBack && fileInfos[userInfo.idcardPicBack].fileUri;
+					}
+					this.registrantInfo = userInfo;
+				}).catch(err => {
+					console.log(err)
+					this.registrantLoading = false;
+					this.$catchError(err)
+				})
+      },
 			handleVerify(row) {
 				this.$router.push({
 					path: `/domain/verifyinfo?partnerId=${row.partnerId}`,
-				})
-			},
-			handleStatus(row) {
-				let data = {
-					partnerId: row.partnerId,
-					status: row.status
-				}
-				updatePartnerStatus(data).then(res => {
-					if(res.data.code === '0001') {
-						this.$message.success(res.data.message)
-					} else {
-						row.status = row.status === 1 ? 0 : 1;
-						this.$message.error(res.data.message)
-					}
-				}).catch(err => {
-					console.log(err)
-					row.status = row.status === 1 ? 0 : 1;
-					this.$catchError(err)
 				})
 			},
 			// 查看驳回原因
@@ -185,11 +244,11 @@
 		}
 	}
 </script>
-<style scoped lang="scss">
-	.logo {
-		display: inline-block;
-		width: 150px;
-		height: 150px;
-		border-radius: 5px;
+<style scoped>
+	.avatar {
+	  width: 160px;
+	  height: 160px;
+	  border-radius: 50%;
+	  border: 1px solid #ddd;
 	}
 </style>
