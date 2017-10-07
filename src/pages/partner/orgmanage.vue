@@ -556,6 +556,7 @@
       		name: this.checkedNode.name,
       		note: this.checkedNode.note
       	}
+      	this.$refs.organizeForm.resetFields()
       	this.orgFormTitle = '编辑部门'
       	this.orgFormVisible = true
       },

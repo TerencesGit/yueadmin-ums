@@ -122,6 +122,7 @@
 					titleName: row.titleName,
 					description: row.description
 				}
+				this.$refs.titleForm.resetFields()
 				this.titleFormTitle = '职位编辑'
 				this.titleFormVisible = true;
 			},

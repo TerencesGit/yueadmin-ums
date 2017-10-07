@@ -326,6 +326,7 @@
 	      	contextRoot: currModule.contextRoot,
 	      	note: currModule.note,
 				}
+				this.$refs.moduleForm.resetFields()
 				this.moduleFormTitle = '编辑系统模块'
 				this.moduleFormVisible = true
 			},
@@ -479,6 +480,7 @@
       		status: this.checkedNode.status,
       		isMenu: this.checkedNode.ismenu,
       	}
+      	this.$refs.funcForm.resetFields()
       	this.funcFormTitle = '编辑功能点'
       	this.funcFormVisible = true
       },

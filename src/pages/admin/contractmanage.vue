@@ -290,6 +290,7 @@
 					expireDate: new Date(row.expireDate),
 					note: row.note,
 				}
+				this.$refs.contractForm.resetFields()
 				this.contractForm.attachFiles = row.attachFiles.map(file => file.fileUuid)
 				this.fileList = [];
 				row.attachFiles.forEach((file, index) => {

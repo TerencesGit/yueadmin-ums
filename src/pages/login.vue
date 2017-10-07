@@ -21,7 +21,7 @@
           <canvas id="canvasCode" width="80px" height="35px" class="canvas-code" @click="drawCode"></canvas>
         </el-form-item>
         <!-- <el-form-item label="登录角色">
-          <el-select v-model="loginForm.isAdmin" class="el-select--block" placeholder="请选择角色">
+          <el-select v-model="loginForm.isAdmin" placeholder="请选择角色">
             <el-option
               v-for="item in loginRoles"
               :label="item.label"
@@ -117,19 +117,10 @@ export default {
                 pwd: escape(btoa(this.loginForm.password)),
               }
               let userId = res.data.result.userInfo.userId
-              localStorage.setItem('user', JSON.stringify(user))
+              // localStorage.setItem('user', JSON.stringify(user))
               Utils.setCookie('userId', userId)
               this.$message.success('登录成功')
               this.$router.push({ path: '/account/infocenter' })
-              // if (this.loginForm.remember) {
-              //   let name = btoa(escape(btoa(this.loginForm.username).split('').reverse().join()))
-              //   let pass = btoa(escape(btoa(this.loginForm.password).split('').reverse().join()))
-              //   Utils.setCookie('uname', name, '7d')
-              //   Utils.setCookie('ukey', pass, '7d')
-              // } else {
-              //   Utils.delCookie('uname')
-              //   Utils.delCookie('ukey')
-              // }
             } else {
               this.$message.error(res.data.message)
             }
@@ -158,11 +149,6 @@ export default {
       this.loginForm.username = atob(unescape(user.name))
       this.loginForm.password = atob(unescape(user.pwd))
     }
-    // if (Utils.getCookie('uname') && Utils.getCookie('ukey')) {
-    //   this.loginForm.username = atob(unescape(atob(Utils.getCookie('uname'))).split(',').reverse().join(''))
-    //   this.loginForm.password = atob(unescape(atob(Utils.getCookie('ukey'))).split(',').reverse().join(''))
-    //   this.loginForm.remember = true
-    // }
     let codeInput = document.querySelectorAll('.el-input__inner')[2]
     codeInput.addEventListener('keydown', this.keyDown)
   }

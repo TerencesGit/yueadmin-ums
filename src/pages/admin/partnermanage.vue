@@ -120,8 +120,8 @@
 			formatStatus(row) {
 				return row.status === 1 ? '启用' : '禁用'
 			},
-			formatTime() {
-				return this.$moment(new Date()).format('YYYY-MM-DD')
+			formatTime(row) {
+				return this.$moment(row.createTime).format('YYYY-MM-DD')
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;

@@ -13,77 +13,15 @@
 						class="partner-form">
 						<el-row>
 							<el-col :span="12">
-								<el-form-item label="企业名称" prop="name">
+								<!-- <el-form-item label="企业名称" prop="name">
 									<el-input v-model="partnerForm.name" placeholder="输入企业名称"></el-input>
-								</el-form-item>
+								</el-form-item> -->
 							</el-col>
 							<el-col :span="12">
 								<el-form-item label="企业简称" prop="shortName">
 									<el-input v-model="partnerForm.shortName" placeholder="输入企业简称"></el-input>
 								</el-form-item>
 							</el-col>
-						</el-row>
-						<el-row>
-							<el-col :span="12">
-								<el-form-item label="企业电话" prop="mobile">
-									<el-input v-model="partnerForm.mobile" placeholder="输入企业联系电话"></el-input>
-								</el-form-item>
-							</el-col>
-							<el-col :span="12">
-								<el-form-item label="企业邮箱" prop="email">
-									<el-input v-model="partnerForm.email" placeholder="输入企业邮箱"></el-input>
-								</el-form-item>
-							</el-col>
-						</el-row>
-						<el-row>
-							<el-col :span="12">
-								<el-form-item label="企业邮编" prop="post">
-									<el-input v-model="partnerForm.post" placeholder="输入企业邮编"></el-input>
-								</el-form-item>
-							</el-col>
-							<el-col :span="12">
-								<el-form-item label="联系地址" prop="contactAddress">
-									<el-input v-model="partnerForm.contactAddress" placeholder="输入企业联系地址"></el-input>
-								</el-form-item>
-							</el-col>
-						</el-row>
-						<el-row>
-							<el-col :span="12">
-								<el-form-item label="企业法人" prop="corporationName">
-									<el-input v-model="partnerForm.corporationName" placeholder="输入企业法人"></el-input>
-								</el-form-item>
-							</el-col>
-							<el-col :span="12">
-								<el-form-item label="法人身份证号" prop="idcardNum">
-									<el-input v-model="partnerForm.idcardNum" placeholder="输入法人身份证号"></el-input>
-								</el-form-item>
-							</el-col>
-						</el-row>
-						<el-row>
-							<el-col :span="12">
-								<el-form-item label="营业执照注册号" prop="licenseNum">
-									<el-input v-model="partnerForm.licenseNum" placeholder="输入营业执照注册号"></el-input>
-								</el-form-item>
-							</el-col>
-							<el-col :span="12">
-								<el-form-item label="联系人" prop="contactName">
-									<el-input v-model="partnerForm.contactName" placeholder="输入联系人"></el-input>
-								</el-form-item>
-							</el-col>
-						</el-row>
-						<el-row>
-							<el-col :span="12">
-								<el-form-item label="企业固话" prop="telphone">
-									<el-input v-model="partnerForm.telphone" placeholder="例如：010-12345678"></el-input>
-								</el-form-item>
-							</el-col>
-							<el-col :span="12">
-								<el-form-item label="企业传真" prop="fax">
-									<el-input v-model="partnerForm.fax" placeholder="输入企业传真"></el-input>
-								</el-form-item>
-							</el-col>
-						</el-row>
-						<el-row>
 							<el-col :span="12">
 								<el-form-item label="企业所在地：" prop="areaId">
 									<el-row>
@@ -113,7 +51,65 @@
 						</el-row>
 						<el-row>
 							<el-col :span="12">
-								<el-form-item label="LOGO" prop="logo">
+								<el-form-item label="企业电话" prop="mobile">
+									<el-input v-model="partnerForm.mobile" placeholder="输入企业联系电话"></el-input>
+								</el-form-item>
+							</el-col>
+							<el-col :span="12">
+								<el-form-item label="企业邮箱" prop="email">
+									<el-input v-model="partnerForm.email" placeholder="输入企业邮箱"></el-input>
+								</el-form-item>
+							</el-col>
+						</el-row>
+						<el-row>
+							<el-col :span="12">
+								<el-form-item label="企业邮编" prop="post">
+									<el-input v-model="partnerForm.post" placeholder="输入企业邮编"></el-input>
+								</el-form-item>
+							</el-col>
+							<el-col :span="12">
+								<el-form-item label="联系地址" prop="contactAddress">
+									<el-input v-model="partnerForm.contactAddress" placeholder="输入企业联系地址"></el-input>
+								</el-form-item>
+							</el-col>
+						</el-row>
+						<!-- <el-row>
+							<el-col :span="12">
+								<el-form-item label="企业法人" prop="corporationName">
+									<el-input v-model="partnerForm.corporationName" placeholder="输入企业法人"></el-input>
+								</el-form-item>
+							</el-col>
+							<el-col :span="12">
+								<el-form-item label="法人身份证号" prop="idcardNum">
+									<el-input v-model="partnerForm.idcardNum" placeholder="输入法人身份证号"></el-input>
+								</el-form-item>
+							</el-col>
+						</el-row> -->
+						<el-row>
+						<!-- 	<el-col :span="12">
+								<el-form-item label="营业执照注册号" prop="licenseNum">
+									<el-input v-model="partnerForm.licenseNum" placeholder="输入营业执照注册号"></el-input>
+								</el-form-item>
+							</el-col> -->
+							<el-col :span="12">
+								<el-form-item label="联系人" prop="contactName">
+									<el-input v-model="partnerForm.contactName" placeholder="输入联系人"></el-input>
+								</el-form-item>
+							</el-col>
+							<el-col :span="12">
+								<el-form-item label="企业传真" prop="fax">
+									<el-input v-model="partnerForm.fax" placeholder="输入企业传真"></el-input>
+								</el-form-item>
+							</el-col>
+						</el-row>
+						<el-row>
+							<el-col :span="12">
+								<el-form-item label="企业固话" prop="telphone">
+									<el-input v-model="partnerForm.telphone" placeholder="例如：010-12345678"></el-input>
+								</el-form-item>
+							</el-col>
+							<el-col :span="12">
+								<el-form-item label="LOGO">
 									<el-upload
 									  class="uploader"
 									  accept="image/jpeg, image/png"
@@ -129,7 +125,8 @@
 									</el-upload>
 								</el-form-item>
 							</el-col>
-							<el-col :span="12">
+						</el-row>
+							<!-- <el-col :span="12">
 								<el-form-item label="营业执照图片" prop="licensePic">
 									<el-upload
 									  class="uploader lisence-uploader"
@@ -144,9 +141,8 @@
 									  <i v-else class="el-icon-plus"></i>
 									</el-upload>
 								</el-form-item>
-							</el-col>
-						</el-row>
-						<el-row>
+							</el-col> -->
+					<!-- 	<el-row>
 							<el-col :span="12">
 								<el-form-item label="法人身份证正面" prop="idcardPicFront">
 									<el-upload
@@ -180,7 +176,7 @@
 									</el-upload>
 								</el-form-item>
 							</el-col>
-						</el-row>
+						</el-row> -->
 						<el-form-item label="企业简介" prop="note">
 							<el-input type="textarea" :rows="4" v-model="partnerForm.note" placeholder="请输入企业简介"></el-input>
 						</el-form-item>

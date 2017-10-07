@@ -112,7 +112,7 @@
 							</el-col>
 						</el-row>
 						<el-form-item label="企业简介：" prop="note">
-							<span>{{partnerForm.note}}</span>
+							<p>{{partnerForm.note}}</p>
 						</el-form-item>
 					</el-form>
 				</el-col>

@@ -171,6 +171,7 @@
 					typeName: row.typeName,
 					note: row.note
 				}
+				this.$refs.typeForm.resetFields()
 				this.typeFormTitle = '编辑商家类型'
 				this.typeFormVisible = true
 			},

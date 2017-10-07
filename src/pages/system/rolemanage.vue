@@ -37,10 +37,10 @@
 						</el-switch>
 	      	</template>
 	      </el-table-column>
-	      <el-table-column label="操作">
+	      <el-table-column label="操作" width="180">
 	        <template scope="scope">
-	        	<el-button size="small" type="info" @click="handleFunc(scope.row)">权限</el-button>
-	          <el-button size="small" type="warning" @click="handleEdit(scope.row)">编辑</el-button>
+	        	<el-button size="small" type="warning" @click="handleEdit(scope.row)">编辑</el-button>
+	        	<el-button size="small" type="info" @click="handleFunc(scope.row)">功能点配置</el-button>
 	          <!-- <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button> -->
 	        </template>
 	      </el-table-column>
@@ -76,9 +76,9 @@
 	    		<el-button type="primary" @click="submitForm">确定</el-button>
 	    	</div>
 	    </el-dialog>
-	    <!-- 权限配置 -->
+	    <!-- 功能点配置 -->
 			<el-dialog 
-				title="权限配置"
+				title="功能点配置"
 				size="tiny" 
 				:visible.sync="funcTreeVisible" 
 				class="dialog-ztree">
@@ -215,6 +215,7 @@
 					roleName: row.roleName,
 					roleDesc: row.roleDesc
 				}
+				this.$refs.roleForm.resetFields()
 				this.roleFormTitle = '编辑角色'
 				this.roleFormVisible = true;
 			},
@@ -335,7 +336,7 @@
 					roleId: this.selectedRole.roleId
 				}
 				getRoleFunctions(params).then(res => {
-					console.log(res)
+					// console.log(res)
 					if(res.data.code === '0001') {
 						let treeObj = $.fn.zTree.getZTreeObj("functionTree");
 						let nodes = treeObj.transformToArray(treeObj.getNodes()).filter(node => node.isParent === false);

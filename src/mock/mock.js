@@ -1,4 +1,4 @@
-import axios from 'axios'
+ import axios from 'axios'
 import Utils from '@/assets/js/utils'
 import Region from '@/assets/js/region'
 import MockAdapter from 'axios-mock-adapter'
