@@ -4,7 +4,6 @@ import CASLogin from '@/pages/casLogin'
 import Register from '@/pages/register'
 import Expired from '@/pages/Expired'
 import NotFound from '@/pages/NotFound'
-import NoPermission from '@/pages/NoPermission'
 
 import BaseFindPasswd from '@/pages/base/findpasswd'
 import BaseSendEmail from '@/pages/base/sendemail'
@@ -41,8 +40,8 @@ const routes = [
   {
     path: '/login',
     name: '欢迎登录',
-    // component: Login
-    component: CASLogin
+    component: Login
+    // component: CASLogin
   },
   {
     path: '/register',
@@ -171,11 +170,6 @@ const routes = [
         component: AdminPartnerTypeManage,
       },
     ]
-  },
-  {
-    path: '/nopermission',
-    name: 'nopermission',
-    component: NoPermission
   },
   {
     path: '/expired',

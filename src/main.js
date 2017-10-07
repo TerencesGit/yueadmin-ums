@@ -81,6 +81,8 @@ router.afterEach((to, from, next) => {
   NProgress.done()
 })
 axios.interceptors.request.use(config => {
+  // console.log(Utils.getToken('CSRF_TOKEN'))
+  config.headers['X-Csrf-Token'] = Utils.getToken('CSRF_TOKEN');
   return config;
 }, error => { 
   return Promise.reject(error)
@@ -89,10 +91,11 @@ axios.interceptors.response.use(res => {
   if (res.data.code === '0000') {
     router.push('/login')
     return Promise.reject(res)
-  } else if (res.data.code === '9999') {
-  	router.push('/nopermission')
-    return Promise.reject(res)
-  }
+  } 
+  // else if (res.data.code === '9999') {
+  // 	router.push('/nopermission')
+  //   return Promise.reject(res)
+  // }
   return res;
 }, err => {
   return Promise.reject(err)

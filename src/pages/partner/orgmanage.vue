@@ -232,7 +232,7 @@
 					</el-col>
 					<el-col :span="12">
 						<el-form-item label="注册时间：">
-							<span>{{staffInfo.createTime}}</span>
+							<span>{{staffInfo.createTime | formatDate}}</span>
 						</el-form-item>
 					</el-col>
 				</el-row>
