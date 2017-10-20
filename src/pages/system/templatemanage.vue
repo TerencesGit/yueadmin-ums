@@ -226,7 +226,6 @@
 					name: row.name,
 					note: row.note,
 				}
-				this.$refs.templateForm.resetFields()
 				this.fileList = [{
 					uid: new Date().getTime(),
 					name: row.templateFileName,

@@ -30,10 +30,10 @@
 							<i class="fa fa-edit"></i>
 							编辑
 						</el-button>
-						<el-button size="small" type="danger" @click="handleDelete">
+						<!-- <el-button size="small" type="danger" @click="handleDelete">
 							<i class="el-icon-delete"></i>
 							删除
-						</el-button>
+						</el-button> -->
 					</el-row>
 					<h3 class="page-header">当前功能点</h3>
 					<el-table
@@ -326,7 +326,6 @@
 	      	contextRoot: currModule.contextRoot,
 	      	note: currModule.note,
 				}
-				this.$refs.moduleForm.resetFields()
 				this.moduleFormTitle = '编辑系统模块'
 				this.moduleFormVisible = true
 			},
@@ -480,7 +479,6 @@
       		status: this.checkedNode.status,
       		isMenu: this.checkedNode.ismenu,
       	}
-      	this.$refs.funcForm.resetFields()
       	this.funcFormTitle = '编辑功能点'
       	this.funcFormVisible = true
       },

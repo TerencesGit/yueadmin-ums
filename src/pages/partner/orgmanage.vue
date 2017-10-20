@@ -184,7 +184,7 @@
 					</el-col>
 					<el-col :span="12">
 						<el-form-item label="性别：">
-							<span>{{staffInfo.sexaul === 0 ? '女' : '男' }}</span>
+							<span>{{staffInfo.sexual === 0 ? '女' : '男' }}</span>
 						</el-form-item>
 					</el-col>
 				</el-row>
@@ -556,7 +556,6 @@
       		name: this.checkedNode.name,
       		note: this.checkedNode.note
       	}
-      	this.$refs.organizeForm.resetFields()
       	this.orgFormTitle = '编辑部门'
       	this.orgFormVisible = true
       },

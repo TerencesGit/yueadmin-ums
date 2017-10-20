@@ -131,11 +131,11 @@
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;
-				this.getTemplateList()
+				this.getPartnerTypeList()
 			},
 			handleCurrentChange(val) {
 				this.pageNo = val;
-				this.getTemplateList()
+				this.getPartnerTypeList()
 			},
 			getPartnerTypeList() {
 				let params = {
@@ -171,7 +171,6 @@
 					typeName: row.typeName,
 					note: row.note
 				}
-				this.$refs.typeForm.resetFields()
 				this.typeFormTitle = '编辑商家类型'
 				this.typeFormVisible = true
 			},

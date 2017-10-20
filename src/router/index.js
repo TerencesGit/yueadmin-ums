@@ -31,6 +31,7 @@ import AdminFuncManage from '@/pages/system/funcmanage'
 import AdminRoleManage from '@/pages/system/rolemanage'
 import AdminTemplateManage from '@/pages/system/templatemanage'
 import AdminPartnerTypeManage from '@/pages/system/partnertypemanage'
+import AdminAccountManage from '@/pages/system/accountmanage'
 
 const routes = [
   {
@@ -40,8 +41,8 @@ const routes = [
   {
     path: '/login',
     name: '欢迎登录',
-    // component: Login
-    component: CASLogin
+    component: Login
+    // component: CASLogin
   },
   {
     path: '/register',
@@ -168,6 +169,11 @@ const routes = [
         path: 'partnertypemanage',
         name: '商家类型管理',
         component: AdminPartnerTypeManage,
+      },
+      {
+        path: 'accountmanage',
+        name: '账户管理',
+        component: AdminAccountManage,
       },
     ]
   },

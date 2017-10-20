@@ -1,4 +1,4 @@
- import axios from 'axios'
+import axios from 'axios'
 import Utils from '@/assets/js/utils'
 import Region from '@/assets/js/region'
 import MockAdapter from 'axios-mock-adapter'
@@ -979,7 +979,7 @@ export default {
 			let { moduleId } = config.params;
 			let functions = _FunctionList.filter(func => func.moduleId == moduleId)
 			// if(functions.length === 0) {}
-			retObj.result = {
+      retObj.result = {
 				functions
 			}
 			return new Promise((resolve, reject) => {
@@ -1134,19 +1134,23 @@ export default {
 		})
 		// 获取角色关联的功能点
 		mock.onGet('/adminInter/getRoleFunctions.do').reply(config => {
-			let { roleId } = config.params
+			let { roleId } = config.params;
 			let funcIdList = _RoleFuncs.filter(rolefunc => rolefunc.roleId == roleId).map(func => func.funcId)
-			let _funcList = [];
+			let roleFuncs = [];
 			funcIdList.forEach(funcId => {
-				_funcList.push(
-					_FunctionList.filter(func => func.funcId == funcId)[0]
-				)
+				_FunctionList.forEach(func => {
+					if(func.funcId === funcId) {
+						roleFuncs.push(
+							func
+						)
+					}
+				})
 			})
 			let retObj = {
 				code: '0001',
 				message: '操作成功',
 				result: {
-					roleFuncs: _funcList
+					roleFuncs
 				}
 			}
 			return new Promise((resolve, reject) => {
@@ -1343,6 +1347,96 @@ export default {
 				})
 			}
 			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取系统用户列表
+		mock.onGet('/adminInter/getSysUsers.do').reply(config => {
+			let { pageNo, pageSize } = config.params;
+			let userList = _UserList;
+			let total = userList.length;
+			let userPage = userList.filter((part, index) => 
+					index < pageNo * pageSize && index >= (pageNo - 1) * pageSize);
+			userPage.forEach(user => {
+  	  	user.orgName = _Organizes.filter(org => org.orgId == user.orgId)[0].name;
+  	  	_TitleList.filter(title => {
+  	  		if(title.id == user.titleId) {
+  	  			user.titleName = title.titleName
+  	  		}
+  	  	})
+  	  	_PartnerList.filter(part => {
+  	  		if(part.id == user.partnerId) {
+  	  			user.partnerName = part.name
+  	  		}
+  	  	})
+  	  })
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					userList: userPage,
+					pageInfo: {
+						total
+					}
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 根据userId获取员工信息
+		mock.onGet('/adminInter/getSysUserInfoById.do').reply(config => {
+			let { userId } = config.params;
+			let userInfo = _UserList.filter(user => user.userId == userId)[0];
+			userInfo.areaName = userInfo.areaId ? Region.filter(region => region.id === userInfo.areaId)[0].name : '未设置';
+			_Organizes.filter(org => {
+				if(userInfo.orgId && org.orgId == userInfo.orgId) {
+					userInfo.orgName = org.name
+				}
+			})
+			let avatarObj, idcardPicFrontObj, idcardPicBackObj;
+			_FileList.filter(file => {
+				if(file.fileUuid === userInfo.avatar) {
+					avatarObj = file
+				}
+				if(file.fileUuid === userInfo.idcardPicFront) {
+					idcardPicFrontObj = file
+				}
+				if(file.fileUuid === userInfo.idcardPicBack) {
+					idcardPicBackObj = file
+				}
+			})
+			let fileInfos = {};
+			fileInfos[userInfo.avatar] = avatarObj;
+			fileInfos[userInfo.idcardPicFront] = idcardPicFrontObj;
+			fileInfos[userInfo.idcardPicBack] = idcardPicBackObj;
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					userInfo,
+					fileInfos,
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+						resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新用户状态
+		mock.onPost('/adminInter/updateUserStatus.do').reply(config => {
+			let { userId, status } = JSON.parse(config.data);
+			_UserList.filter(user => {
+				if(user.userId === userId) {
+					user.status = status
+				}
+			})
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 					resolve([200, retObj])

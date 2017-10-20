@@ -215,7 +215,6 @@
 					roleName: row.roleName,
 					roleDesc: row.roleDesc
 				}
-				this.$refs.roleForm.resetFields()
 				this.roleFormTitle = '编辑角色'
 				this.roleFormVisible = true;
 			},
@@ -276,7 +275,10 @@
 			},
 			// 获取系统功能树
 			getFuncTree() {
-				// if(this.funTreeList.length !== 0) return;
+				if(this.funTreeList.length !== 0) {
+					this.getRoleFuncs()
+					return;
+				};
 				this.treeLoading = true;
 				let data = {
 					moduleId: this.moduleId
@@ -321,6 +323,7 @@
 				      zNode.push(treeObj)
 				    })
 				    $.fn.zTree.init($('#functionTree'), setting, zNode);
+				    this.getRoleFuncs()
 					} else {
 						this.$message.error(res.data.message)
 					}
@@ -366,7 +369,6 @@
 				this.selectedRole = row
 				this.funcTreeVisible = true
 				this.getFuncTree()
-				this.getRoleFuncs()
 			},
 			// 权限提交
 			roleFuncSubmit() {

@@ -241,8 +241,8 @@
 				},
 				provinceId: '',
 				cityId: '',
-				uploadAction: '/uploadFileUrl',
-				// uploadAction: '/ums/baseInter/uploadFile.do',
+				// uploadAction: '/uploadFileUrl',
+				uploadAction: '/ums/baseInter/uploadFile.do',
 				avatarUrl: '',
 				idcardFrontUrl: '',
 				idcardBackUrl: '',
@@ -395,6 +395,9 @@
       	// console.log(this.userForm)
       	// this.idcardFrontUrl = this.userForm.idcardFrontUrl;
       	// this.idcardBackUrl = this.userForm.idcardBackUrl;
+      	if(!this.userForm.birthday) {
+      		this.userForm.birthday = new Date()
+      	}
       	if(this.userForm.areaId && !this.areaFormat) {
       		this.formatRegion(this.userForm.areaId)
 					this.areaFormat = true;
