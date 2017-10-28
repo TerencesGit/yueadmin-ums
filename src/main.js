@@ -12,6 +12,7 @@ import ElementUI from 'element-ui'
 import NProgress from 'nprogress'
 import moment from 'moment'
 import Mock from './mock'
+import Md5 from '@/assets/js/md5'
 import 'element-ui/lib/theme-default/index.css'
 import 'font-awesome/css/font-awesome.min.css'
 import 'nprogress/nprogress.css'
@@ -22,6 +23,7 @@ Mock.bootstrap()
 Vue.use(Vuex)
 Vue.use(Router)
 Vue.use(ElementUI)
+Vue.prototype.$Md5 = Md5
 Vue.prototype.$moment = moment
 Vue.prototype.$nprogress = NProgress
 Vue.config.productionTip = false
@@ -56,6 +58,7 @@ Vue.prototype.$catchError = (err) => {
     return;
   }
   if(err.data.code) {
+    if(err.data.code === '0000') return;
     ElementUI.Message(err.data.message)
   } else {
     ElementUI.Message('服务器响应超时')

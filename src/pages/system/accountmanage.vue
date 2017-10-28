@@ -13,7 +13,7 @@
       style="width: 100%">
       <el-table-column type="index" width="55"></el-table-column>
       <el-table-column prop="userId" label="用户ID" sortable></el-table-column>
-      <el-table-column prop="name" label="昵称"></el-table-column>
+      <el-table-column prop="name" label="用户名"></el-table-column>
       <!-- <el-table-column prop="realname" label="真实姓名"></el-table-column> -->
       <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
       <el-table-column prop="partnerName" label="企业名称"></el-table-column>
@@ -49,8 +49,8 @@
         :total="total">
       </el-pagination>
     </el-row>
-    <!-- 员工信息 -->
-		<el-dialog :visible.sync="userInfoVisible" title="员工信息">
+    <!-- 账户信息 -->
+		<el-dialog :visible.sync="userInfoVisible" title="账户信息">
 			<el-form :model="userInfo" label-width="120px" v-loading="userLoading">
 				<el-row>
 					<el-col :span="12" :offset="5">

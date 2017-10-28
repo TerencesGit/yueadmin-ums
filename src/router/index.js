@@ -1,9 +1,9 @@
 import Layout from '@/components/Layout'
-import Login from '@/pages/login'
-import CASLogin from '@/pages/casLogin'
-import Register from '@/pages/register'
-import Expired from '@/pages/Expired'
-import NotFound from '@/pages/NotFound'
+
+import Login from '@/pages/base/login'
+import CASLogin from '@/pages/base/casLogin'
+import Register from '@/pages/base/register'
+import NotFound from '@/pages/base/NotFound'
 
 import BaseFindPasswd from '@/pages/base/findpasswd'
 import BaseSendEmail from '@/pages/base/sendemail'
@@ -40,13 +40,13 @@ const routes = [
   },
   {
     path: '/login',
-    name: '欢迎登录',
+    name: '悦视觉.登录',
     component: Login
     // component: CASLogin
   },
   {
     path: '/register',
-    name: ' ',
+    name: '悦视觉.注册',
     component: Register
   },
   {
@@ -178,18 +178,9 @@ const routes = [
     ]
   },
   {
-    path: '/expired',
-    name: 'expired',
-    component: Expired
-  },
-  {
-    path: '/notfound',
-    name: 'notfound',
+    path: '*',
+    name: '404',
     component: NotFound
   },
-  {
-  	path: '*',
-  	redirect: '/notfound'
-  }
 ]
 export default routes
