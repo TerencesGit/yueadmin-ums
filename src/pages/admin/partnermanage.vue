@@ -16,6 +16,7 @@
     </el-row>
 		<el-table 
       border 
+      stripe
       :data="partnerList" 
       v-loading="loading" 
       highlight-current-row
@@ -40,9 +41,11 @@
 					</el-switch>
       	</template>
       </el-table-column>
-      <el-table-column label="商家信息">
+      <el-table-column label="商家信息" width="180">
         <template scope="scope">
         	<el-button size="small" type="info" @click="handleDetail(scope.row)">查看</el-button>
+        <!-- 	<el-button size="small" type="info" @click="showStaffList(scope.row)">员工列表</el-button> -->
+        	<router-link class="el-button el-button--info el-button--small" :to='"/domain/staffmanage?partnerId="+scope.row.partnerId' target="_blank">员工列表</router-link>
         </template>
       </el-table-column>
     </el-table>
@@ -180,49 +183,11 @@
 					this.$catchError(err)
 				})
 			},
-			getTypeList() {
-				let params = {
-					pageNo: 1,
-					pageSize: 100
-				}
-				this.tpyeLoading = true;
-				getPartnerTypes(params).then(res => {
-					this.tpyeLoading = false
-					if(res.data.code === '0001') {
-						this.typeList = res.data.result.partnerTypes;
-					} else {
-						this.$message.error(res.data.message)
-					}
-				}).catch(err => {
-					console.log(err)
-					this.tpyeLoading = false;
-					this.$catchError(err)
+			showStaffList(row) {
+				this.$router.push({
+					path: `/domain/partnerstaff?partnerId=${row.partnerId}`,
 				})
 			},
-			handlePartType(row) {
-				this.partInfo = row;
-				this.typeId = row.typeId;
-				this.typeList.length === 0 && this.getTypeList()
-				this.typeListVisible = true
-			},
-			setTypeSubmit() {
-				let data = {
-					partnerId: this.partInfo.partnerId,
-					typeId: this.typeId
-				}
-				updatePartType(data).then(res => {
-					if(res.data.code === '0001') {
-						this.$message.success(res.data.message)
-						this.getPartnerList()
-					} else {
-						this.$message.error(res.data.message)
-					}
-				}).catch(err => {
-					console.log(err)
-					this.$catchError(err)
-				})
-				this.typeListVisible = false
-			}
 		},
 		mounted() {
 			this.getPartnerList()

@@ -26,6 +26,7 @@ import DomainPartnerVerify from '@/pages/admin/partnerverify'
 import DomainContractManage from '@/pages/admin/contractmanage'
 import DomainVerifyInfo from '@/pages/admin/verifyinfo'
 import DomainPartnerInfo from '@/pages/admin/partnerinfo'
+import DomainPartStaffs from '@/pages/admin/partnerstaffs'
 
 import AdminFuncManage from '@/pages/system/funcmanage'
 import AdminRoleManage from '@/pages/system/rolemanage'
@@ -176,6 +177,11 @@ const routes = [
         component: AdminAccountManage,
       },
     ]
+  },
+  {
+    path: '/domain/staffmanage',
+    name: '企业员工列表',
+    component: DomainPartStaffs
   },
   {
     path: '*',

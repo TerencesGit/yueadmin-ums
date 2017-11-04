@@ -14,9 +14,10 @@
       <el-table-column type="index" width="60"></el-table-column>
       <el-table-column prop="typeId" label="商家类型编号" sortable width="150"></el-table-column>
       <el-table-column prop="typeName" label="商家类型名称"></el-table-column>
+      <el-table-column prop="partnerLevel" label="商家类型等级" :formatter="formatLevel"></el-table-column>
       <el-table-column prop="note" label="商家类型描述"></el-table-column>
       <el-table-column label="更新时间" sortable width="180" :formatter="formatTime"></el-table-column>
-      <el-table-column prop="status" label="状态">
+      <el-table-column prop="status" label="状态" width="100">
       	<template scope="scope">
       		<el-switch
 					  v-model="scope.row.status"
@@ -28,7 +29,7 @@
 					</el-switch>
       	</template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="180">
         <template scope="scope">
         	<!-- <el-button size="small" type="info" @click="handleDetail(scope.row)">查看</el-button> -->
           <el-button size="small" type="warning" @click="handleEdit(scope.row)">编辑</el-button>
@@ -56,6 +57,15 @@
 		    		<el-form-item label="商家类型名称" prop="typeName">
 		    			<el-input v-model="typeForm.typeName" placeholder="商家类型名称"></el-input>
 		    		</el-form-item>
+		    		<el-form-item label="商家类型等级" prop="partnerLevel">
+							<el-select v-model="typeForm.partnerLevel" style="width: 100%" placeholder="选择商家等级">
+								<el-option label="一级" :value="1"></el-option>
+								<el-option label="二级" :value="2"></el-option>
+								<el-option label="三级" :value="3"></el-option>
+								<el-option label="四级" :value="4"></el-option>
+								<el-option label="五级" :value="5"></el-option>
+							</el-select>
+						</el-form-item>
 		    		<el-form-item label="商家类型描述" prop="note">
 		    			<el-input type="textarea" v-model="typeForm.note" placeholder="商家类型描述"></el-input>
 		    		</el-form-item>
@@ -106,11 +116,15 @@
 				typeForm: {
 					typeId: '',
 					typeName: '',
+					partnerLevel: 1,
 					note: ''
 				},
 				rules: {
 					typeName: [
 						{ required: true, message: '请输入商家类型名称', trigger: 'blur'}
+					],
+					partnerLevel: [
+						{ required: true, type: 'number', message: '请输入商家五级价格', trigger: 'blur'}
 					],
 					note: [
 						{ required: true, message: '请输入备注', trigger: 'blur'}
@@ -137,6 +151,10 @@
 				this.pageNo = val;
 				this.getPartnerTypeList()
 			},
+			formatLevel(row) {
+				let level = ['零级','一级','二级','三级','四级','五级'];
+				return level[row.partnerLevel];
+			},
 			getPartnerTypeList() {
 				let params = {
 					pageNo: this.pageNo,
@@ -160,7 +178,8 @@
 			handleAdd(row) {
 				this.typeForm = {
 					typeName: '',
-					note: ''
+					partnerLevel: 1,
+					note: '',
 				}
 				this.typeFormTitle = '新建商家类型'
 				this.typeFormVisible = true
@@ -169,8 +188,10 @@
 				this.typeForm = {
 					typeId: row.typeId,
 					typeName: row.typeName,
-					note: row.note
+					partnerLevel: row.partnerLevel,
+					note: row.note,
 				}
+				console.log(this.typeForm)
 				this.typeFormTitle = '编辑商家类型'
 				this.typeFormVisible = true
 			},
@@ -178,6 +199,7 @@
 				this.$refs.typeForm.validate(valid => {
 					if(!valid) return;
 					let data = Object.assign({}, this.typeForm)
+					console.log(data)
 					if(data.typeId) {
 						updatePartnerType(data).then(res => {
 							if(res.data.code === '0001') {

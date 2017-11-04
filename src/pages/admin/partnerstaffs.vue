@@ -1,28 +1,8 @@
 <template>
-	<section>
-		<div v-title :data-title="this.$route.name"></div>
-    <el-row class="toolbar">
-		  <el-form inline :model="filter">
-		  	<el-radio-group v-model="filter.isLogin" @change="isLoginChange">
-			    <el-radio-button :label="1">已通过</el-radio-button>
-			    <el-radio-button :label="0">待审核</el-radio-button>
-			  </el-radio-group>
-		  	<el-form-item>
-		  		<el-input v-model="filter.email" placeholder="邮箱号"></el-input>
-		  	</el-form-item>
-		  	<el-form-item>
-		  		<el-input v-model="filter.mobile" placeholder="手机号"></el-input>
-		  	</el-form-item>
-		  	<el-form-item>
-		  		<el-input v-model="filter.partnerName" placeholder="企业名称"></el-input>
-		  	</el-form-item>
-		  	<el-form-item>
-		  		<el-button type="primary" :disabled="disabled" @click="getUserList">搜索</el-button>
-		  	</el-form-item>
-		  </el-form>
-      <!-- <el-button type="primary" @click="handleAdd">新增用户</el-button> -->
-    </el-row>
+	<section class="container">
+		<div v-title :data-title="userList[0].partnerName"></div>
     <!-- 账户列表 -->
+    <h3 class="title">{{userList[0].partnerName}}</h3>
     <el-table 
       border 
       :data="userList" 
@@ -32,27 +12,13 @@
       <el-table-column type="index" width="55"></el-table-column>
       <el-table-column prop="userId" label="用户ID" sortable></el-table-column>
       <el-table-column prop="name" label="用户名"></el-table-column>
-      <!-- <el-table-column prop="realname" label="真实姓名"></el-table-column> -->
       <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
-      <el-table-column prop="partnerName" label="企业名称"></el-table-column>
+      <!-- <el-table-column prop="partnerName" label="企业名称"></el-table-column> -->
+      <el-table-column prop="titleName" label="职位"></el-table-column>
       <el-table-column label="注册时间" sortable :formatter="formatTime"></el-table-column>
-      <el-table-column prop="status" label="状态">
-      	<template scope="scope">
-      		<el-switch
-					  v-model="scope.row.status"
-					  :on-value="1"
-					  :off-value="0"
-					  on-text="启用"
-					  off-text="禁用"
-					  @change="handleStatus(scope.row)">
-					</el-switch>
-      	</template>
-      </el-table-column>
       <el-table-column label="详情">
         <template scope="scope">
-        	<!-- <el-button size="small" type="info" @click="handleDetail(scope.row)">查看</el-button> -->
-          <el-button v-if="scope.row.isLogin === 0" size="small" type="info" @click="handleShow(scope.row)">审核</el-button>
-          <el-button v-else size="small" type="primary" @click="handleShow(scope.row)">查看</el-button>
+          <el-button size="small" type="primary" @click="handleShow(scope.row)">查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -61,8 +27,8 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="filter.pageNo"
-        :page-size="filter.pageSize"
+        :current-page="pageNo"
+        :page-size="pageSize"
         :page-sizes="[10, 20, 30, 40]"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total">
@@ -168,20 +134,15 @@
 	</section>
 </template>
 <script>
-	import { getSysUsers, getSysUserInfoById, updateUserStatus, updateUserIsLogin } from '@/api'
+	import { getPartnerUsers, getPartnerUserInfoById } from '@/api'
 	export default {
 		data() {
 			return {
+				partnerId: '',
 				loading: false,
+				pageNo: 1,
+				pageSize: 10,
 				total: 0,
-				filter: {
-					email: '',
-					mobile: '',
-					partnerName: '',
-					isLogin: 1,
-					pageNo: 1,
-					pageSize: 10,
-				},
 				userList: [],
 				userInfo: {},
 				userInfoVisible: false,
@@ -193,22 +154,24 @@
 				return this.$moment(row.createTime).format('YYYY-MM-DD')
 			},
 			handleSizeChange(val) {
-				this.filter.pageSize = val;
+				this.pageSize = val;
 				this.getUserList()
 			},
 			handleCurrentChange(val) {
-				this.filter.pageNo = val;
+				this.pageNo = val;
 				this.getUserList()
 			},
-			isLoginChange(val) {
-				this.filter.isLogin = val;
-				this.getUserList()
+			handleBack() {
+				this.$router.back()
 			},
 			getUserList() {
-				let params = Object.assign({}, this.filter);
-				console.log(params)
+				let params = {
+					pageNo: this.pageNo,
+					pageSize: this.pageSize,
+					partnerId: this.partnerId,
+				}
 				this.loading = true;
-				getSysUsers(params).then(res => {
+				getPartnerUsers(params).then(res => {
 					this.loading = false
 					if(res.data.code === '0001') {
 						this.userList = res.data.result.userList;
@@ -230,7 +193,7 @@
 					userId: row.userId
 				}
 				this.userLoading = true;
-				getSysUserInfoById(params).then(res => {
+				getPartnerUserInfoById(params).then(res => {
 					this.userLoading = false;
 					let userInfo = res.data.result.userInfo;
 					let fileInfos = res.data.result.fileInfos;
@@ -246,60 +209,20 @@
 					this.$catchError(err)
 				})
       },
-			handleStatus(row) {
-				let data = {
-					userId: row.userId,
-					status: row.status
-				}
-				updateUserStatus(data).then(res => {
-					if(res.data.code === '0001') {
-						this.$message.success(res.data.message)
-					} else {
-						row.status = row.status === 0 ? 1 : 0;
-						this.$message.error(res.data.message)
-					}
-				}).catch(err => {
-					console.log(err)
-					row.status = row.status === 0 ? 1 : 0;
-					this.$catchError(err)
-				})
-			},
-			updateIsLogin(isLogin) {
-				console.log(isLogin)
-				let data = {
-					userId: this.userInfo.userId,
-					isLogin,
-				}
-				updateUserIsLogin(data).then(res => {
-					this.userInfoVisible = false;
-					if(res.data.code === '0001') {
-						this.$message.success(res.data.message)
-						this.getUserList()
-					} else {
-						this.$message.error(res.data.message)
-					}
-				}).catch(err => {
-					this.userInfoVisible = false;
-					console.log(err)
-					this.$catchError(err)
-				})
-			}
-		},
-		computed: {
-			disabled () {
-				if(this.filter.email || this.filter.mobile || this.filter.partnerName) {
-					return false;
-				} else {
-					return true;
-				}
-			}
 		},
 		mounted() {
-			this.getUserList()
+			this.partnerId = this.$route.query.partnerId;
+			this.partnerId && this.getUserList()
 		}
 	}
 </script>
 <style scoped lang="scss">
+	.title {
+		margin: 15px 0;
+		padding: 15px;
+		text-align: center;
+		background: #f0f0f0;
+	}
 	.avatar {
 		width: 160px;
 		height: 160px;

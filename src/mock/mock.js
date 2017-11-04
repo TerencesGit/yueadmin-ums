@@ -1274,10 +1274,11 @@ export default {
 		})
 		// 新建商家类型
 		mock.onPost('/adminInter/createPartnerType.do').reply(config => {
-			let { typeName, note } = JSON.parse(config.data);
+			let { typeName, partnerLevel, note } = JSON.parse(config.data);
 			_PartnerTypeList.push({
 				typeId: new Date().getTime(),
 				typeName,
+				partnerLevel,
 				note,
 				status: 1
 			})
@@ -1290,11 +1291,12 @@ export default {
 		})
 		// 更新商家类型
 		mock.onPost('/adminInter/updatePartnerType.do').reply(config => {
-			let { typeId, typeName, note } = JSON.parse(config.data);
+			let { typeId, typeName, partnerLevel, note } = JSON.parse(config.data);
 			_PartnerTypeList.filter(type => {
 				if(type.typeId == typeId) {
 					type.typeName = typeName;
-					type.note = note
+					type.partnerLevel = partnerLevel;
+					type.note = note;
 				}
 			})
 			retObj.result = {}
@@ -1355,8 +1357,9 @@ export default {
 		})
 		// 获取系统用户列表
 		mock.onGet('/adminInter/getSysUsers.do').reply(config => {
-			let { pageNo, pageSize } = config.params;
-			let userList = _UserList;
+			let { pageNo, pageSize, isLogin, email, mobile, partnerName } = config.params;
+			console.log(pageNo, pageSize, isLogin, email, mobile, partnerName)
+			let userList = _UserList.filter(user => user.isLogin === isLogin);
 			let total = userList.length;
 			let userPage = userList.filter((part, index) => 
 					index < pageNo * pageSize && index >= (pageNo - 1) * pageSize);
@@ -1435,6 +1438,21 @@ export default {
 			_UserList.filter(user => {
 				if(user.userId === userId) {
 					user.status = status
+				}
+			})
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新用户审核状态
+		mock.onPost('/adminInter/updateUserIsLogin.do').reply(config => {
+			let { userId, isLogin } = JSON.parse(config.data);
+			console.log(userId, isLogin)
+			_UserList.filter(user => {
+				if(user.userId === userId) {
+					user.isLogin = isLogin
 				}
 			})
 			return new Promise((resolve, reject) => {
@@ -1703,6 +1721,78 @@ export default {
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取商家用户列表
+		mock.onGet('/domainInter/getPartnerUsers.do').reply(config => {
+			let { pageNo, pageSize, partnerId } = config.params;
+			let userList = _UserList.filter(user => user.partnerId == partnerId);
+			let total = userList.length;
+			let userPage = userList.filter((part, index) => 
+					index < pageNo * pageSize && index >= (pageNo - 1) * pageSize);
+			userPage.forEach(user => {
+  	  	user.orgName = _Organizes.filter(org => org.orgId == user.orgId)[0].name;
+  	  	user.partnerName = _PartnerList.filter(part => part.partnerId == user.partnerId)[0].name;
+  	  	_TitleList.filter(title => {
+  	  		if(title.id == user.titleId) {
+  	  			user.titleName = title.titleName
+  	  		}
+  	  	})
+  	  })
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					userList: userPage,
+					pageInfo: {
+						total
+					}
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 根据userId获取员工信息
+		mock.onGet('/domainInter/getPartnerUserInfoById.do').reply(config => {
+			let { userId } = config.params;
+			let userInfo = _UserList.filter(user => user.userId == userId)[0];
+			userInfo.areaName = userInfo.areaId ? Region.filter(region => region.id === userInfo.areaId)[0].name : '未设置';
+			_Organizes.filter(org => {
+				if(userInfo.orgId && org.orgId == userInfo.orgId) {
+					userInfo.orgName = org.name
+				}
+			})
+			let avatarObj, idcardPicFrontObj, idcardPicBackObj;
+			_FileList.filter(file => {
+				if(file.fileUuid === userInfo.avatar) {
+					avatarObj = file
+				}
+				if(file.fileUuid === userInfo.idcardPicFront) {
+					idcardPicFrontObj = file
+				}
+				if(file.fileUuid === userInfo.idcardPicBack) {
+					idcardPicBackObj = file
+				}
+			})
+			let fileInfos = {};
+			fileInfos[userInfo.avatar] = avatarObj;
+			fileInfos[userInfo.idcardPicFront] = idcardPicFrontObj;
+			fileInfos[userInfo.idcardPicBack] = idcardPicBackObj;
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					userInfo,
+					fileInfos,
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+						resolve([200, retObj])
 				}, 500)
 			})
 		})
