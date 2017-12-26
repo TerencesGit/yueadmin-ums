@@ -23,6 +23,7 @@ import PartnerTitleManage from '@/pages/partner/titlemanage'
 
 import DomainPartnerManage from '@/pages/admin/partnermanage'
 import DomainPartnerVerify from '@/pages/admin/partnerverify'
+import DomainPortalVerify from '@/pages/admin/portalverify'
 import DomainContractManage from '@/pages/admin/contractmanage'
 import DomainVerifyInfo from '@/pages/admin/verifyinfo'
 import DomainPartnerInfo from '@/pages/admin/partnerinfo'
@@ -42,8 +43,8 @@ const routes = [
   {
     path: '/login',
     name: '悦视觉.登录',
-    component: Login
-    // component: CASLogin
+    // component: Login
+    component: CASLogin
   },
   {
     path: '/register',
@@ -119,6 +120,11 @@ const routes = [
     name: '我的商家',
     component: Layout,
     children: [
+      {
+        path: 'portalverify',
+        name: '门户网站审核',
+        component: DomainPortalVerify,
+      },
       {
         path: 'partnerverify',
         name: '商家审核',

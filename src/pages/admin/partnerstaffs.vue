@@ -121,14 +121,8 @@
 				</el-row>
 			</el-form>
 			<div slot="footer">
-				<div v-if="userInfo.isLogin === 0">
-					<el-button @click="updateIsLogin(-1)">驳回</el-button>
-					<el-button type="primary" @click="updateIsLogin(1)">通过</el-button>
-				</div>
-				<div v-else>
-					<el-button @click="userInfoVisible = false">取消</el-button>
-					<el-button type="primary" @click="userInfoVisible = false">确定</el-button>
-				</div>
+				<el-button @click="userInfoVisible = false">取消</el-button>
+				<el-button type="primary" @click="userInfoVisible = false">确定</el-button>
 			</div>
 		</el-dialog>
 	</section>

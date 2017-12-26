@@ -19,7 +19,7 @@ import 'nprogress/nprogress.css'
 import '@/assets/css/base.scss'
 import Utils from '@/assets/js/utils'
 NProgress.configure({ ease: 'ease', speed: 500, minimum: 0.5, showSpinner: false})
-Mock.bootstrap()
+// Mock.bootstrap()
 Vue.use(Vuex)
 Vue.use(Router)
 Vue.use(ElementUI)
@@ -68,15 +68,11 @@ const router = new Router({
   routes
 })
 router.beforeEach((to, from, next) => {
-  Vue.prototype.$fromPath = from.path;
+  Vue.prototype.$fromPath = from.path === '/register' ? '/' : from.path;
   // let user = Utils.getCookie('userId');
   // let logRequired = to.path.indexOf('account') !== -1 || 
   //                   to.path.indexOf('admin') !== -1 ||
   //                   to.path.indexOf('system') !== -1;
-  // if(logRequired && !user) {
-  //   // ElementUI.Message('尚未登录或当前会话已过期')
-  //   return router.push('/login')
-  // }
   NProgress.start()
   next()
 })

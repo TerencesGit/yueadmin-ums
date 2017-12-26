@@ -4,7 +4,7 @@ import Region from '@/assets/js/region'
 import MockAdapter from 'axios-mock-adapter'
 import { Menus, FileList, UserList, PartnerList, OrganizeList, ModuleList, FunctionList, 
 				TitleList, RoleList, OrgRoles, RoleFuncs, ContractTempList, 
-				PartnerTypeList, TypeRoles, Contracts } from './data/user'
+				PartnerTypeList, TypeRoles, Contracts, PortalList } from './data/user'
 let _Menus = Menus,
 		_FileList = FileList,
 		_UserList = UserList,
@@ -19,7 +19,8 @@ let _Menus = Menus,
 		_ContractTempList = ContractTempList,
 		_PartnerTypeList = PartnerTypeList,
 		_TypeRoles = TypeRoles,
-		_Contracts = Contracts;
+		_Contracts = Contracts,
+		_PortalList = PortalList;
 const retObj = {
 	code: '0001',
 	message: '操作成功',
@@ -1793,6 +1794,57 @@ export default {
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 						resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 获取门户网站列表
+		mock.onGet('/domainInter/getPortalList.do').reply(config => {
+			let { pageNo, pageSize, status, isVerified } = config.params;
+			let _portalList = _PortalList;
+			if(isVerified >= 0) {
+				_portalList = _PortalList.filter(part => part.isVerified == isVerified)
+			}
+			if(status >= 0) {
+				_portalList = _PortalList.filter(part => part.status == status)
+			}
+			let total = _portalList.length;
+			let portalPage = _portalList.filter((part, index) => 
+				index < pageNo * pageSize && index >= (pageNo - 1) * pageSize);
+			// portalPage.forEach(partner => {
+			// 	_UserList.forEach(user => {
+			// 		if(user.userId === partner.adminId) {
+			// 			partner.adminName = user.name;
+			// 		}
+			// 	})
+			// })
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					portalList: portalPage,
+					pageInfo: {
+						total
+					}
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新门户网站审核状态
+		mock.onPost('/domainInter/updatePortalIsVerified.do').reply(config => {
+			let { userId, isVerified } = JSON.parse(config.data);
+			_PortalList.filter(portal => {
+				if(portal.userId == userId) {
+					portal.isVerified = isVerified
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
 				}, 500)
 			})
 		})
