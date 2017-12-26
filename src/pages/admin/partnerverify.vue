@@ -174,15 +174,15 @@
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;
-				this.getPartnerList()
+				this.handlePageJump()
 			},	
 			handleCurrentChange(val) {
 				this.pageNo = val;
-				this.getPartnerList()
+				this.handlePageJump()
 			},
 			isVerifiedChange(val) {
 				this.isVerified = val;
-				this.getPartnerList()
+				this.handlePageJump()
 			},
 			getPartnerList() {
 				let params = {
@@ -190,6 +190,7 @@
 					pageSize: this.pageSize,
 					isVerified: this.isVerified,
 				}
+				// console.log(params)
 				this.loading = true
 				getPartners(params).then(res => {
 					if(res.data.code === '0001') {
@@ -233,13 +234,29 @@
 					path: `/domain/verifyinfo?partnerId=${row.partnerId}`,
 				})
 			},
-			// 查看驳回原因
+			handlePageJump() {
+				this.$router.push({
+					path: '/domain/partnerverify',
+					query: {
+						pageNo: this.pageNo,
+						pageSize: this.pageSize,
+						isVerified: this.isVerified,
+					}
+				})
+			},
 			handleReason(row) {
-				this.partInfo = row
+				this.partInfo = row;
 				this.rejectInfoVisible = true;
 			},
 		},
-		mounted() {
+		beforeRouteUpdate (to, from, next) {
+			this.getPartnerList()
+			next()
+		},
+		created() {
+			this.pageNo = this.$route.query.pageNo && Number(this.$route.query.pageNo) || 1;
+			this.pageSize = this.$route.query.pageSize && Number(this.$route.query.pageSize) || 10;
+			this.isVerified = this.$route.query.isVerified >= 0 && Number(this.$route.query.isVerified) || 0;
 			this.getPartnerList()
 		}
 	}

@@ -16,12 +16,13 @@
       <el-table-column type="index" width="55"></el-table-column>
       <el-table-column prop="partnerName" label="商家名称"></el-table-column>
       <el-table-column prop="contactName" label="联系人"></el-table-column>
+      <el-table-column prop="titleName" label="职务"></el-table-column>
       <el-table-column prop="email" label="邮箱"></el-table-column>
       <el-table-column prop="mobile" label="手机号"></el-table-column>
       <el-table-column prop="createTime" label="创建时间" sortable :formatter="formatTime" width="160"></el-table-column>
       <el-table-column prop="status" label="状态" :formatter="formatStatus">
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="150">
         <template scope="scope" v-if="scope.row.isVerified === 0">
         	<el-button size="small" type="success" @click="handlePass(scope.row)">通过</el-button>
         	<el-button size="small" type="warning" @click="handleReject(scope.row)">驳回</el-button>
