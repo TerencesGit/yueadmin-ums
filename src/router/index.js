@@ -34,6 +34,7 @@ import AdminRoleManage from '@/pages/system/rolemanage'
 import AdminTemplateManage from '@/pages/system/templatemanage'
 import AdminPartnerTypeManage from '@/pages/system/partnertypemanage'
 import AdminAccountManage from '@/pages/system/accountmanage'
+import AdminUserManage from '@/pages/system/usermanage'
 
 const routes = [
   {
@@ -43,8 +44,8 @@ const routes = [
   {
     path: '/login',
     name: '悦视觉.登录',
-    // component: Login
-    component: CASLogin
+    component: Login
+    // component: CASLogin
   },
   {
     path: '/register',
@@ -188,6 +189,11 @@ const routes = [
     path: '/domain/staffmanage',
     name: '企业员工列表',
     component: DomainPartStaffs
+  },
+  {
+    path: '/admin/usermanage',
+    name: 'C端用户列表',
+    component: AdminUserManage
   },
   {
     path: '*',

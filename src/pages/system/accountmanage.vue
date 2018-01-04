@@ -23,7 +23,7 @@
       <!-- <el-button type="primary" @click="handleAdd">新增用户</el-button> -->
     </el-row>
     <!-- 账户列表 -->
-    <el-table 
+    <el-table  
       border 
       :data="userList" 
       v-loading="loading" 

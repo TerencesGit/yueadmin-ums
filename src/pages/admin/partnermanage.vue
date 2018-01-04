@@ -128,21 +128,31 @@
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;
-				this.getPartnerList()
+				this.handlePageJump()
 			},	
 			handleCurrentChange(val) {
 				this.pageNo = val;
-				this.getPartnerList()
+				this.handlePageJump()
 			},
 			handleSearch() {
 				console.log(Object.assign({}, this.filter))
+			},
+			handlePageJump() {
+				this.$router.push({
+					path: '/domain/partnermanage',
+					query: {
+						pageNo: this.pageNo,
+						pageSize: this.pageSize,
+						isVerified: this.isVerified,
+					}
+				})
 			},
 			getPartnerList() {
 				let params = {
 					pageNo: this.pageNo,
 					pageSize: this.pageSize,
 					partnerName: this.partnerName,
-					isVerified: 1
+					isVerified: 1,
 				}
 				this.loading = true
 				getPartners(params).then(res => {
@@ -189,9 +199,16 @@
 				})
 			},
 		},
-		mounted() {
+		beforeRouteUpdate (to, from, next) {
 			this.getPartnerList()
-		}
+			next()
+		},
+		created() {
+			this.pageNo = this.$route.query.pageNo && Number(this.$route.query.pageNo) || 1;
+			this.pageSize = this.$route.query.pageSize && Number(this.$route.query.pageSize) || 10;
+			this.isVerified = this.$route.query.isVerified >= 0 && Number(this.$route.query.isVerified) || 0;
+			this.getPartnerList()
+		},
 	}
 </script>
 <style scoped lang="scss">

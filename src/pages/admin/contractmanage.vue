@@ -201,17 +201,27 @@
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;
-				this.getContractList()
+				this.handlePageJump()
 			},	
 			handleCurrentChange(val) {
 				this.pageNo = val;
-				this.getContractList()
+				this.handlePageJump()
+			},
+			handlePageJump() {
+				this.$router.push({
+					path: '/domain/contractmanage',
+					query: {
+						pageNo: this.pageNo,
+						pageSize: this.pageSize,
+					}
+				})
 			},
 			getContractList() {
 				let params = {
 					pageNo: this.pageNo,
 					pageSize: this.pageSize
 				}
+				console.log(params)
 				this.loading = true
 				getContracts(params).then(res => {
 					if(res.data.code === '0001') {
@@ -361,8 +371,14 @@
       	})
       }
 		},
-		mounted () {
+		beforeRouteUpdate (to, from, next) {
 			this.getContractList()
-		}
+			next()
+		},
+		created() {
+			this.pageNo = this.$route.query.pageNo && Number(this.$route.query.pageNo) || 1;
+			this.pageSize = this.$route.query.pageSize && Number(this.$route.query.pageSize) || 10;
+			this.getContractList()
+		},
 	}
 </script>

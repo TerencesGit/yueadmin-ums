@@ -4,7 +4,7 @@ import Region from '@/assets/js/region'
 import MockAdapter from 'axios-mock-adapter'
 import { Menus, FileList, UserList, PartnerList, OrganizeList, ModuleList, FunctionList, 
 				TitleList, RoleList, OrgRoles, RoleFuncs, ContractTempList, 
-				PartnerTypeList, TypeRoles, Contracts, PortalList } from './data/user'
+				PartnerTypeList, TypeRoles, Contracts, PortalList, CEndUserList } from './data/user'
 let _Menus = Menus,
 		_FileList = FileList,
 		_UserList = UserList,
@@ -20,7 +20,8 @@ let _Menus = Menus,
 		_PartnerTypeList = PartnerTypeList,
 		_TypeRoles = TypeRoles,
 		_Contracts = Contracts,
-		_PortalList = PortalList;
+		_PortalList = PortalList,
+		_CEndUserList = CEndUserList;
 const retObj = {
 	code: '0001',
 	message: '操作成功',
@@ -1462,6 +1463,57 @@ export default {
 				}, 500)
 			})
 		})
+		// 获取C端用户列表
+		mock.onGet('/adminInter/getCEndUsers.do').reply(config => {
+			let { pageNo, pageSize } = config.params;
+			let userList = _CEndUserList;
+			let total = userList.length;
+			let userPage = userList.filter((part, index) => 
+					index < pageNo * pageSize && index >= (pageNo - 1) * pageSize);
+			// userPage.forEach(user => {
+	  	//   	user.orgName = _Organizes.filter(org => org.orgId == user.orgId)[0].name;
+	  	//   	_TitleList.filter(title => {
+	  	//   		if(title.id == user.titleId) {
+	  	//   			user.titleName = title.titleName
+	  	//   		}
+	  	//   	})
+	  	//   	_PartnerList.filter(part => {
+	  	//   		if(part.id == user.partnerId) {
+	  	//   			user.partnerName = part.name
+	  	//   		}
+	  	//   	})
+	  	//   })
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					userList: userPage,
+					pageInfo: {
+						total
+					}
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新用户备注
+		mock.onPost('/adminInter/updateUserNote.do').reply(config => {
+			let { userId, note } = JSON.parse(config.data);
+			_CEndUserList.filter(user => {
+				if(user.id == userId) {
+					user.note = note;
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
 		// 获得商家分页列表
 		mock.onGet('/domainInter/getPartnerList.do').reply(config => {
 			let { pageNo, pageSize, status, isVerified } = config.params;
@@ -1606,7 +1658,9 @@ export default {
 		mock.onGet('/domainInter/getContracts.do').reply(config => {
 			let { pageNo, pageSize } = config.params;
 			let total = _Contracts.length;
-			_Contracts.forEach(cont => {
+			let contractPage = _Contracts.filter((contract, index) => 
+					index < pageNo * pageSize && index >= (pageNo - 1) * pageSize);
+			contractPage.forEach(cont => {
 				_ContractTempList.filter(temp => {
 					if(temp.templateId == cont.templateId) {
 						cont.templateName = temp.name
@@ -1619,7 +1673,7 @@ export default {
 				})
 			})
 			retObj.result = {
-				contracts: _Contracts,
+				contracts: contractPage,
 				pageInfo: {
 					total
 				}
@@ -1799,16 +1853,18 @@ export default {
 		})
 		// 获取门户网站列表
 		mock.onGet('/domainInter/getPortalList.do').reply(config => {
-			let { pageNo, pageSize, status, isVerified } = config.params;
+			let { pageNo, pageSize, isVerified } = config.params;
+			console.log(pageNo, pageSize, isVerified)
 			let _portalList = _PortalList;
 			if(isVerified >= 0) {
-				_portalList = _PortalList.filter(part => part.isVerified == isVerified)
+				_portalList = _PortalList.filter(port => port.isVerified == isVerified)
 			}
-			if(status >= 0) {
-				_portalList = _PortalList.filter(part => part.status == status)
-			}
+			console.log(_portalList)
+			// if(status >= 0) {
+			// 	_portalList = _PortalList.filter(port => port.status == status)
+			// }
 			let total = _portalList.length;
-			let portalPage = _portalList.filter((part, index) => 
+			let portalPage = _portalList.filter((port, index) => 
 				index < pageNo * pageSize && index >= (pageNo - 1) * pageSize);
 			// portalPage.forEach(partner => {
 			// 	_UserList.forEach(user => {

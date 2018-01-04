@@ -82,15 +82,25 @@
 			},
 			handleSizeChange(val) {
 				this.pageSize = val;
-				this.getPortalList()
+				this.handlePageJump()
 			},	
 			handleCurrentChange(val) {
 				this.pageNo = val;
-				this.getPortalList()
+				this.handlePageJump()
 			},
 			isVerifiedChange(val) {
 				this.isVerified = val;
-				this.getPortalList()
+				this.handlePageJump()
+			},
+			handlePageJump() {
+				this.$router.push({
+					path: '/domain/portalverify',
+					query: {
+						pageNo: this.pageNo,
+						pageSize: this.pageSize,
+						isVerified: this.isVerified,
+					}
+				})
 			},
 			getPortalList() {
 				let params = {
@@ -166,9 +176,16 @@
 				this.rejectInfoVisible = true;
 			},
 		},
-		mounted() {
+		beforeRouteUpdate (to, from, next) {
 			this.getPortalList()
-		}
+			next()
+		},
+		created() {
+			this.pageNo = this.$route.query.pageNo && Number(this.$route.query.pageNo) || 1;
+			this.pageSize = this.$route.query.pageSize && Number(this.$route.query.pageSize) || 10;
+			this.isVerified = this.$route.query.isVerified >= 0 && Number(this.$route.query.isVerified) || 0;
+			this.getPortalList()
+		},
 	}
 </script>
 <style scoped>
