@@ -15,7 +15,7 @@
       style="width: 100%">
       <el-table-column type="index" width="55"></el-table-column>
       <el-table-column prop="partnerName" label="商家名称"></el-table-column>
-      <el-table-column prop="contactName" label="联系人"></el-table-column>
+      <el-table-column prop="name" label="联系人"></el-table-column>
       <el-table-column prop="titleName" label="职务"></el-table-column>
       <el-table-column prop="email" label="邮箱"></el-table-column>
       <el-table-column prop="mobile" label="手机号"></el-table-column>
@@ -112,6 +112,13 @@
 				getPortals(params).then(res => {
 					if(res.data.code === '0001') {
 						this.partnerList = res.data.result.portalList;
+						this.partnerList.forEach(portal => {
+							if(portal.note) {
+								let note = JSON.parse(portal.note);
+								portal.titleName = note.titleName;
+								portal.partnerName = note.partnerName;
+							}
+						})
 						this.total = res.data.result.pageInfo.total;
 					} else {
 						this.$message.error(res.data.message)

@@ -1,8 +1,15 @@
 <template>
-	<section class="user-page">
+	<section>
 		<div v-title :data-title="this.$route.name"></div>
-   	<h2 class="page-header">C端用户列表</h2>
+   	<!-- <h2 class="page-header">商城客户管理</h2> -->
     <!-- 账户列表 -->
+    <el-row class="toolbar">
+			<el-radio-group v-model="registerPlatform" @change="handleChange">
+		    <el-radio-button :label="0">全部</el-radio-button>
+		    <el-radio-button :label="1">PC端</el-radio-button>
+		    <el-radio-button :label="2">移动端</el-radio-button>
+		  </el-radio-group>
+    </el-row>
     <el-table  
       border 
       :data="userList" 
@@ -13,6 +20,7 @@
       <el-table-column prop="id" label="用户ID" sortable></el-table-column>
       <el-table-column prop="username" label="用户名"></el-table-column>
       <el-table-column prop="phone" label="手机号码" width="180"></el-table-column>
+      <el-table-column prop="registerPlatformName" label="注册来源" width="120"></el-table-column>
       <el-table-column label="注册时间" sortable :formatter="formatTime"></el-table-column>
       <!-- <el-table-column prop="status" label="状态">
       	<template scope="scope">
@@ -124,7 +132,7 @@
 	</section>
 </template>
 <script>
-	import { getMyInfo, getCEndUsers, updateUserStatus, updateUserNote } from '@/api'
+	import { getMyInfo, getPartnerCustomers, updateCustomerNote } from '@/api'
 	export default {
 		data() {
 			return {
@@ -139,12 +147,16 @@
 				userNoteVisible: false,
 				noteTitle: '',
 				noteForm: {
-					userId: '',
+					id: '',
 					note: '',
 				},
+				registerPlatform: 0,
 			}
 		},
 		methods: {
+			handleChange() {
+				this.getUserList()
+			},
 			// 获取用户信息
 	    getUserInfo() {
 	      getMyInfo().then(res => {
@@ -172,7 +184,7 @@
 			},
 			handlePageJump() {
 				this.$router.push({
-					path : '/admin/usermanage',
+					path : '/partner/customermanage',
 					query: {
 						pageNo: this.pageNo,
 						pageSize: this.pageSize,
@@ -183,12 +195,13 @@
 				let params = {
 					pageNo: this.pageNo,
 					pageSize: this.pageSize,
+					registerPlatform: this.registerPlatform
 				}
 				this.loading = true;
-				getCEndUsers(params).then(res => {
+				getPartnerCustomers(params).then(res => {
 					this.loading = false
 					if(res.data.code === '0001') {
-						this.userList = res.data.result.userList;
+						this.userList = res.data.result.customerList;
 						this.total = res.data.result.pageInfo.total;
 					} else {
 						this.$message.error(res.data.message)
@@ -204,27 +217,27 @@
       	this.userInfo = Object.assign({}, row);
       	this.userInfoVisible = true;
       },
-			handleStatus(row) {
-				let data = {
-					userId: row.userId,
-					status: row.status
-				}
-				updateUserStatus(data).then(res => {
-					if(res.data.code === '0001') {
-						this.$message.success(res.data.message)
-					} else {
-						row.status = row.status === 0 ? 1 : 0;
-						this.$message.error(res.data.message)
-					}
-				}).catch(err => {
-					console.log(err)
-					row.status = row.status === 0 ? 1 : 0;
-					this.$catchError(err)
-				})
-			},
+			// handleStatus(row) {
+			// 	let data = {
+			// 		userId: row.userId,
+			// 		status: row.status
+			// 	}
+			// 	updateUserStatus(data).then(res => {
+			// 		if(res.data.code === '0001') {
+			// 			this.$message.success(res.data.message)
+			// 		} else {
+			// 			row.status = row.status === 0 ? 1 : 0;
+			// 			this.$message.error(res.data.message)
+			// 		}
+			// 	}).catch(err => {
+			// 		console.log(err)
+			// 		row.status = row.status === 0 ? 1 : 0;
+			// 		this.$catchError(err)
+			// 	})
+			// },
 			// 备注用户信息
 			handleNote(row) {
-				this.noteForm.userId = row.id;
+				this.noteForm.id = row.id;
 				this.noteTitle = `备注 ${row.username} 信息`;
 				this.noteForm.note = row.note;
 				this.userNoteVisible = true;
@@ -233,7 +246,7 @@
 				this.$refs.noteForm.validate(valid => {
 					if(!valid) return;
 					let data = Object.assign({}, this.noteForm)
-					updateUserNote(data).then(res => {
+					updateCustomerNote(data).then(res => {
 						this.userNoteVisible = false;
 						if(res.data.code === '0001') {
 							this.$message.success(res.data.message)
@@ -262,9 +275,6 @@
 	}
 </script>
 <style scoped lang="scss">
-	.user-page {
-		padding: 30px;
-	}
 	.avatar {
 		width: 160px;
 		height: 160px;

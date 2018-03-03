@@ -20,6 +20,7 @@ import PartnerInfo from '@/pages/partner/partnerinfo'
 import PartnerEdit from '@/pages/partner/partneredit'
 import PartnerOrgManage from '@/pages/partner/orgmanage'
 import PartnerTitleManage from '@/pages/partner/titlemanage'
+import PartnerCustomerManage from '@/pages/partner/customermanage'
 
 import DomainPartnerManage from '@/pages/admin/partnermanage'
 import DomainPartnerVerify from '@/pages/admin/partnerverify'
@@ -34,7 +35,9 @@ import AdminRoleManage from '@/pages/system/rolemanage'
 import AdminTemplateManage from '@/pages/system/templatemanage'
 import AdminPartnerTypeManage from '@/pages/system/partnertypemanage'
 import AdminAccountManage from '@/pages/system/accountmanage'
-import AdminUserManage from '@/pages/system/usermanage'
+
+
+import ToolsImgUpload from '@/pages/tools/imageupload'
 
 const routes = [
   {
@@ -114,6 +117,11 @@ const routes = [
         name: '职位管理',
         component: PartnerTitleManage,
       },
+      {
+        path: 'customermanage',
+        name: '商城客户管理',
+        component: PartnerCustomerManage
+      },
     ]
   },
   {
@@ -191,9 +199,16 @@ const routes = [
     component: DomainPartStaffs
   },
   {
-    path: '/admin/usermanage',
-    name: 'C端用户列表',
-    component: AdminUserManage
+    path: '/tools',
+    name: '系统工具',
+    component: Layout,
+    children: [
+      {
+        path: 'imageUpload',
+        name: '图片上传',
+        component: ToolsImgUpload
+      }
+    ]
   },
   {
     path: '*',

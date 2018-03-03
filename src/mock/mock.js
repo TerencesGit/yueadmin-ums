@@ -920,6 +920,58 @@ export default {
 				}, 500)
 			})
 		})
+		// 获取C端用户列表
+		mock.onGet('/partnerInter/getPartnerCustomers.do').reply(config => {
+			let { pageNo, pageSize, registerPlatform } = config.params;
+			// console.log(registerPlatform)
+			let userList = _CEndUserList;
+			let total = userList.length;
+			let userPage = userList.filter((part, index) => 
+					index < pageNo * pageSize && index >= (pageNo - 1) * pageSize);
+			// userPage.forEach(user => {
+	  	//   	user.orgName = _Organizes.filter(org => org.orgId == user.orgId)[0].name;
+	  	//   	_TitleList.filter(title => {
+	  	//   		if(title.id == user.titleId) {
+	  	//   			user.titleName = title.titleName
+	  	//   		}
+	  	//   	})
+	  	//   	_PartnerList.filter(part => {
+	  	//   		if(part.id == user.partnerId) {
+	  	//   			user.partnerName = part.name
+	  	//   		}
+	  	//   	})
+	  	//   })
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					customerList: userPage,
+					pageInfo: {
+						total
+					}
+				}
+			}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 更新用户备注
+		mock.onPost('/partnerInter/updateCustomerNote.do').reply(config => {
+			let { id, note } = JSON.parse(config.data);
+			_CEndUserList.filter(user => {
+				if(user.id == id) {
+					user.note = note;
+				}
+			})
+			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
 		// 获取功能模块列表
 		mock.onGet('/adminInter/getModules.do').reply(config => {
 			let retObj = {
@@ -1457,57 +1509,6 @@ export default {
 					user.isLogin = isLogin
 				}
 			})
-			return new Promise((resolve, reject) => {
-				setTimeout(() => {
-					resolve([200, retObj])
-				}, 500)
-			})
-		})
-		// 获取C端用户列表
-		mock.onGet('/adminInter/getCEndUsers.do').reply(config => {
-			let { pageNo, pageSize } = config.params;
-			let userList = _CEndUserList;
-			let total = userList.length;
-			let userPage = userList.filter((part, index) => 
-					index < pageNo * pageSize && index >= (pageNo - 1) * pageSize);
-			// userPage.forEach(user => {
-	  	//   	user.orgName = _Organizes.filter(org => org.orgId == user.orgId)[0].name;
-	  	//   	_TitleList.filter(title => {
-	  	//   		if(title.id == user.titleId) {
-	  	//   			user.titleName = title.titleName
-	  	//   		}
-	  	//   	})
-	  	//   	_PartnerList.filter(part => {
-	  	//   		if(part.id == user.partnerId) {
-	  	//   			user.partnerName = part.name
-	  	//   		}
-	  	//   	})
-	  	//   })
-			let retObj = {
-				code: '0001',
-				message: '操作成功',
-				result: {
-					userList: userPage,
-					pageInfo: {
-						total
-					}
-				}
-			}
-			return new Promise((resolve, reject) => {
-				setTimeout(() => {
-					resolve([200, retObj])
-				}, 500)
-			})
-		})
-		// 更新用户备注
-		mock.onPost('/adminInter/updateUserNote.do').reply(config => {
-			let { userId, note } = JSON.parse(config.data);
-			_CEndUserList.filter(user => {
-				if(user.id == userId) {
-					user.note = note;
-				}
-			})
-			retObj.result = {}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 					resolve([200, retObj])
