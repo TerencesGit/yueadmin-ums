@@ -37,7 +37,7 @@ import AdminPartnerTypeManage from '@/pages/system/partnertypemanage'
 import AdminAccountManage from '@/pages/system/accountmanage'
 
 
-import ToolsImgUpload from '@/pages/tools/imageupload'
+import ToolsFileUpload from '@/pages/tools/fileupload'
 
 const routes = [
   {
@@ -206,7 +206,7 @@ const routes = [
       {
         path: 'imageUpload',
         name: '图片上传',
-        component: ToolsImgUpload
+        component: ToolsFileUpload
       }
     ]
   },

@@ -4,7 +4,7 @@ import Region from '@/assets/js/region'
 import MockAdapter from 'axios-mock-adapter'
 import { Menus, FileList, UserList, PartnerList, OrganizeList, ModuleList, FunctionList, 
 				TitleList, RoleList, OrgRoles, RoleFuncs, ContractTempList, 
-				PartnerTypeList, TypeRoles, Contracts, PortalList, CEndUserList } from './data/user'
+				PartnerTypeList, TypeRoles, Contracts, PortalList, CEndUserList, PictureList } from './data/user'
 let _Menus = Menus,
 		_FileList = FileList,
 		_UserList = UserList,
@@ -1899,6 +1899,25 @@ export default {
 				}
 			})
 			retObj.result = {}
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve([200, retObj])
+				}, 500)
+			})
+		})
+		// 图片列表
+		mock.onGet('/baseInter/getPicList.do').reply(config => {
+			let { pageNo, pageSize, beginDate, endDate } = config.params;
+			let retObj = {
+				code: '0001',
+				message: '操作成功',
+				result: {
+					pictureList: PictureList,
+					pageInfo: {
+						total: 134
+					}
+				}
+			}
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
 					resolve([200, retObj])
