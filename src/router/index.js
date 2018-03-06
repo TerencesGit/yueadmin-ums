@@ -47,8 +47,8 @@ const routes = [
   {
     path: '/login',
     name: '悦视觉.登录',
-    component: Login
-    // component: CASLogin
+    // component: Login
+    component: CASLogin
   },
   {
     path: '/register',

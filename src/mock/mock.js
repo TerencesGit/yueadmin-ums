@@ -1907,7 +1907,8 @@ export default {
 		})
 		// 图片列表
 		mock.onGet('/baseInter/getPicList.do').reply(config => {
-			let { pageNo, pageSize, beginDate, endDate } = config.params;
+			let { pageNo, pageSize, beginDate, endDate,category } = config.params;
+			// console.log(pageNo, pageSize, beginDate, endDate,category)
 			let retObj = {
 				code: '0001',
 				message: '操作成功',
